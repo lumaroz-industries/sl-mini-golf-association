@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { findNavItem } from "@/config/navigation";
 import { PLATFORMS, deriveHandle } from "@/config/social-platforms";
-import { getActiveSocialLinks, getSiteSettings, getSocialPageContent } from "@/content/repository";
-import { SocialIcon } from "@/components/ui/SocialIcon";
+import { getActiveSocialLinks, getPeople, getSiteSettings, getSocialPageContent } from "@/content/repository";
+import type { ImageAsset, SocialPlatform } from "@/content/schema";
+import { ChannelFeature } from "@/components/social/ChannelFeature";
+import { Orbit } from "@/components/social/Orbit";
+import { ProfileCard } from "@/components/social/ProfileCard";
+import { Spotlight } from "@/components/social/Spotlight";
 import styles from "./page.module.css";
+import social from "@/components/social/Social.module.css";
 
 const item = findNavItem("/social-media");
 
@@ -14,65 +18,122 @@ export const metadata: Metadata = {
   alternates: { canonical: "/social-media" },
 };
 
+type Card =
+  | {
+      kind: "profile";
+      id: string;
+      span: "normal" | "wide";
+      platform: SocialPlatform;
+      url: string;
+      name: string;
+      handle?: string;
+      tags: string[];
+      detail?: string;
+      portrait?: ImageAsset;
+      brand?: boolean;
+    }
+  | {
+      kind: "channel";
+      id: string;
+      span: "full";
+      url: string;
+      name: string;
+      handle?: string;
+      owner?: { name: string; portrait?: ImageAsset };
+      description?: string;
+    };
+
+const TYPE_TAG = { organisation: "Organisation", person: "Person", channel: "Channel" } as const;
+
 export default async function SocialMediaPage() {
-  const [content, links, site] = await Promise.all([getSocialPageContent(), getActiveSocialLinks(), getSiteSettings()]);
+  const [content, site, official, people] = await Promise.all([getSocialPageContent(), getSiteSettings(), getActiveSocialLinks(), getPeople()]);
+  const person = (id?: string) => {
+    if (!id) return undefined;
+    const p = people.find((x) => x.id === id);
+    if (!p) throw new Error(`Social account references unknown person "${id}"`);
+    return p;
+  };
+
+  // The association's own accounts lead the grid, then everything else in content order.
+  const cards: Card[] = [
+    ...official.map<Card>((link) => ({
+      kind: "profile",
+      id: `official-${link.platform}`,
+      span: "wide",
+      platform: link.platform,
+      url: link.url,
+      name: site.name,
+      handle: link.handle ?? deriveHandle(link.platform, link.url),
+      tags: ["Official"],
+      detail: link.description,
+      brand: true,
+    })),
+    ...content.accounts.map<Card>((a) => {
+      const p = person(a.personId);
+      const name = a.name ?? p!.name;
+      const handle = a.handle ?? deriveHandle(a.platform, a.url);
+      if (a.type === "channel" && a.platform === "youtube") {
+        return { kind: "channel", id: a.id, span: "full", url: a.url, name, handle, owner: p && { name: p.name, portrait: p.portrait }, description: a.description };
+      }
+      return {
+        kind: "profile",
+        id: a.id,
+        span: a.featured ? "wide" : "normal",
+        platform: a.platform,
+        url: a.url,
+        name,
+        handle,
+        tags: [a.type === "person" && p ? p.role : TYPE_TAG[a.type], a.label].filter((t): t is string => Boolean(t)),
+        detail: a.description,
+        portrait: a.type === "person" ? p?.portrait : undefined,
+      };
+    }),
+  ];
+
+  const platforms = [...new Set(cards.map((c) => (c.kind === "channel" ? "youtube" : c.platform)))].map((p) => PLATFORMS[p].label);
+  const orbitMembers = cards.map((c) => ({ id: c.id, name: c.name, portrait: c.kind === "profile" ? c.portrait : undefined }));
 
   return (
-    <section className={styles.page} aria-labelledby="social-title">
+    <div className={styles.page}>
       <div className={styles.glow} aria-hidden="true" />
-      <div className={`container ${styles.inner}`}>
-        <header className={styles.header}>
+
+      <section className={`container ${styles.hero}`} aria-labelledby="social-title">
+        <div className={styles.heroText}>
           <span className="kicker">{content.kicker}</span>
           <h1 id="social-title" className={styles.title}>
             {content.heading}
           </h1>
           <p className={styles.intro}>{content.intro}</p>
-        </header>
+          {cards.length > 0 && (
+            <p className={styles.stats}>
+              <span className={styles.stat}>
+                <b>{cards.length}</b> {cards.length === 1 ? "account" : "accounts"}
+              </span>
+              <span className={styles.stat}>{platforms.join(" · ")}</span>
+            </p>
+          )}
+        </div>
+        <Orbit members={orbitMembers} />
+      </section>
 
-        {links.length > 0 ? (
-          <ul className={styles.grid} data-count={links.length}>
-            {links.map((link, i) => {
-              const info = PLATFORMS[link.platform];
-              const handle = link.handle ?? deriveHandle(link.platform, link.url);
-              return (
-                <li key={link.platform} className={styles.item} style={{ "--i": i } as React.CSSProperties}>
-                  <a className={styles.card} href={link.url} target="_blank" rel="noopener noreferrer" data-platform={link.platform}>
-                    <span className={styles.top}>
-                      <span className={styles.icon}>
-                        <SocialIcon platform={link.platform} size={30} />
-                      </span>
-                      <span className={styles.index} aria-hidden="true">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                    </span>
-                    <span className={styles.body}>
-                      <span className={styles.platform}>{info.label}</span>
-                      {handle && <span className={styles.handle}>{handle}</span>}
-                      {link.description && <span className={styles.description}>{link.description}</span>}
-                    </span>
-                    <span className={styles.cta}>
-                      {info.action} on {info.label}
-                      <span className={styles.arrow} aria-hidden="true">
-                        ↗
-                      </span>
-                      <span className="visually-hidden"> (opens in a new tab)</span>
-                    </span>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
+      <div className={`container ${styles.cards}`}>
+        {cards.length > 0 ? (
+          <Spotlight className={social.bento}>
+            {cards.map((c, i) => (
+              <li key={c.id} className={social.cell} data-span={c.span} style={{ "--i": i } as React.CSSProperties}>
+                {c.kind === "channel" ? (
+                  <ChannelFeature url={c.url} name={c.name} handle={c.handle} owner={c.owner} description={c.description} />
+                ) : (
+                  <ProfileCard {...c} wide={c.span === "wide"} />
+                )}
+              </li>
+            ))}
+          </Spotlight>
         ) : (
-          <div className={styles.empty}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/slmga-icon-dark.svg" alt="" width={96} height={32} className={styles.emptyMark} />
-            <p className={styles.emptyText}>{content.emptyState}</p>
-            <Link href="/contact" className={styles.emptyLink}>
-              Contact {site.name} <span aria-hidden="true">→</span>
-            </Link>
-          </div>
+          <p className={styles.empty}>{content.emptyState}</p>
         )}
+        <p className={styles.note}>{content.note}</p>
       </div>
-    </section>
+    </div>
   );
 }

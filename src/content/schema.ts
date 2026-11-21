@@ -154,11 +154,57 @@ export const ContactContent = z.object({
 });
 export type ContactContent = z.infer<typeof ContactContent>;
 
+/** What kind of account a social card represents (drives its tag and layout). */
+export const socialAccountTypes = ["organisation", "person", "channel"] as const;
+export const SocialAccountType = z.enum(socialAccountTypes);
+export type SocialAccountType = z.infer<typeof SocialAccountType>;
+
+/**
+ * An account listed on the social media page (other organisations, people,
+ * channels). The association's OWN channels live in site settings instead,
+ * so the footer, menu and structured data only ever show official profiles.
+ * Cards appear in the order listed here.
+ */
+export const SocialAccount = z
+  .object({
+    id: z.string().min(1),
+    type: SocialAccountType,
+    platform: SocialPlatform,
+    url: z.url(),
+    /** Display name. Optional when `personId` is set (the person's name is used). */
+    name: optionalText,
+    /** Links the account to an entry in people.json (name, role, portrait). */
+    personId: optionalText,
+    /** Display handle; derived from the URL when empty. */
+    handle: optionalText,
+    /** Short tag, e.g. a city or "India". */
+    label: optionalText,
+    description: optionalText,
+    /** Shown as a wider card. */
+    featured: z.boolean().optional().default(false),
+  })
+  .superRefine((acc, ctx) => {
+    if (!urlMatchesPlatform(acc.platform, acc.url)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["url"],
+        message: `"${acc.id}": the ${PLATFORMS[acc.platform].label} link must be an https:// address on ${PLATFORMS[acc.platform].hosts.join(" or ")}.`,
+      });
+    }
+    if (!acc.name && !acc.personId) {
+      ctx.addIssue({ code: "custom", path: ["name"], message: `"${acc.id}": set a name or a personId.` });
+    }
+  });
+export type SocialAccount = z.infer<typeof SocialAccount>;
+
 export const SocialPageContent = z.object({
   kicker: z.string().min(1),
   heading: z.string().min(1),
   intro: z.string().min(1),
-  /** Shown while no official channel has been published yet. */
+  accounts: z.array(SocialAccount),
+  /** Shown if there are no accounts at all. */
   emptyState: z.string().min(1),
+  /** Small print under the cards. */
+  note: z.string().min(1),
 });
 export type SocialPageContent = z.infer<typeof SocialPageContent>;

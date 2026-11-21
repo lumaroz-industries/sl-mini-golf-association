@@ -1,6 +1,56 @@
 {
   "kicker": "Social Media",
   "heading": "Follow the journey",
-  "intro": "Follow SL Mini Golf Association across platforms for updates, stories and moments from India's mini-golf community.",
-  "emptyState": "Our official social media channels will be listed here soon."
+  "intro": "SL Mini Golf Association and the wider mini-golf community across India, in one place. Follow the organisations, the people and the stories shaping the sport.",
+  "accounts": [
+    {
+      "id": "minigolf-federation-of-india",
+      "type": "organisation",
+      "platform": "instagram",
+      "url": "https://www.instagram.com/minigolf_federation_of_india/",
+      "name": "Minigolf Federation of India",
+      "label": "India",
+      "featured": true
+    },
+    {
+      "id": "pune-minigolf-association",
+      "type": "organisation",
+      "platform": "instagram",
+      "url": "https://www.instagram.com/pune_minigolf_association/",
+      "name": "Pune Minigolf Association",
+      "label": "Pune"
+    },
+    {
+      "id": "nagpur-minigolf-association",
+      "type": "organisation",
+      "platform": "instagram",
+      "url": "https://www.instagram.com/nagpur_minigolf_association/",
+      "name": "Nagpur Minigolf Association",
+      "label": "Nagpur"
+    },
+    {
+      "id": "suyash-lahane-instagram",
+      "type": "person",
+      "platform": "instagram",
+      "url": "https://www.instagram.com/suyashx01/",
+      "personId": "suyash-lahane"
+    },
+    {
+      "id": "chaitanya-payghan-instagram",
+      "type": "person",
+      "platform": "instagram",
+      "url": "https://www.instagram.com/chaitux2859/",
+      "personId": "chaitanya-payghan"
+    },
+    {
+      "id": "the-mini-golf-journey",
+      "type": "channel",
+      "platform": "youtube",
+      "url": "https://www.youtube.com/@TheMiniGolfJourney",
+      "name": "The Mini Golf Journey",
+      "personId": "suyash-lahane"
+    }
+  ],
+  "emptyState": "Social media accounts will be listed here soon.",
+  "note": "Accounts listed here are run by their respective owners. Links open on Instagram and YouTube."
 }

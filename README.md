@@ -73,7 +73,7 @@ intentionally **not** part of the content model.
 | Platform description, tagline, SEO | `src/content/sources/local/site.json` |
 | Official email | `site.json` → `contact.email` (hidden while empty) |
 | Social links | `site.json` → `social[]`: `url` (platform hidden while empty), optional `handle` and `description` |
-| Social media page copy | `src/content/sources/local/social.json` |
+| Social media page copy and listed accounts | `src/content/sources/local/social.json` |
 | People & portraits | `src/content/sources/local/people.json` + image in `public/people/` |
 
 To add Suyash's portrait: put the image in `public/people/` and add a
@@ -95,17 +95,22 @@ To add Suyash's portrait: put the image in `public/people/` and add a
 
 ## Social media page
 
-`/social-media` shows one card per platform that has an official URL in
-`site.json` (Instagram, YouTube, Facebook, LinkedIn, WhatsApp); platforms
-without a URL stay hidden everywhere (page, footer, menu). Until at least one
-is set, the page shows a short "coming soon" note linking to Contact.
+`/social-media` is one grid of cards (no sections):
 
-- URLs are checked at build time: each must be `https://` on that platform's
-  own domain, otherwise the build stops with a clear message.
-- The handle is shown from `handle`, or derived from the URL when possible
-  (e.g. `instagram.com/name` → `@name`).
-- The official profiles are also published to search engines as
-  Organization structured data (`sameAs`).
+1. The association's **own** channels (`site.json` → `social[]`) lead the
+   grid as featured "Official" cards — hidden until their URLs are set. Only
+   these appear in the footer, menu and search-engine structured data.
+2. Then every entry in `src/content/sources/local/social.json` → `accounts`,
+   in the order listed: other organisations, people and channels.
+
+Each account has `type` (`organisation` | `person` | `channel`), `platform`,
+`url`, and either a `name` or a `personId` (links to `people.json` for the
+name, role and portrait). Optional: `handle` (otherwise derived from the URL),
+`label` (e.g. a city), `description`, `featured` (wider card). YouTube
+channels render as a full-width feature.
+
+URLs are checked at build time: each must be `https://` on that platform's
+own domain, otherwise the build stops with a clear message.
 
 ## Contact page
 
