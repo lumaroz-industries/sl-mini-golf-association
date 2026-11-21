@@ -9,8 +9,9 @@
 import "server-only";
 import { cache } from "react";
 import { z } from "zod";
-import { ArticleCategory, ArticlesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
+import { ArticleCategory, ArticlesPageContent, UpdatesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
 import { loadArticles, type RawArticle } from "./articles";
+import { loadUpdates, type RawUpdate } from "./updates";
 import siteJson from "./sources/local/site.json";
 import homeJson from "./sources/local/home.json";
 import peopleJson from "./sources/local/people.json";
@@ -18,6 +19,7 @@ import contactJson from "./sources/local/contact.json";
 import socialJson from "./sources/local/social.json";
 import articlesPageJson from "./sources/local/articles.json";
 import articleCategoriesJson from "./sources/local/article-categories.json";
+import updatesPageJson from "./sources/local/updates.json";
 
 interface ContentSource {
   site(): Promise<unknown>;
@@ -28,6 +30,8 @@ interface ContentSource {
   articlesPage(): Promise<unknown>;
   articleCategories(): Promise<unknown>;
   articles(): Promise<RawArticle[]>;
+  updatesPage(): Promise<unknown>;
+  updates(): Promise<RawUpdate[]>;
 }
 
 const localSource: ContentSource = {
@@ -39,6 +43,8 @@ const localSource: ContentSource = {
   articlesPage: async () => articlesPageJson,
   articleCategories: async () => articleCategoriesJson,
   articles: loadArticles,
+  updatesPage: async () => updatesPageJson,
+  updates: loadUpdates,
 };
 
 const source: ContentSource = localSource;
@@ -136,5 +142,48 @@ export async function getRelatedArticles(article: Article, limit = 3): Promise<A
   const others = (await getArticles()).filter((a) => a.slug !== article.slug);
   const same = others.filter((a) => a.category.id === article.category.id);
   return [...same, ...others.filter((a) => a.category.id !== article.category.id)].slice(0, limit);
+}
+
+/* ----------------------------------------------------------------- updates */
+
+export const getUpdatesPageContent = cache(async (): Promise<UpdatesPageContent> =>
+  parse(UpdatesPageContent, await source.updatesPage(), "updates page"),
+);
+
+export interface Update extends Omit<RawUpdate, "article"> {
+  /** Plain-text summary for previews and the feed. */
+  summaryText: string;
+  article?: Article;
+}
+
+function plainSummary(markdown: string): string {
+  const para = markdown
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .find((p) => p && !p.startsWith("#") && !p.startsWith("!") && !/^https?:\/\/\S+$/.test(p));
+  const text = (para ?? "")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/[*_`>#]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.length > 200 ? `${text.slice(0, 197).replace(/\s+\S*$/, "")}…` : text;
+}
+
+/** Published updates, newest first, with linked articles resolved. */
+export const getUpdates = cache(async (): Promise<Update[]> => {
+  const [raw, articles] = await Promise.all([source.updates(), getArticles()]);
+  return raw.map((u) => {
+    let article: Article | undefined;
+    if (u.article) {
+      article = articles.find((a) => a.slug === u.article);
+      if (!article) throw new Error(`Update "${u.slug}": linked article "${u.article}" is not a published article.`);
+    }
+    return { ...u, article, summaryText: u.summary ?? plainSummary(u.body) };
+  });
+});
+
+export async function getUpdate(slug: string): Promise<Update | undefined> {
+  return (await getUpdates()).find((u) => u.slug === slug);
 }
 

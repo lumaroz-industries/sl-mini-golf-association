@@ -13,6 +13,7 @@ import { Toc } from "@/components/articles/Toc";
 import { Avatar } from "@/components/social/Avatar";
 import a from "@/components/articles/Articles.module.css";
 import styles from "./page.module.css";
+import prose from "@/styles/prose.module.css";
 
 interface Params {
   params: Promise<{ slug: string }>;
@@ -129,7 +130,7 @@ export default async function ArticlePage({ params }: Params) {
               <Toc items={toc} />
             </aside>
           )}
-          <div id="article-body" className={styles.prose}>
+          <div id="article-body" className={prose.prose}>
             {content}
           </div>
         </div>

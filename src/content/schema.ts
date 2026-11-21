@@ -255,3 +255,56 @@ export const ArticlesPageContent = z.object({
 });
 export type ArticlesPageContent = z.infer<typeof ArticlesPageContent>;
 
+/* ----------------------------------------------------------------- updates */
+
+export const updateTypes = ["announcement", "tournament", "result", "community", "platform"] as const;
+export const UpdateType = z.enum(updateTypes);
+export type UpdateType = z.infer<typeof UpdateType>;
+
+const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use 24-hour time, e.g. 09:30 or 18:00.");
+/** https:// link or a path on this site (e.g. /contact). */
+const linkTarget = z.string().refine((v) => v.startsWith("/") || /^https:\/\//.test(v), "Use an https:// link or a path on this site starting with /.");
+
+/** Optional event details: turns an update into an event card (dates in India time). */
+export const UpdateEvent = z
+  .object({
+    startDate: isoDate,
+    endDate: isoDate.optional(),
+    startTime: hhmm.optional(),
+    endTime: hhmm.optional(),
+    city: z.string().min(1),
+    venue: optionalText,
+    registrationUrl: z.string().regex(/^https:\/\//, "Use an https:// link.").optional(),
+  })
+  .refine((e) => !e.endDate || e.endDate >= e.startDate, { message: "endDate must be on or after startDate.", path: ["endDate"] });
+export type UpdateEvent = z.infer<typeof UpdateEvent>;
+
+export const UpdateFrontmatter = z.object({
+  title: z.string().min(1).max(140),
+  slug,
+  type: UpdateType,
+  publishedAt: isoDate,
+  /** Optional short summary for link previews and the RSS feed; otherwise taken from the text. */
+  summary: z.string().max(300).optional(),
+  image: ImageAsset.extend({ credit: optionalText }).optional(),
+  /** A button, e.g. { label: "See the post", url: "https://instagram.com/..." }. */
+  action: z.object({ label: z.string().min(1).max(40), url: linkTarget }).optional(),
+  /** Slug of a related article. */
+  article: slug.optional(),
+  event: UpdateEvent.optional(),
+  pinned: z.boolean().default(false),
+  draft: z.boolean().default(false),
+});
+export type UpdateFrontmatter = z.infer<typeof UpdateFrontmatter>;
+
+export const UpdatesPageContent = z.object({
+  kicker: z.string().min(1),
+  heading: z.string().min(1),
+  intro: z.string().min(1),
+  emptyHeading: z.string().min(1),
+  emptyBody: z.string().min(1),
+  allLabel: z.string().min(1),
+  typeLabels: z.record(UpdateType, z.string().min(1)),
+});
+export type UpdatesPageContent = z.infer<typeof UpdatesPageContent>;
+

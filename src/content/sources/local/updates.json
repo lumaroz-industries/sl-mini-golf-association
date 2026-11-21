@@ -1,0 +1,15 @@
+{
+  "kicker": "Updates",
+  "heading": "Latest from the green",
+  "intro": "Announcements, tournaments, results and news from SL Mini Golf Association and the mini-golf community.",
+  "emptyHeading": "Updates will appear here",
+  "emptyBody": "News and announcements from SL Mini Golf Association will be posted here.",
+  "allLabel": "All",
+  "typeLabels": {
+    "announcement": "Announcement",
+    "tournament": "Tournament",
+    "result": "Result",
+    "community": "Community",
+    "platform": "Platform"
+  }
+}

@@ -75,6 +75,7 @@ intentionally **not** part of the content model.
 | Social links | `site.json` → `social[]`: `url` (platform hidden while empty), optional `handle` and `description` |
 | Social media page copy and listed accounts | `src/content/sources/local/social.json` |
 | Articles | `src/content/sources/local/articles/*.md` (see the template) |
+| Updates | `src/content/sources/local/updates/*.md` (see the template); page copy and type labels in `updates.json` |
 | Articles page copy, categories | `articles.json`, `article-categories.json` |
 | People & portraits | `src/content/sources/local/people.json` + image in `public/people/` |
 
@@ -117,6 +118,28 @@ and set `draft: false` to publish.
   `SHOW_DRAFTS=1 npm run dev` (never set this on Vercel).
 - In the future admin dashboard these files become a database table and the
   body a rich-text editor that saves the same Markdown.
+
+## Updates
+
+`/updates` is a timeline of short news, newest first: pinned updates on top,
+month markers, type filters (kept in the URL), a "New" badge for the last
+7 days, and a ball rolling down the putting line as you scroll. Each update
+also has its own page (`/updates/<slug>`) with share links and a generated
+link preview. Followers can subscribe to the RSS feed at `/updates/feed.xml`.
+
+**Posting an update:** copy
+`src/content/sources/local/updates/update-template.md` — it explains every
+option. Types: announcement, tournament, result, community, platform.
+
+- Add an `event` block (date, optional times in India time, city, venue,
+  registration link) to turn an update into an event card: date badge, live
+  "In 12 days / Today / On now / Completed" status (worked out in the
+  visitor's browser, so it never goes stale), Register button and
+  Add to calendar (Google, Outlook.com, Apple/.ics). Events are also marked
+  up for Google as sports events.
+- Optional: `pinned`, `image`, an `action` button, and `article` (slug of a
+  published article to link to).
+- Drafts and validation work exactly like articles.
 
 ## Social media page
 
