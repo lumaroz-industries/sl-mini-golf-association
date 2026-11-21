@@ -9,12 +9,15 @@
 import "server-only";
 import { cache } from "react";
 import { z } from "zod";
-import { ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type SocialLink } from "./schema";
+import { ArticleCategory, ArticlesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
+import { loadArticles, type RawArticle } from "./articles";
 import siteJson from "./sources/local/site.json";
 import homeJson from "./sources/local/home.json";
 import peopleJson from "./sources/local/people.json";
 import contactJson from "./sources/local/contact.json";
 import socialJson from "./sources/local/social.json";
+import articlesPageJson from "./sources/local/articles.json";
+import articleCategoriesJson from "./sources/local/article-categories.json";
 
 interface ContentSource {
   site(): Promise<unknown>;
@@ -22,6 +25,9 @@ interface ContentSource {
   people(): Promise<unknown>;
   contact(): Promise<unknown>;
   socialPage(): Promise<unknown>;
+  articlesPage(): Promise<unknown>;
+  articleCategories(): Promise<unknown>;
+  articles(): Promise<RawArticle[]>;
 }
 
 const localSource: ContentSource = {
@@ -30,6 +36,9 @@ const localSource: ContentSource = {
   people: async () => peopleJson,
   contact: async () => contactJson,
   socialPage: async () => socialJson,
+  articlesPage: async () => articlesPageJson,
+  articleCategories: async () => articleCategoriesJson,
+  articles: loadArticles,
 };
 
 const source: ContentSource = localSource;
@@ -76,3 +85,56 @@ export async function getActiveSocialLinks(): Promise<Array<SocialLink & { url: 
   const { social } = await getSiteSettings();
   return social.filter((s): s is SocialLink & { url: string } => Boolean(s.url));
 }
+
+/* ---------------------------------------------------------------- articles */
+
+export const getArticlesPageContent = cache(async (): Promise<ArticlesPageContent> =>
+  parse(ArticlesPageContent, await source.articlesPage(), "articles page"),
+);
+
+export const getArticleCategories = cache(async (): Promise<ArticleCategory[]> =>
+  parse(z.array(ArticleCategory), await source.articleCategories(), "article categories"),
+);
+
+export interface ArticleAuthorView {
+  name: string;
+  role?: string;
+  bio?: string;
+  photo?: ImageAsset;
+}
+
+export interface Article extends Omit<RawArticle, "category" | "author"> {
+  category: ArticleCategory;
+  author: ArticleAuthorView;
+}
+
+/** Published articles, newest first, with category and author resolved. */
+export const getArticles = cache(async (): Promise<Article[]> => {
+  const [raw, categories, people] = await Promise.all([source.articles(), getArticleCategories(), getPeople()]);
+  return raw.map((a) => {
+    const category = categories.find((c) => c.id === a.category);
+    if (!category) throw new Error(`Article "${a.slug}": unknown category "${a.category}". Use one of: ${categories.map((c) => c.id).join(", ")}.`);
+    let author: ArticleAuthorView;
+    if ("personId" in a.author) {
+      const id = a.author.personId;
+      const p = people.find((x) => x.id === id);
+      if (!p) throw new Error(`Article "${a.slug}": unknown author personId "${id}".`);
+      author = { name: p.name, role: p.role, photo: p.portrait };
+    } else {
+      author = { name: a.author.name, bio: a.author.bio, photo: a.author.photo };
+    }
+    return { ...a, category, author };
+  });
+});
+
+export async function getArticle(slug: string): Promise<Article | undefined> {
+  return (await getArticles()).find((a) => a.slug === slug);
+}
+
+/** Same-category articles first, then the most recent others. */
+export async function getRelatedArticles(article: Article, limit = 3): Promise<Article[]> {
+  const others = (await getArticles()).filter((a) => a.slug !== article.slug);
+  const same = others.filter((a) => a.category.id === article.category.id);
+  return [...same, ...others.filter((a) => a.category.id !== article.category.id)].slice(0, limit);
+}
+

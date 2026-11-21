@@ -16,7 +16,7 @@ export interface NavItem {
 export const navigation: NavItem[] = [
   { label: "Home", href: "/", status: "live", summary: "SL Mini Golf Association" },
   { label: "Players", href: "/players", status: "coming-soon", summary: "Profiles of the players shaping Indian mini golf." },
-  { label: "Articles", href: "/articles", status: "coming-soon", summary: "Stories, journeys and features from the mini-golf community." },
+  { label: "Articles", href: "/articles", status: "live", summary: "Stories, journeys and features from the mini-golf community." },
   { label: "Updates", href: "/updates", status: "coming-soon", summary: "News and announcements from the platform." },
   { label: "Gallery", href: "/gallery", status: "coming-soon", summary: "Moments from courses, competitions and the community." },
   { label: "Social Media", href: "/social-media", status: "live", summary: "Follow SL Mini Golf Association across platforms." },

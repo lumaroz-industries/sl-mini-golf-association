@@ -1,0 +1,455 @@
+/* ================================================================ hero */
+.hero {
+  position: relative;
+  display: grid;
+  align-items: end;
+  min-height: min(86svh, 860px);
+  padding: calc(var(--nav-h) + 80px) 0 clamp(40px, 6vw, 72px);
+  overflow: clip;
+  isolation: isolate;
+}
+
+.heroMedia {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.heroMedia > * {
+  width: 100%;
+  height: 100%;
+}
+
+.heroShade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgb(5 8 7 / 0.55) 0%, rgb(5 8 7 / 0.15) 35%, rgb(5 8 7 / 0.82) 75%, var(--bg) 100%),
+    linear-gradient(90deg, rgb(5 8 7 / 0.6), transparent 70%);
+}
+
+.heroInner {
+  display: grid;
+  gap: 20px;
+  justify-items: start;
+}
+
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.crumbs > a:first-child:hover {
+  color: var(--fg);
+}
+
+.title {
+  max-width: 20ch;
+  font-size: clamp(2.25rem, 1.2rem + 4.2vw, 5.5rem);
+  line-height: 0.98;
+  text-wrap: balance;
+  text-shadow: 0 2px 30px rgb(0 0 0 / 0.5);
+}
+
+.excerpt {
+  max-width: 56ch;
+  font-size: var(--fs-md);
+  color: rgb(255 255 255 / 0.82);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-top: 6px;
+}
+
+.metaAuthor {
+  display: grid;
+  line-height: 1.3;
+}
+
+.metaAuthor b {
+  font-weight: 700;
+}
+
+.metaAuthor span {
+  font-size: var(--fs-xs);
+  color: var(--fg-muted);
+}
+
+.metaFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-left: 16px;
+  border-left: 1px solid var(--line);
+  font-size: var(--fs-sm);
+  color: var(--fg-muted);
+}
+
+@media (max-width: 640px) {
+  .metaFacts {
+    flex-basis: 100%;
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+.credit {
+  position: absolute;
+  right: var(--gutter);
+  bottom: 14px;
+  font-size: 0.6875rem;
+  color: var(--fg-subtle);
+}
+
+/* ============================================================== layout */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  padding-top: clamp(24px, 4vw, 48px);
+}
+
+.layout[data-toc] {
+  grid-template-columns: 260px minmax(0, 1fr) 260px;
+  align-items: start;
+  gap: 48px;
+}
+
+.aside {
+  position: sticky;
+  top: calc(var(--nav-h) + 40px);
+  width: 100%;
+}
+
+@media (max-width: 1180px) {
+  .layout[data-toc] {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .aside {
+    position: static;
+    max-width: 68ch;
+  }
+}
+
+/* =============================================================== prose */
+.prose {
+  width: 100%;
+  max-width: 68ch;
+  font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  line-height: 1.75;
+  color: rgb(255 255 255 / 0.86);
+}
+
+.prose > :global(*:first-child) {
+  margin-top: 0;
+}
+
+.prose :global(p) {
+  margin: 0 0 1.25em;
+}
+
+/* Opening paragraph reads a touch larger. */
+.prose > :global(p:first-of-type) {
+  font-size: 1.12em;
+  color: var(--fg);
+}
+
+.prose :global(h2),
+.prose :global(h3) {
+  scroll-margin-top: calc(var(--nav-h) + 48px);
+  color: var(--fg);
+}
+
+.prose :global(h2) {
+  margin: 2.2em 0 0.7em;
+  font-size: clamp(1.6rem, 1.2rem + 1.3vw, 2.25rem);
+  text-transform: uppercase;
+}
+
+.prose :global(h3) {
+  margin: 1.8em 0 0.6em;
+  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+}
+
+.prose :global(a) {
+  color: var(--fg);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  transition: color var(--dur-fast);
+}
+
+.prose :global(a:hover) {
+  color: var(--c-emerald-bright);
+}
+
+.prose :global(strong) {
+  color: var(--fg);
+}
+
+.prose :global(ul),
+.prose :global(ol) {
+  margin: 0 0 1.4em;
+  padding-left: 1.3em;
+}
+
+.prose :global(li) {
+  margin: 0.4em 0;
+}
+
+.prose :global(li::marker) {
+  color: var(--accent);
+}
+
+/* Pull quotes */
+.prose :global(blockquote) {
+  margin: 2em 0;
+  padding: 0.2em 0 0.2em 1.2em;
+  border-left: 3px solid var(--accent);
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 1.1rem + 1vw, 1.9rem);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--fg);
+}
+
+.prose :global(blockquote p) {
+  margin: 0 0 0.5em;
+}
+
+.prose :global(blockquote p:last-child) {
+  margin: 0;
+}
+
+.prose :global(hr) {
+  margin: 3em auto;
+  width: 80px;
+  height: 1px;
+  border: 0;
+  background: var(--accent);
+}
+
+.prose :global(code) {
+  padding: 0.15em 0.4em;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.07);
+  font-size: 0.88em;
+}
+
+.prose :global(pre) {
+  margin: 0 0 1.5em;
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  background: #020403;
+  border: 1px solid var(--line);
+  overflow-x: auto;
+}
+
+.prose :global(pre code) {
+  padding: 0;
+  background: none;
+}
+
+/* Figures and galleries */
+.prose :global(figure) {
+  margin: 2.2em 0;
+}
+
+.prose :global(figure img) {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+}
+
+.prose :global(figcaption) {
+  display: block;
+  margin-top: 10px;
+  font-size: var(--fs-sm);
+  font-style: normal;
+  color: var(--fg-subtle);
+}
+
+.prose :global(figure[data-gallery]) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.prose :global(figure[data-gallery][data-count="3"] img:first-child) {
+  grid-column: 1 / -1;
+}
+
+.prose :global(figure[data-gallery] img) {
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4 / 3;
+}
+
+@media (min-width: 900px) {
+  /* Single figures break out of the text column a little. */
+  .prose :global(figure:not([data-gallery])) {
+    margin-inline: -6%;
+  }
+}
+
+.prose :global(.table-wrap) {
+  margin: 0 0 1.6em;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.prose :global(table) {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+
+.prose :global(th),
+.prose :global(td) {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.prose :global(th) {
+  color: var(--accent);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.prose :global(tr:last-child td) {
+  border-bottom: 0;
+}
+
+/* ============================================================== footer */
+.footer {
+  display: grid;
+  gap: 32px;
+  max-width: calc(68ch + 2 * var(--gutter));
+  margin-top: clamp(32px, 5vw, 56px);
+}
+
+.footRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-sm);
+  color: var(--fg-muted);
+}
+
+.authorCard {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+}
+
+.authorLabel {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.authorName {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.authorBio {
+  margin-top: 4px;
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+}
+
+.pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .pager {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pagerLink {
+  display: grid;
+  gap: 6px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: border-color var(--dur-fast), background var(--dur-fast);
+}
+
+.pagerLink span {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.pagerLink b {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.pagerLink:hover {
+  border-color: var(--line-accent);
+  background: rgb(0 168 107 / 0.05);
+}
+
+.pagerNext {
+  text-align: right;
+}
+
+.related {
+  display: grid;
+  gap: 28px;
+  padding-block: var(--section-y);
+}
+
+.relatedTitle {
+  font-size: var(--fs-2xl);
+  text-transform: uppercase;
+}

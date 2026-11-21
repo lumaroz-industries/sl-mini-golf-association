@@ -208,3 +208,50 @@ export const SocialPageContent = z.object({
   note: z.string().min(1),
 });
 export type SocialPageContent = z.infer<typeof SocialPageContent>;
+
+/* ---------------------------------------------------------------- articles */
+
+const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers and hyphens, e.g. my-first-article.");
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use the format YYYY-MM-DD.");
+
+export const ArticleCategory = z.object({
+  id: slug,
+  label: z.string().min(1),
+  description: z.string().min(1),
+});
+export type ArticleCategory = z.infer<typeof ArticleCategory>;
+
+/** Either someone from people.json, or a guest writer. */
+export const ArticleAuthor = z.union([
+  z.object({ personId: z.string().min(1) }),
+  z.object({ name: z.string().min(1), bio: optionalText, photo: ImageAsset.optional() }),
+]);
+export type ArticleAuthor = z.infer<typeof ArticleAuthor>;
+
+/** The details block at the top of each article's Markdown file. */
+export const ArticleFrontmatter = z.object({
+  title: z.string().min(1).max(140),
+  slug,
+  excerpt: z.string().min(1).max(320),
+  category: slug,
+  author: ArticleAuthor,
+  publishedAt: isoDate,
+  updatedAt: isoDate.optional(),
+  cover: ImageAsset.extend({ credit: optionalText }).optional(),
+  tags: z.array(z.string().min(1)).default([]),
+  featured: z.boolean().default(false),
+  /** Drafts never appear on the live site. */
+  draft: z.boolean().default(false),
+});
+export type ArticleFrontmatter = z.infer<typeof ArticleFrontmatter>;
+
+export const ArticlesPageContent = z.object({
+  kicker: z.string().min(1),
+  heading: z.string().min(1),
+  intro: z.string().min(1),
+  emptyHeading: z.string().min(1),
+  emptyBody: z.string().min(1),
+  allLabel: z.string().min(1),
+});
+export type ArticlesPageContent = z.infer<typeof ArticlesPageContent>;
+

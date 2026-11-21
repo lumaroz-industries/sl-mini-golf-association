@@ -74,6 +74,8 @@ intentionally **not** part of the content model.
 | Official email | `site.json` → `contact.email` (hidden while empty) |
 | Social links | `site.json` → `social[]`: `url` (platform hidden while empty), optional `handle` and `description` |
 | Social media page copy and listed accounts | `src/content/sources/local/social.json` |
+| Articles | `src/content/sources/local/articles/*.md` (see the template) |
+| Articles page copy, categories | `articles.json`, `article-categories.json` |
 | People & portraits | `src/content/sources/local/people.json` + image in `public/people/` |
 
 To add Suyash's portrait: put the image in `public/people/` and add a
@@ -92,6 +94,29 @@ To add Suyash's portrait: put the image in `public/people/` and add a
 - Text overlay timings live in `src/experience/timeline/chapters.ts`.
 - Fallbacks: without WebGL2 or JavaScript the same content renders as stacked
   sections. With reduced motion, the 3D view cuts between held stills.
+
+## Articles
+
+`/articles` lists published articles (a featured lead, then a filterable
+grid); `/articles/<slug>` is the reading page with contents list, reading
+progress, tap-to-load embeds, share links, related articles, structured data
+and an auto-generated link preview image.
+
+**Writing an article:** copy
+`src/content/sources/local/articles/article-template.md` — it explains every
+option and formatting feature. Name the file after its slug
+(`my-story.md` → `slug: my-story`), put photos in `public/articles/<slug>/`,
+and set `draft: false` to publish.
+
+- Categories: `src/content/sources/local/article-categories.json`.
+- Authors: `author: { personId: ... }` for someone in `people.json`, or a
+  guest with `author: { name: ..., bio: ... }`.
+- Details are checked at build time (missing fields, unknown category or
+  author, file name not matching the slug) with a clear message.
+- Drafts never appear on the site. To preview them locally:
+  `SHOW_DRAFTS=1 npm run dev` (never set this on Vercel).
+- In the future admin dashboard these files become a database table and the
+  body a rich-text editor that saves the same Markdown.
 
 ## Social media page
 

@@ -1,0 +1,6 @@
+[
+  { "id": "player-stories", "label": "Player Stories", "description": "The people behind Indian mini golf and the journeys that shaped them." },
+  { "id": "tournaments", "label": "Tournaments", "description": "Competitions, results and the stories from the course." },
+  { "id": "guides", "label": "Guides", "description": "Rules, technique and getting started with mini golf." },
+  { "id": "community", "label": "Community", "description": "Clubs, events and the growing mini-golf community across India." }
+]
