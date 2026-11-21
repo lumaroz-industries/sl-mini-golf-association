@@ -92,6 +92,35 @@ To add Suyash's portrait: put the image in `public/people/` and add a
 - Fallbacks: without WebGL2 or JavaScript the same content renders as stacked
   sections. With reduced motion, the 3D view cuts between held stills.
 
+## Contact page
+
+`/contact` offers exactly two channels: the official email (from `site.json`,
+hidden until provided) and a contact form.
+
+- Validation runs in the browser for instant feedback and again on the server
+  (`src/lib/contact/schema.ts` is shared by both).
+- Spam protection: hidden honeypot field, minimum fill time, same-origin
+  check, body size limit and a per-IP rate limit (5 per 10 minutes,
+  best-effort per server instance). Suspected bots get a normal-looking
+  response and nothing is sent.
+- Delivery uses [Resend](https://resend.com) (free tier) through its HTTP API.
+  **The form stays visibly closed until it is configured** — the site never
+  claims a message was sent when it was not.
+
+To switch it on, set these in Vercel → Project → Settings → Environment
+Variables, then redeploy (the page is pre-rendered, so it picks up the change
+on the next build):
+
+| Variable | Value |
+|---|---|
+| `RESEND_API_KEY` | API key from the Resend dashboard |
+| `CONTACT_TO_EMAIL` | the inbox that receives messages |
+| `CONTACT_FROM_EMAIL` | optional — e.g. `SL Mini Golf Association <hello@your-domain>`; requires a domain verified in Resend |
+
+Without a verified domain, Resend's test sender only delivers to the email
+address that owns the Resend account, so create the Resend account with the
+association's official inbox. See `.env.example`.
+
 ## Brand assets
 
 The logo was redrawn as clean vector geometry from the approved traced logo.

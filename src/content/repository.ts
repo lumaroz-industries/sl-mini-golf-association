@@ -9,21 +9,24 @@
 import "server-only";
 import { cache } from "react";
 import { z } from "zod";
-import { HomeContent, Person, SiteSettings, type SocialLink } from "./schema";
+import { ContactContent, HomeContent, Person, SiteSettings, type SocialLink } from "./schema";
 import siteJson from "./sources/local/site.json";
 import homeJson from "./sources/local/home.json";
 import peopleJson from "./sources/local/people.json";
+import contactJson from "./sources/local/contact.json";
 
 interface ContentSource {
   site(): Promise<unknown>;
   home(): Promise<unknown>;
   people(): Promise<unknown>;
+  contact(): Promise<unknown>;
 }
 
 const localSource: ContentSource = {
   site: async () => siteJson,
   home: async () => homeJson,
   people: async () => peopleJson,
+  contact: async () => contactJson,
 };
 
 const source: ContentSource = localSource;
@@ -42,6 +45,10 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings> =>
 
 export const getHomeContent = cache(async (): Promise<HomeContent> =>
   parse(HomeContent, await source.home(), "homepage"),
+);
+
+export const getContactContent = cache(async (): Promise<ContactContent> =>
+  parse(ContactContent, await source.contact(), "contact page"),
 );
 
 export const getPeople = cache(async (): Promise<Person[]> =>

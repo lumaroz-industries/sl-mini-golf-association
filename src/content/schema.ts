@@ -123,3 +123,17 @@ export const HomeContent = z.object({
   }),
 });
 export type HomeContent = z.infer<typeof HomeContent>;
+
+export const ContactContent = z.object({
+  kicker: z.string().min(1),
+  heading: z.string().min(1),
+  intro: z.string().min(1),
+  /** Shown in place of the email address until it is provided. */
+  emailPending: z.string().min(1),
+  formHeading: z.string().min(1),
+  /** Shown when the form's email delivery is not configured yet. */
+  formUnavailable: z.string().min(1),
+  successHeading: z.string().min(1),
+  successBody: z.string().min(1),
+});
+export type ContactContent = z.infer<typeof ContactContent>;

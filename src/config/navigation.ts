@@ -20,7 +20,7 @@ export const navigation: NavItem[] = [
   { label: "Updates", href: "/updates", status: "coming-soon", summary: "News and announcements from the platform." },
   { label: "Gallery", href: "/gallery", status: "coming-soon", summary: "Moments from courses, competitions and the community." },
   { label: "Social Media", href: "/social-media", status: "coming-soon", summary: "Follow SL Mini Golf Association across platforms." },
-  { label: "Contact", href: "/contact", status: "coming-soon", summary: "Get in touch with SL Mini Golf Association." },
+  { label: "Contact", href: "/contact", status: "live", summary: "Get in touch with SL Mini Golf Association." },
 ];
 
 export function findNavItem(href: string): NavItem {
