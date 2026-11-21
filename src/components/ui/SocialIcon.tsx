@@ -1,4 +1,5 @@
 import type { SocialPlatform } from "@/content/schema";
+import { PLATFORMS } from "@/config/social-platforms";
 
 /** Minimal line-style platform icons drawn to match the site's visual language. */
 const icons: Record<SocialPlatform, React.ReactNode> = {
@@ -31,13 +32,7 @@ const icons: Record<SocialPlatform, React.ReactNode> = {
   ),
 };
 
-export const platformLabels: Record<SocialPlatform, string> = {
-  instagram: "Instagram",
-  youtube: "YouTube",
-  facebook: "Facebook",
-  linkedin: "LinkedIn",
-  whatsapp: "WhatsApp",
-};
+export const platformLabels = Object.fromEntries(Object.entries(PLATFORMS).map(([k, v]) => [k, v.label])) as Record<SocialPlatform, string>;
 
 export function SocialIcon({ platform, size = 20 }: { platform: SocialPlatform; size?: number }) {
   return (

@@ -51,10 +51,23 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const site = await getSiteSettings();
   const social = await getActiveSocialLinks();
+  const base = await getBaseUrl();
+  // Structured data: lets search engines connect the site to its official profiles.
+  const organization = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: site.name,
+    description: site.description,
+    url: base.toString(),
+    logo: new URL("/brand/icon-512.png", base).toString(),
+    ...(site.contact.email ? { email: site.contact.email } : {}),
+    ...(social.length ? { sameAs: social.map((s) => s.url) } : {}),
+  };
 
   return (
     <html lang="en-IN" className={`${clash.variable} ${manrope.variable}`} suppressHydrationWarning>
       <body id="top">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, "\\u003c") }} />
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>

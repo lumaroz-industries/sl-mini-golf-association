@@ -2,17 +2,45 @@
   "name": "SL Mini Golf Association",
   "shortName": "SLMGA",
   "description": "SL Mini Golf Association is an independent mini-golf community platform dedicated to connecting players, celebrating achievements, showcasing talent and promoting the growth of mini golf across India and beyond.",
-  "tagline": ["Beyond the green.", "Beyond boundaries."],
+  "tagline": [
+    "Beyond the green.",
+    "Beyond boundaries."
+  ],
   "supportingStatement": "Connecting players, celebrating talent and taking Indian mini golf further.",
   "contact": {
     "email": ""
   },
   "social": [
-    { "platform": "instagram", "url": "" },
-    { "platform": "youtube", "url": "" },
-    { "platform": "facebook", "url": "" },
-    { "platform": "linkedin", "url": "" },
-    { "platform": "whatsapp", "url": "" }
+    {
+      "platform": "instagram",
+      "url": "",
+      "handle": "",
+      "description": ""
+    },
+    {
+      "platform": "youtube",
+      "url": "",
+      "handle": "",
+      "description": ""
+    },
+    {
+      "platform": "facebook",
+      "url": "",
+      "handle": "",
+      "description": ""
+    },
+    {
+      "platform": "linkedin",
+      "url": "",
+      "handle": "",
+      "description": ""
+    },
+    {
+      "platform": "whatsapp",
+      "url": "",
+      "handle": "",
+      "description": ""
+    }
   ],
   "credits": {
     "ownerId": "suyash-lahane",
@@ -22,6 +50,12 @@
   "siteUrl": "",
   "seo": {
     "title": "SL Mini Golf Association — Beyond the Green. Beyond Boundaries.",
-    "keywords": ["mini golf", "mini golf India", "minigolf", "Indian mini golf players", "SL Mini Golf Association"]
+    "keywords": [
+      "mini golf",
+      "mini golf India",
+      "minigolf",
+      "Indian mini golf players",
+      "SL Mini Golf Association"
+    ]
   }
 }

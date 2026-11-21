@@ -8,6 +8,7 @@
  * The same schemas will validate admin form input and database rows later.
  */
 import { z } from "zod";
+import { PLATFORMS, urlMatchesPlatform } from "@/config/social-platforms";
 
 /** Optional string that treats "" as "not provided". */
 const optionalText = z
@@ -34,11 +35,26 @@ export const socialPlatforms = ["instagram", "youtube", "facebook", "linkedin", 
 export const SocialPlatform = z.enum(socialPlatforms);
 export type SocialPlatform = z.infer<typeof SocialPlatform>;
 
-export const SocialLink = z.object({
-  platform: SocialPlatform,
-  /** Official URL. Leave empty until provided — the platform is then hidden. */
-  url: optionalUrl,
-});
+export const SocialLink = z
+  .object({
+    platform: SocialPlatform,
+    /** Official URL. Leave empty until provided — the platform is then hidden. */
+    url: optionalUrl,
+    /** Optional display handle, e.g. "@slminigolf". Derived from the URL when empty. */
+    handle: optionalText,
+    /** Optional one-line description of what the channel shares. */
+    description: optionalText,
+  })
+  .superRefine((link, ctx) => {
+    if (!link.url) return;
+    if (!urlMatchesPlatform(link.platform, link.url)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["url"],
+        message: `The ${PLATFORMS[link.platform].label} link must be an https:// address on ${PLATFORMS[link.platform].hosts.join(" or ")}.`,
+      });
+    }
+  });
 export type SocialLink = z.infer<typeof SocialLink>;
 
 export const ImageAsset = z.object({
@@ -137,3 +153,12 @@ export const ContactContent = z.object({
   successBody: z.string().min(1),
 });
 export type ContactContent = z.infer<typeof ContactContent>;
+
+export const SocialPageContent = z.object({
+  kicker: z.string().min(1),
+  heading: z.string().min(1),
+  intro: z.string().min(1),
+  /** Shown while no official channel has been published yet. */
+  emptyState: z.string().min(1),
+});
+export type SocialPageContent = z.infer<typeof SocialPageContent>;

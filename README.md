@@ -72,7 +72,8 @@ intentionally **not** part of the content model.
 | Homepage copy | `src/content/sources/local/home.json` |
 | Platform description, tagline, SEO | `src/content/sources/local/site.json` |
 | Official email | `site.json` → `contact.email` (hidden while empty) |
-| Social links | `site.json` → `social[].url` (each platform hidden while empty) |
+| Social links | `site.json` → `social[]`: `url` (platform hidden while empty), optional `handle` and `description` |
+| Social media page copy | `src/content/sources/local/social.json` |
 | People & portraits | `src/content/sources/local/people.json` + image in `public/people/` |
 
 To add Suyash's portrait: put the image in `public/people/` and add a
@@ -91,6 +92,20 @@ To add Suyash's portrait: put the image in `public/people/` and add a
 - Text overlay timings live in `src/experience/timeline/chapters.ts`.
 - Fallbacks: without WebGL2 or JavaScript the same content renders as stacked
   sections. With reduced motion, the 3D view cuts between held stills.
+
+## Social media page
+
+`/social-media` shows one card per platform that has an official URL in
+`site.json` (Instagram, YouTube, Facebook, LinkedIn, WhatsApp); platforms
+without a URL stay hidden everywhere (page, footer, menu). Until at least one
+is set, the page shows a short "coming soon" note linking to Contact.
+
+- URLs are checked at build time: each must be `https://` on that platform's
+  own domain, otherwise the build stops with a clear message.
+- The handle is shown from `handle`, or derived from the URL when possible
+  (e.g. `instagram.com/name` → `@name`).
+- The official profiles are also published to search engines as
+  Organization structured data (`sameAs`).
 
 ## Contact page
 
