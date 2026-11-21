@@ -129,8 +129,12 @@ on the next build):
 | Variable | Value |
 |---|---|
 | `RESEND_API_KEY` | API key from the Resend dashboard |
-| `CONTACT_TO_EMAIL` | the inbox that receives messages |
+| `CONTACT_TO_EMAIL` | optional — the inbox that receives messages; defaults to the official email in `site.json` |
 | `CONTACT_FROM_EMAIL` | optional — e.g. `SL Mini Golf Association <hello@your-domain>`; requires a domain verified in Resend |
+
+To check the setup on the live site, open `/api/contact` in a browser: it
+reports `configured`, `hasApiKey` and where the recipient comes from (never
+the key or the address).
 
 Without a verified domain, Resend's test sender only delivers to the email
 address that owns the Resend account, so create the Resend account with the

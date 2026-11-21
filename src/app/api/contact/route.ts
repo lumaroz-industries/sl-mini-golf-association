@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ContactFields, ContactSubmission, MIN_FILL_MS, fieldErrors, type ContactResponse } from "@/lib/contact/schema";
-import { DeliveryError, deliverContactMessage, getDeliveryConfig } from "@/lib/contact/delivery";
+import { DeliveryError, deliverContactMessage, getDeliveryConfig, getDeliveryStatus } from "@/lib/contact/delivery";
 import { rateLimit } from "@/lib/contact/rate-limit";
 
 export const runtime = "nodejs";
@@ -15,8 +15,16 @@ function clientIp(req: Request): string {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
 }
 
+/**
+ * Setup check: open /api/contact in a browser to see whether delivery is
+ * configured. Reports only yes/no facts — never the key or the address.
+ */
+export async function GET() {
+  return NextResponse.json(await getDeliveryStatus(), { headers: { "Cache-Control": "no-store" } });
+}
+
 export async function POST(req: Request) {
-  if (!getDeliveryConfig()) {
+  if (!(await getDeliveryConfig())) {
     return reply(503, { ok: false, error: "unavailable", message: "The contact form is not accepting messages yet." });
   }
 

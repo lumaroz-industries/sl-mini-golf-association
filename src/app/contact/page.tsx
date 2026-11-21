@@ -55,7 +55,7 @@ export default async function ContactPage() {
 
         <ContactForm
           heading={content.formHeading}
-          enabled={isContactDeliveryConfigured()}
+          enabled={await isContactDeliveryConfigured()}
           unavailableMessage={content.formUnavailable}
           successHeading={content.successHeading}
           successBody={content.successBody}

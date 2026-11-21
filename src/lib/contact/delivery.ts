@@ -1,10 +1,12 @@
 import "server-only";
+import { getSiteSettings } from "@/content/repository";
 import type { ContactFields } from "./schema";
 
 /**
  * Email delivery for the contact form, via Resend's HTTP API (free tier).
  *
- * Delivery is OFF until both RESEND_API_KEY and CONTACT_TO_EMAIL are set.
+ * Delivery is ON when RESEND_API_KEY is set and there is a recipient:
+ * CONTACT_TO_EMAIL, or else the official email published in site content.
  * While it is off, the page shows the form as unavailable and the API
  * refuses submissions — the site never pretends a message was sent.
  */
@@ -15,9 +17,29 @@ interface DeliveryConfig {
   endpoint: string;
 }
 
-export function getDeliveryConfig(): DeliveryConfig | null {
+export interface DeliveryStatus {
+  configured: boolean;
+  hasApiKey: boolean;
+  recipientSource: "CONTACT_TO_EMAIL" | "site content" | "missing";
+}
+
+async function recipient(): Promise<{ to?: string; source: DeliveryStatus["recipientSource"] }> {
+  const fromEnv = process.env.CONTACT_TO_EMAIL?.trim();
+  if (fromEnv) return { to: fromEnv, source: "CONTACT_TO_EMAIL" };
+  const { contact } = await getSiteSettings();
+  return contact.email ? { to: contact.email, source: "site content" } : { source: "missing" };
+}
+
+/** Non-secret summary of the setup, for the status check. */
+export async function getDeliveryStatus(): Promise<DeliveryStatus> {
+  const hasApiKey = Boolean(process.env.RESEND_API_KEY?.trim());
+  const { source } = await recipient();
+  return { configured: hasApiKey && source !== "missing", hasApiKey, recipientSource: source };
+}
+
+export async function getDeliveryConfig(): Promise<DeliveryConfig | null> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
-  const to = process.env.CONTACT_TO_EMAIL?.trim();
+  const { to } = await recipient();
   if (!apiKey || !to) return null;
   return {
     apiKey,
@@ -30,8 +52,8 @@ export function getDeliveryConfig(): DeliveryConfig | null {
   };
 }
 
-export function isContactDeliveryConfigured(): boolean {
-  return getDeliveryConfig() !== null;
+export async function isContactDeliveryConfigured(): Promise<boolean> {
+  return (await getDeliveryConfig()) !== null;
 }
 
 const escapeHtml = (s: string) =>
@@ -42,7 +64,7 @@ const oneLine = (s: string) => s.replace(/[\r\n]+/g, " ").trim();
 export class DeliveryError extends Error {}
 
 export async function deliverContactMessage(fields: ContactFields): Promise<void> {
-  const config = getDeliveryConfig();
+  const config = await getDeliveryConfig();
   if (!config) throw new DeliveryError("Contact delivery is not configured");
 
   const subject = `Website message: ${oneLine(fields.subject)}`;
@@ -69,6 +91,12 @@ export async function deliverContactMessage(fields: ContactFields): Promise<void
   }
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
-    throw new DeliveryError(`Email provider responded ${res.status}: ${detail.slice(0, 300)}`);
+    const hint =
+      res.status === 401 || res.status === 400
+        ? " — check that RESEND_API_KEY is copied exactly (it starts with re_)."
+        : res.status === 403
+          ? " — without a verified domain, Resend only delivers to the email address that owns the Resend account."
+          : "";
+    throw new DeliveryError(`Email provider responded ${res.status}${hint} ${detail.slice(0, 300)}`);
   }
 }
