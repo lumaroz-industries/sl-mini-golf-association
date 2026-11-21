@@ -11,7 +11,7 @@ Website for **SL Mini Golf Association**, an independent mini-golf community pla
 - CSS Modules + design tokens (`src/styles/tokens.css`)
 - Zod schemas for all editable content
 - Fonts: Clash Display (Fontshare, self-hosted in `src/fonts`) and Manrope (Google Fonts via `next/font`)
-- Planned for the homepage 3D journey: three.js / React Three Fiber, GSAP ScrollTrigger, Lenis
+- Homepage 3D journey: three.js (plain, no React wrapper) + Lenis smooth scrolling
 
 ## Getting started
 
@@ -34,9 +34,14 @@ src/
     footer/             global footer
     placeholder/        shared Coming-soon page
     ui/                 Logo, SocialLinks, SocialIcon, Reveal
-  sections/home/        homepage sections (Hero, Intro, Vision & Mission,
-                        Community & Impact, People)
-  experience/           (milestone 2+) the 3D engine — fixed, NOT CMS-editable
+  sections/home/        journey/ (scroll-driven 3D stage + text overlays), People
+  experience/           the 3D engine — fixed, NOT CMS-editable
+    timeline/           chapters.ts (master timeline), ballMotion.ts (baked shot)
+    course/             path.ts (one continuous course), buildWorld.ts, sweep.ts
+    actors/             ball and putter
+    camera/             shot list
+    engine/             renderer, bloom, render-on-demand loop
+    quality.ts          device quality tiers (?quality=high|medium|low to force)
   content/
     schema.ts           content contract (Zod) — also for future admin forms
     repository.ts       the only way UI code reads content
@@ -72,6 +77,20 @@ intentionally **not** part of the content model.
 
 To add Suyash's portrait: put the image in `public/people/` and add a
 `portrait` object (src, alt, width, height) to his entry in `people.json`.
+
+## The 3D journey
+
+- Scroll progress (0 → 1) through the pinned journey drives everything:
+  camera, ball, putter, lights and the text overlays. Scrolling back reverses
+  it exactly; when scrolling stops, nothing renders and the frame holds.
+- The ball's motion is simulated once on load (gravity, rolling friction, a
+  rail bounce) and then looked up by scroll position, so it is physically
+  plausible and fully reversible.
+- Everything is generated in code: geometry, turf/stone/concrete textures,
+  ball dimples, typography. No downloaded 3D assets.
+- Text overlay timings live in `src/experience/timeline/chapters.ts`.
+- Fallbacks: without WebGL2 or JavaScript the same content renders as stacked
+  sections. With reduced motion, the 3D view cuts between held stills.
 
 ## Brand assets
 

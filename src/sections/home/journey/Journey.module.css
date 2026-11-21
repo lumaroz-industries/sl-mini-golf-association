@@ -1,0 +1,435 @@
+/*
+ * Two layouts share the same markup:
+ *  - static (default): stacked sections. Used without WebGL2 or JavaScript.
+ *  - cinematic (:root[data-journey="cinematic"]): a pinned 3D stage whose
+ *    overlays are driven by scroll progress.
+ */
+
+.journey {
+  position: relative;
+  --journey-length: 1000svh;
+}
+
+@media (max-width: 760px) {
+  .journey {
+    --journey-length: 820svh;
+  }
+}
+
+.stage {
+  position: relative;
+}
+
+.canvas,
+.vignette,
+.cue,
+.skip {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- backdrop
+   Static hero visual, and the loading state in cinematic mode. */
+.backdrop {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 100svh;
+  overflow: hidden;
+  perspective: 900px;
+  pointer-events: none;
+}
+
+.glow {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  width: min(1400px, 180vw);
+  aspect-ratio: 2.4 / 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 168 107 / 0.24), rgb(5 43 32 / 0.3) 45%, transparent 75%);
+}
+
+.floor {
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  bottom: -35%;
+  height: 80%;
+  transform: rotateX(72deg);
+  transform-origin: 50% 100%;
+  background-image:
+    linear-gradient(rgb(0 168 107 / 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(0 168 107 / 0.2) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: linear-gradient(to top, #000 10%, transparent 85%);
+}
+
+/* ---------------------------------------------------------------- scenes */
+.scenes {
+  position: relative;
+}
+
+.scene p {
+  color: var(--fg-muted);
+  font-size: var(--fs-md);
+  line-height: 1.65;
+}
+
+.hero {
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: clamp(16px, 2.4vw, 26px);
+  padding: calc(var(--nav-h) + 48px) var(--gutter) 96px;
+  text-align: center;
+}
+
+.heroTitle {
+  font-family: var(--font-body);
+  font-size: clamp(0.75rem, 0.68rem + 0.35vw, 0.95rem);
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.hero .tagline {
+  display: grid;
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.hero .tagline span:last-child {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--fg);
+}
+
+.hero .supporting {
+  max-width: 38ch;
+}
+
+.short,
+.statement,
+.message,
+.finale {
+  width: 100%;
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding: var(--section-y) var(--gutter) 0;
+  display: grid;
+  gap: 18px;
+}
+
+.short p {
+  max-width: 34ch;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--fg);
+}
+
+.intro {
+  width: 100%;
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding: var(--section-y) var(--gutter) 0;
+}
+
+.panel {
+  display: grid;
+  gap: 22px;
+  max-width: 620px;
+}
+
+.introTitle {
+  font-size: var(--fs-2xl);
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.statementLabel,
+.messageTitle {
+  font-size: var(--fs-3xl);
+  text-transform: uppercase;
+  line-height: 0.9;
+}
+
+.statement p,
+.message p {
+  max-width: 36ch;
+}
+
+.statement p {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--fg);
+}
+
+.messageIndex {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.messageIndex b {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  color: var(--fg-subtle);
+}
+
+.messageTitle {
+  font-size: clamp(2.5rem, 1.2rem + 5.4vw, 6.5rem);
+  text-wrap: balance;
+}
+
+.finale {
+  justify-items: center;
+  text-align: center;
+  padding-bottom: var(--section-y);
+}
+
+.finaleLogo {
+  width: min(520px, 82vw);
+  height: auto;
+}
+
+.finale p {
+  max-width: 40ch;
+}
+
+/* ============================================================ cinematic */
+:global(:root[data-journey="cinematic"]) .journey {
+  height: var(--journey-length);
+}
+
+:global(:root[data-journey="cinematic"]) .stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--c-black);
+}
+
+:global(:root[data-journey="cinematic"]) .backdrop {
+  height: 100%;
+  transition: opacity 1.2s var(--ease-out);
+}
+
+:global(:root[data-journey="cinematic"]) .journey[data-ready] .backdrop {
+  opacity: 0;
+}
+
+:global(:root[data-journey="cinematic"]) .canvas {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease-out);
+}
+
+:global(:root[data-journey="cinematic"]) .journey[data-ready] .canvas {
+  opacity: 1;
+}
+
+:global(:root[data-journey="cinematic"]) .vignette {
+  display: block;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(130% 90% at 50% 45%, transparent 55%, rgb(2 4 3 / 0.65)),
+    linear-gradient(to top, rgb(2 4 3 / 0.75), transparent 38%),
+    linear-gradient(to bottom, rgb(2 4 3 / 0.45), transparent 22%);
+}
+
+:global(:root[data-journey="cinematic"]) .scenes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+:global(:root[data-journey="cinematic"]) .scene {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  max-width: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate3d(0, calc((1 - var(--o, 0)) * 22px), 0);
+  will-change: opacity, transform;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 0.55);
+}
+
+/* Scroll cue */
+:global(:root[data-journey="cinematic"]) .cue {
+  display: grid;
+  justify-items: center;
+  align-content: end;
+  gap: 12px;
+  padding-bottom: 34px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.cue i {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(var(--accent), transparent);
+  animation: cue 2.2s var(--ease-in-out) infinite;
+  transform-origin: top;
+}
+
+@keyframes cue {
+  0% { transform: scaleY(0); transform-origin: top; }
+  50% { transform: scaleY(1); transform-origin: top; }
+  51% { transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+/* Hero sits in the upper part of the frame; the ball sits below it. */
+:global(:root[data-journey="cinematic"]) .hero {
+  min-height: 0;
+  align-content: start;
+  padding-top: calc(var(--nav-h) + 9svh);
+}
+
+:global(:root[data-journey="cinematic"]) .short,
+:global(:root[data-journey="cinematic"]) .statement,
+:global(:root[data-journey="cinematic"]) .message {
+  align-content: end;
+  padding: 0 calc(var(--gutter) + max(0px, (100vw - var(--max-w)) / 2)) clamp(48px, 10svh, 110px);
+}
+
+:global(:root[data-journey="cinematic"]) .right {
+  justify-items: end;
+  text-align: right;
+}
+
+:global(:root[data-journey="cinematic"]) .right p {
+  justify-self: end;
+}
+
+:global(:root[data-journey="cinematic"]) .intro {
+  display: grid;
+  align-items: center;
+  justify-items: end;
+  padding: calc(var(--nav-h) + 24px) calc(var(--gutter) + max(0px, (100vw - var(--max-w)) / 2)) 24px;
+  text-shadow: none;
+}
+
+:global(:root[data-journey="cinematic"]) .panel {
+  width: min(600px, 100%);
+  padding: clamp(26px, 3.4vw, 48px);
+  border: 1px solid var(--line-accent);
+  border-radius: var(--radius-lg);
+  background: rgb(5 9 8 / 0.66);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.9);
+}
+
+:global(:root[data-journey="cinematic"]) .finale {
+  align-content: center;
+  padding: var(--nav-h) var(--gutter) 0;
+}
+
+/* Skip intro */
+:global(:root[data-journey="cinematic"]) .skip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: absolute;
+  right: var(--gutter);
+  bottom: 28px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgb(5 9 8 / 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  transition: color var(--dur-fast), border-color var(--dur-fast), opacity var(--dur), visibility var(--dur);
+}
+
+:global(:root[data-journey="cinematic"]) .skip:hover {
+  color: var(--fg);
+  border-color: var(--line-accent);
+}
+
+:global(:root[data-journey="cinematic"]) .journey[data-past-intro] .skip {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Phones: everything anchors to the bottom of the frame, smaller type. */
+@media (max-width: 760px) {
+  :global(:root[data-journey="cinematic"]) .hero {
+    padding-top: calc(var(--nav-h) + 6svh);
+  }
+
+  :global(:root[data-journey="cinematic"]) .intro {
+    align-items: end;
+    justify-items: stretch;
+    padding-bottom: 76px;
+  }
+
+  :global(:root[data-journey="cinematic"]) .panel {
+    gap: 14px;
+  }
+
+  :global(:root[data-journey="cinematic"]) .panel p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  :global(:root[data-journey="cinematic"]) .introTitle {
+    font-size: 1.75rem;
+  }
+
+  :global(:root[data-journey="cinematic"]) .right {
+    justify-items: start;
+    text-align: left;
+  }
+
+  :global(:root[data-journey="cinematic"]) .right p {
+    justify-self: start;
+  }
+
+  :global(:root[data-journey="cinematic"]) .short,
+  :global(:root[data-journey="cinematic"]) .statement,
+  :global(:root[data-journey="cinematic"]) .message {
+    padding-bottom: 84px;
+  }
+
+  :global(:root[data-journey="cinematic"]) .skip {
+    bottom: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cue i {
+    animation: none;
+  }
+
+  :global(:root[data-journey="cinematic"]) .scene {
+    transform: none;
+  }
+}

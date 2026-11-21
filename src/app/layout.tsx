@@ -53,7 +53,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const social = await getActiveSocialLinks();
 
   return (
-    <html lang="en-IN" className={`${clash.variable} ${manrope.variable}`}>
+    <html lang="en-IN" className={`${clash.variable} ${manrope.variable}`} suppressHydrationWarning>
       <body id="top">
         <a href="#main-content" className="skip-link">
           Skip to content

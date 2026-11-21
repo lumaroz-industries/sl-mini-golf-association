@@ -1,9 +1,13 @@
 import { getHomeContent, getPeopleByIds } from "@/content/repository";
-import { HeroSection } from "@/sections/home/HeroSection";
-import { IntroSection } from "@/sections/home/IntroSection";
-import { VisionMissionSection } from "@/sections/home/VisionMissionSection";
-import { CommunitySection } from "@/sections/home/CommunitySection";
+import { Journey } from "@/sections/home/journey/Journey";
 import { PeopleSection } from "@/sections/home/PeopleSection";
+
+/**
+ * Runs before first paint: enables the cinematic layout only when WebGL2 is
+ * available, so the page never flashes between layouts. Without it (or
+ * without JavaScript) the same content renders as stacked sections.
+ */
+const JOURNEY_MODE = `try{if(document.createElement('canvas').getContext('webgl2'))document.documentElement.setAttribute('data-journey','cinematic')}catch(e){}`;
 
 export default async function HomePage() {
   const home = await getHomeContent();
@@ -11,10 +15,8 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSection hero={home.hero} />
-      <IntroSection intro={home.intro} />
-      <VisionMissionSection content={home.visionMission} />
-      <CommunitySection content={home.community} />
+      <script dangerouslySetInnerHTML={{ __html: JOURNEY_MODE }} />
+      <Journey hero={home.hero} intro={home.intro} visionMission={home.visionMission} community={home.community} />
       <PeopleSection content={home.people} people={people} />
     </>
   );
