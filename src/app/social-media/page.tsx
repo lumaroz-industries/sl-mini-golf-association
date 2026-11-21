@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { findNavItem } from "@/config/navigation";
 import { PLATFORMS, deriveHandle } from "@/config/social-platforms";
 import { getActiveSocialLinks, getPeople, getSiteSettings, getSocialPageContent } from "@/content/repository";
-import type { ImageAsset, SocialPlatform } from "@/content/schema";
+import type { SocialPlatform } from "@/content/schema";
 import { ChannelFeature } from "@/components/social/ChannelFeature";
 import { Orbit } from "@/components/social/Orbit";
 import { ProfileCard } from "@/components/social/ProfileCard";
@@ -29,7 +29,6 @@ type Card =
       handle?: string;
       tags: string[];
       detail?: string;
-      portrait?: ImageAsset;
       brand?: boolean;
     }
   | {
@@ -39,7 +38,7 @@ type Card =
       url: string;
       name: string;
       handle?: string;
-      owner?: { name: string; portrait?: ImageAsset };
+      owner?: { name: string };
       description?: string;
     };
 
@@ -54,6 +53,7 @@ export default async function SocialMediaPage() {
     return p;
   };
 
+  // Every card uses initials rather than photos (a deliberate, uniform look).
   // The association's own accounts lead the grid, then everything else in content order.
   const cards: Card[] = [
     ...official.map<Card>((link) => ({
@@ -73,7 +73,7 @@ export default async function SocialMediaPage() {
       const name = a.name ?? p!.name;
       const handle = a.handle ?? deriveHandle(a.platform, a.url);
       if (a.type === "channel" && a.platform === "youtube") {
-        return { kind: "channel", id: a.id, span: "full", url: a.url, name, handle, owner: p && { name: p.name, portrait: p.portrait }, description: a.description };
+        return { kind: "channel", id: a.id, span: "full", url: a.url, name, handle, owner: p && { name: p.name }, description: a.description };
       }
       return {
         kind: "profile",
@@ -85,13 +85,12 @@ export default async function SocialMediaPage() {
         handle,
         tags: [a.type === "person" && p ? p.role : TYPE_TAG[a.type], a.label].filter((t): t is string => Boolean(t)),
         detail: a.description,
-        portrait: a.type === "person" ? p?.portrait : undefined,
       };
     }),
   ];
 
   const platforms = [...new Set(cards.map((c) => (c.kind === "channel" ? "youtube" : c.platform)))].map((p) => PLATFORMS[p].label);
-  const orbitMembers = cards.map((c) => ({ id: c.id, name: c.name, portrait: c.kind === "profile" ? c.portrait : undefined }));
+  const orbitMembers = cards.map((c) => ({ id: c.id, name: c.name }));
 
   return (
     <div className={styles.page}>
