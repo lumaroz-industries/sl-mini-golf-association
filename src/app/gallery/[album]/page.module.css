@@ -1,0 +1,167 @@
+.page {
+  padding-bottom: var(--section-y);
+}
+
+.hero {
+  position: relative;
+  display: grid;
+  align-items: end;
+  min-height: min(68svh, 640px);
+  padding: calc(var(--nav-h) + 72px) 0 clamp(32px, 5vw, 56px);
+  margin-bottom: clamp(28px, 4vw, 48px);
+  overflow: clip;
+  isolation: isolate;
+}
+
+.heroMedia {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.heroMedia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-size: cover;
+}
+
+.heroShade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgb(5 8 7 / 0.6) 0%, rgb(5 8 7 / 0.2) 35%, rgb(5 8 7 / 0.85) 80%, var(--bg) 100%),
+    linear-gradient(90deg, rgb(5 8 7 / 0.55), transparent 70%);
+}
+
+.heroInner {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+}
+
+.back {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.back:hover {
+  color: var(--accent);
+}
+
+.title {
+  max-width: 18ch;
+  font-size: clamp(2.25rem, 1.2rem + 4.2vw, 5.25rem);
+  text-transform: uppercase;
+  text-wrap: balance;
+  text-shadow: 0 2px 30px rgb(0 0 0 / 0.5);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: rgb(255 255 255 / 0.85);
+}
+
+.meta > * + *::before {
+  content: "·";
+  margin-right: 18px;
+  color: var(--accent);
+}
+
+.description {
+  max-width: 56ch;
+  color: rgb(255 255 255 / 0.8);
+}
+
+.removal {
+  margin-top: 28px;
+  font-size: var(--fs-sm);
+  color: var(--fg-subtle);
+}
+
+.removal a {
+  color: var(--fg);
+  border-bottom: 1px solid var(--line-accent);
+}
+
+.more {
+  display: grid;
+  gap: 24px;
+  margin-top: var(--section-y);
+}
+
+.moreTitle {
+  font-size: var(--fs-2xl);
+  text-transform: uppercase;
+}
+
+.albums {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 900px) {
+  .albums {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.albumCard {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.albumCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-size: cover;
+  transition: transform 0.9s var(--ease-out);
+}
+
+.albumCardText {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  gap: 4px;
+  padding: 40px 16px 16px;
+  background: linear-gradient(to top, rgb(2 4 3 / 0.92), transparent);
+}
+
+.albumCardText b {
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.albumCardText span {
+  font-size: var(--fs-xs);
+  color: var(--fg-muted);
+}
+
+@media (hover: hover) {
+  .albumCard:hover img {
+    transform: scale(1.05);
+  }
+
+  .albumCard:hover {
+    border-color: var(--line-accent);
+  }
+}

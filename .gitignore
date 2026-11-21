@@ -8,3 +8,6 @@ next-env.d.ts
 .vercel
 .DS_Store
 __pycache__/
+
+# Gallery originals (full-size photos) — processed by `npm run gallery`, not committed
+gallery-originals/

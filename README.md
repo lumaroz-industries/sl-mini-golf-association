@@ -76,6 +76,7 @@ intentionally **not** part of the content model.
 | Social media page copy and listed accounts | `src/content/sources/local/social.json` |
 | Articles | `src/content/sources/local/articles/*.md` (see the template) |
 | Updates | `src/content/sources/local/updates/*.md` (see the template); page copy and type labels in `updates.json` |
+| Gallery albums | `gallery-originals/<album>/` + `npm run gallery`, then `src/content/sources/local/gallery/<album>/album.yaml`; page copy in `gallery.json` |
 | Articles page copy, categories | `articles.json`, `article-categories.json` |
 | People & portraits | `src/content/sources/local/people.json` + image in `public/people/` |
 
@@ -140,6 +141,38 @@ option. Types: announcement, tournament, result, community, platform.
 - Optional: `pinned`, `image`, an `action` button, and `article` (slug of a
   published article to link to).
 - Drafts and validation work exactly like articles.
+
+## Gallery
+
+`/gallery` is one justified photo wall of every album, with album filter
+chips (kept in the URL). Each album also has its own page
+(`/gallery/<album>`) with a cover header, a share-preview collage and a
+"want a photo removed?" note. Tapping a photo opens a full-screen viewer:
+swipe or arrow keys to move, swipe down / Esc / Back to close, double-tap or
+pinch to zoom, and "Copy link" for a link that opens that exact photo.
+Downloads are not offered.
+
+**Adding photos**
+
+1. Create a folder per album in `gallery-originals/` named like the album
+   slug, e.g. `gallery-originals/pune-open-2026/`, and put the original
+   photos in it (JPG, PNG or WebP — export iPhone HEIC photos as JPG). This
+   folder is **not committed**; keep your originals backed up elsewhere.
+2. Run `npm run gallery`. It resizes every photo to web sizes, turns phone
+   photos the right way up, strips all hidden metadata (including GPS
+   location), makes blur-up placeholders and a link-preview collage, and
+   adds any new photos to `src/content/sources/local/gallery/<album>/album.yaml`.
+3. Open that `album.yaml`: set the title, date, city and description, and
+   write the **alt text** (a short description) for every photo — the build
+   stops until each photo has one. Captions and a `cover` photo are optional.
+4. Commit `public/gallery/<album>/` and the album folder in
+   `src/content/sources/local/gallery/`.
+
+Re-running the command only processes new or changed photos; deleting a
+photo from the originals folder removes it from the site. Photos are resized
+ahead of time so the site never relies on Vercel's limited on-the-fly image
+optimisation. For thousands of photos, move to cloud storage with the
+future admin uploader.
 
 ## Social media page
 

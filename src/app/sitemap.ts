@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
 import { navigation } from "@/config/navigation";
-import { getArticles, getUpdates } from "@/content/repository";
+import { getAlbums, getArticles, getUpdates } from "@/content/repository";
 import { getBaseUrl } from "@/lib/site-url";
 
-/** Live routes, published articles and updates; placeholders are excluded. */
+/** Live routes, articles, updates and gallery albums (with images); placeholders are excluded. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [base, articles, updates] = await Promise.all([getBaseUrl(), getArticles(), getUpdates()]);
+  const [base, articles, updates, albums] = await Promise.all([getBaseUrl(), getArticles(), getUpdates(), getAlbums()]);
   const pages: MetadataRoute.Sitemap = navigation
     .filter((item) => item.status === "live")
     .map((item) => ({ url: new URL(item.href, base).toString(), changeFrequency: "monthly", priority: item.href === "/" ? 1 : 0.7 }));
@@ -21,5 +21,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "yearly",
     priority: 0.5,
   }));
-  return [...pages, ...posts, ...news];
+  const galleries: MetadataRoute.Sitemap = albums.map((a) => ({
+    url: new URL(`/gallery/${a.slug}`, base).toString(),
+    lastModified: a.date,
+    changeFrequency: "monthly",
+    priority: 0.5,
+    images: a.photos.slice(0, 50).map((p) => new URL(p.src, base).toString()),
+  }));
+  return [...pages, ...posts, ...news, ...galleries];
 }

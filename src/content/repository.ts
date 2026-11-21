@@ -9,9 +9,10 @@
 import "server-only";
 import { cache } from "react";
 import { z } from "zod";
-import { ArticleCategory, ArticlesPageContent, UpdatesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
+import { ArticleCategory, ArticlesPageContent, GalleryPageContent, UpdatesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
 import { loadArticles, type RawArticle } from "./articles";
 import { loadUpdates, type RawUpdate } from "./updates";
+import { loadGallery, type GalleryAlbum } from "./gallery";
 import siteJson from "./sources/local/site.json";
 import homeJson from "./sources/local/home.json";
 import peopleJson from "./sources/local/people.json";
@@ -20,6 +21,7 @@ import socialJson from "./sources/local/social.json";
 import articlesPageJson from "./sources/local/articles.json";
 import articleCategoriesJson from "./sources/local/article-categories.json";
 import updatesPageJson from "./sources/local/updates.json";
+import galleryPageJson from "./sources/local/gallery.json";
 
 interface ContentSource {
   site(): Promise<unknown>;
@@ -32,6 +34,8 @@ interface ContentSource {
   articles(): Promise<RawArticle[]>;
   updatesPage(): Promise<unknown>;
   updates(): Promise<RawUpdate[]>;
+  galleryPage(): Promise<unknown>;
+  gallery(): Promise<GalleryAlbum[]>;
 }
 
 const localSource: ContentSource = {
@@ -45,6 +49,8 @@ const localSource: ContentSource = {
   articles: loadArticles,
   updatesPage: async () => updatesPageJson,
   updates: loadUpdates,
+  galleryPage: async () => galleryPageJson,
+  gallery: loadGallery,
 };
 
 const source: ContentSource = localSource;
@@ -185,5 +191,20 @@ export const getUpdates = cache(async (): Promise<Update[]> => {
 
 export async function getUpdate(slug: string): Promise<Update | undefined> {
   return (await getUpdates()).find((u) => u.slug === slug);
+}
+
+/* ----------------------------------------------------------------- gallery */
+
+export type { GalleryAlbum, GalleryPhoto } from "./gallery";
+
+export const getGalleryPageContent = cache(async (): Promise<GalleryPageContent> =>
+  parse(GalleryPageContent, await source.galleryPage(), "gallery page"),
+);
+
+/** Published albums with photos, newest first. */
+export const getAlbums = cache(async (): Promise<GalleryAlbum[]> => source.gallery());
+
+export async function getAlbum(slug: string): Promise<GalleryAlbum | undefined> {
+  return (await getAlbums()).find((a) => a.slug === slug);
 }
 
