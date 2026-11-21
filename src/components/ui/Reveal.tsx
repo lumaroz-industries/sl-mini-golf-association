@@ -39,6 +39,7 @@ export function Reveal({ as: Tag = "div", index, style, children, ...rest }: Rev
   return (
     <Tag
       ref={ref as React.Ref<never>}
+      data-reveal-target=""
       style={index === undefined ? style : ({ ...style, "--i": index } as React.CSSProperties)}
       {...rest}
     >
