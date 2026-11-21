@@ -1,0 +1,159 @@
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding-block: calc(var(--nav-h) + 48px) 120px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  perspective: 900px;
+}
+
+.glow {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  width: min(1400px, 180vw);
+  aspect-ratio: 2.4 / 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 168 107 / 0.28), rgb(5 43 32 / 0.35) 45%, transparent 75%);
+  animation: glow-in 2.4s var(--ease-out) both;
+}
+
+/* Perspective grid suggesting a putting surface. */
+.floor {
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  bottom: -35%;
+  height: 80%;
+  transform: rotateX(72deg);
+  transform-origin: 50% 100%;
+  background-image:
+    linear-gradient(rgb(0 168 107 / 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(0 168 107 / 0.22) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: linear-gradient(to top, #000 10%, transparent 85%);
+  animation: floor-in 3s var(--ease-out) 0.3s both;
+}
+
+.ball {
+  position: absolute;
+  left: 50%;
+  bottom: 21%;
+  width: clamp(14px, 1.6vw, 22px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle at 35% 30%, #fff, #d9e2de 55%, #8d9893);
+  box-shadow:
+    0 0 24px rgb(0 168 107 / 0.55),
+    0 6px 8px -2px rgb(0 0 0 / 0.8);
+  animation: ball-in 1.6s var(--ease-out) 1.2s both;
+}
+
+@keyframes glow-in {
+  from { opacity: 0; transform: translateX(-50%) scale(0.85); }
+}
+
+@keyframes floor-in {
+  from { opacity: 0; }
+}
+
+@keyframes ball-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+}
+
+.content {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: clamp(18px, 2.4vw, 28px);
+}
+
+.title {
+  font-size: clamp(0.8125rem, 0.7rem + 0.4vw, 1rem);
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--accent);
+  animation: rise 1.2s var(--ease-out) 0.4s both;
+}
+
+.tagline {
+  display: grid;
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.tagline span {
+  display: block;
+  animation: rise 1.4s var(--ease-out) both;
+}
+
+.tagline span:first-child {
+  animation-delay: 0.6s;
+}
+
+.tagline span:last-child {
+  animation-delay: 0.8s;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--fg);
+}
+
+.supporting {
+  max-width: 38ch;
+  font-size: var(--fs-md);
+  color: var(--fg-muted);
+  animation: rise 1.4s var(--ease-out) 1s both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(24px); }
+}
+
+.cue {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--fg-subtle);
+}
+
+.cue i {
+  width: 1px;
+  height: 44px;
+  background: linear-gradient(var(--accent), transparent);
+  transform-origin: top;
+  animation: cue 2.2s var(--ease-in-out) infinite;
+}
+
+@keyframes cue {
+  0% { transform: scaleY(0); }
+  50% { transform: scaleY(1); transform-origin: top; }
+  51% { transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cue i { animation: none; }
+}

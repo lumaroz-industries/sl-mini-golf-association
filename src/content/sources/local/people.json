@@ -1,0 +1,18 @@
+[
+  {
+    "id": "suyash-lahane",
+    "name": "Suyash Lahane",
+    "role": "Founder & Owner"
+  },
+  {
+    "id": "chaitanya-payghan",
+    "name": "Chaitanya Payghan",
+    "role": "Website Design & Development",
+    "portrait": {
+      "src": "/people/chaitanya-payghan.webp",
+      "alt": "Portrait of Chaitanya Payghan",
+      "width": 960,
+      "height": 1200
+    }
+  }
+]

@@ -1,0 +1,255 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--c-black);
+  visibility: hidden;
+  clip-path: inset(0 0 100% 0);
+  transition:
+    clip-path var(--dur-slow) var(--ease-in-out),
+    visibility 0s linear var(--dur-slow);
+}
+
+.overlay[data-open] {
+  visibility: visible;
+  clip-path: inset(0 0 0 0);
+  transition:
+    clip-path var(--dur-slow) var(--ease-in-out),
+    visibility 0s;
+}
+
+
+.glow {
+  position: absolute;
+  inset: -20% -10% auto auto;
+  width: min(900px, 120vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 168 107 / 0.22), transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-8%);
+  transition: opacity 1.2s var(--ease-out), transform 1.2s var(--ease-out);
+}
+
+.overlay[data-open] .glow {
+  opacity: 1;
+  transform: none;
+}
+
+/* Subtle putting-green grid texture. */
+.grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse at 70% 20%, #000 10%, transparent 70%);
+}
+
+.inner {
+  position: relative;
+  min-height: 100%;
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding: calc(var(--nav-h) + 56px) var(--gutter) 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  align-items: end;
+  gap: 48px;
+}
+
+@media (max-width: 860px) {
+  .inner {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 40px;
+    padding-top: calc(var(--nav-h) + 40px);
+  }
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: nav;
+}
+
+.item {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+.overlay[data-open] .item,
+.overlay[data-open] .aside {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--dur-slow) var(--ease-out) calc(220ms + var(--i) * 55ms),
+    transform var(--dur-slow) var(--ease-out) calc(220ms + var(--i) * 55ms);
+}
+
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(14px, 2vw, 28px);
+  padding: 0.12em 0;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 1.1rem + 3.9vw, 4.5rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  color: var(--fg);
+  transition: color var(--dur) var(--ease-out), opacity var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+}
+
+.meta {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  width: 48px;
+  flex-shrink: 0;
+  font-family: var(--font-body);
+  line-height: 1;
+}
+
+.index {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--fg-subtle);
+  transition: color var(--dur) var(--ease-out);
+}
+
+.label {
+  position: relative;
+}
+
+/* Emerald underline sweep. */
+.label::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.04em;
+  height: 0.06em;
+  min-height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.soon {
+  padding: 3px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-subtle);
+}
+
+@media (max-width: 480px) {
+  .link {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .link {
+    font-size: 1.625rem;
+    gap: 10px;
+  }
+}
+
+@media (hover: hover) {
+  .list:hover .link:not(:hover) {
+    opacity: 0.32;
+  }
+
+  .link:hover {
+    transform: translateX(10px);
+  }
+
+  .link:hover .label::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .link:hover .index {
+    color: var(--accent);
+  }
+}
+
+.link:focus-visible .label::after {
+  transform: scaleX(1);
+}
+
+.link[aria-current="page"] {
+  color: var(--accent);
+}
+
+.link[aria-current="page"] .index {
+  color: var(--accent);
+}
+
+.link[aria-current="page"] .label::after {
+  transform: scaleX(1);
+  background: currentColor;
+}
+
+.aside {
+  display: grid;
+  gap: 20px;
+  padding-bottom: 14px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+}
+
+.tagline {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.tagline span {
+  color: var(--accent);
+}
+
+.note {
+  max-width: 32ch;
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+}
+
+.email {
+  justify-self: start;
+  font-weight: 600;
+  border-bottom: 1px solid var(--line-accent);
+  transition: color var(--dur-fast), border-color var(--dur-fast);
+}
+
+.email:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.social {
+  margin-top: 4px;
+}

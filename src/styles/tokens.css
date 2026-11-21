@@ -1,0 +1,74 @@
+/*
+ * Design tokens — SL Mini Golf Association.
+ * The site is dark-only by design (cinematic, emerald on near-black).
+ */
+:root {
+  /* Brand palette */
+  --c-emerald: #00a86b;
+  --c-emerald-bright: #19d18c;
+  --c-emerald-deep: #00764b;
+  --c-forest: #052b20;
+  --c-ink: #081e16;
+  --c-black: #050807;
+  --c-white: #ffffff;
+  --c-gray: #a7b0ac;
+
+  /* Semantic */
+  --bg: var(--c-black);
+  --bg-raised: #0a120f;
+  --fg: var(--c-white);
+  --fg-muted: var(--c-gray);
+  --fg-subtle: #6f7a75;
+  --accent: var(--c-emerald);
+  --line: rgb(255 255 255 / 0.08);
+  --line-accent: rgb(0 168 107 / 0.35);
+  --focus: var(--c-emerald-bright);
+
+  /* Glass */
+  --glass-bg: rgb(8 14 12 / 0.42);
+  --glass-bg-strong: rgb(5 9 8 / 0.72);
+  --glass-blur: 14px;
+  --glass-blur-strong: 22px;
+
+  /* Typography */
+  --font-display: var(--font-clash), "Arial Narrow", system-ui, sans-serif;
+  --font-body: var(--font-manrope), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-md: clamp(1.0625rem, 0.98rem + 0.3vw, 1.25rem);
+  --fs-lg: clamp(1.25rem, 1.05rem + 0.8vw, 1.75rem);
+  --fs-xl: clamp(1.75rem, 1.3rem + 1.8vw, 3rem);
+  --fs-2xl: clamp(2.25rem, 1.4rem + 3.6vw, 4.75rem);
+  --fs-3xl: clamp(2.75rem, 1.2rem + 6.4vw, 8rem);
+
+  --tracking-caps: 0.18em;
+  --leading-tight: 0.95;
+
+  /* Space & layout */
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2.5rem);
+  --section-y: clamp(5rem, 3rem + 8vw, 10rem);
+  --max-w: 1320px;
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 24px;
+  --nav-h: 64px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 180ms;
+  --dur: 360ms;
+  --dur-slow: 720ms;
+
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 1ms;
+    --dur: 1ms;
+    --dur-slow: 1ms;
+  }
+}
