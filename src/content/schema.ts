@@ -367,6 +367,12 @@ export const FeaturedPlayer = z.object({
   name: z.string().min(1).max(60),
   /** Where the card sits in the line-up: girls on the left and centre, boys on the right. */
   side: z.enum(["left", "center", "right"]),
+  /**
+   * Optional fixed place on a left/right side: 1 = next to the centre card,
+   * 2 = one further out, 3 = the outer edge. Without it, players fill the
+   * free places in the order listed. Layout only — never shown as a rank.
+   */
+  place: z.number().int().min(1).max(3).optional(),
   /** Real photograph only (portrait works best). Without one, the card shows the SL mark. */
   photo: ImageAsset.optional(),
   /** Leave a count out (rather than 0) when it is not known yet — the card shows "–". */
@@ -393,6 +399,11 @@ export const PlayersPageContent = z
     if (count("right") > 3) ctx.addIssue({ code: "custom", path: ["featured"], message: "At most 3 players on the right." });
     if (count("center") > 1) ctx.addIssue({ code: "custom", path: ["featured"], message: "Only 1 player in the centre." });
     const slugs = c.featured.map((p) => p.slug);
+    for (const side of ["left", "right"] as const) {
+      const places = c.featured.filter((p) => p.side === side && p.place !== undefined).map((p) => p.place);
+      if (new Set(places).size !== places.length) ctx.addIssue({ code: "custom", path: ["featured"], message: `Two players share the same place on the ${side}.` });
+    }
+    if (c.featured.some((p) => p.side === "center" && p.place !== undefined)) ctx.addIssue({ code: "custom", path: ["featured"], message: "The centre card does not take a place." });
     if (new Set(slugs).size !== slugs.length) ctx.addIssue({ code: "custom", path: ["featured"], message: "Each player needs a unique slug." });
   });
 export type PlayersPageContent = z.infer<typeof PlayersPageContent>;

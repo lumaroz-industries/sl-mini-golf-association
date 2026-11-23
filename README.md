@@ -170,8 +170,10 @@ without a player show "Reveal soon".
 }
 ```
 
-- `side`: `left` (up to 3, listed far-left first), `center` (1) or
-  `right` (up to 3, listed nearest the centre first).
+- `side`: `left` (up to 3), `center` (1) or `right` (up to 3).
+- `place` (optional, left/right only): `1` next to the centre card, `2` one
+  further out, `3` the outer edge. Players without one fill the free places,
+  nearest the centre first, in the order listed.
   This is layout only — the site never ranks or numbers the players.
 - Leave a medal count out (rather than 0) if it is not known — the card
   shows "–".
