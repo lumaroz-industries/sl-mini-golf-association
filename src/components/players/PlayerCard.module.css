@@ -1,12 +1,10 @@
 /*
  * Collectible player card.
  * A richer, jewel-toned take on the site palette: lacquered deep emerald,
- * a champagne-gold + mint foil frame, holographic sheen and real metal medals.
+ * a champagne-gold + mint foil frame and real metal medals.
  *
  * Driven by CSS variables set on the card (or an ancestor):
- *   --mx, --my  pointer position over the card (0–100%), default centre-top
  *   --tx, --ty  tilt angles, default 0
- *   --lit       0–1, how "active" the card is (front card = 1), default 1
  * (set by the line-up; never declared on .card so ancestors can drive them)
  */
 
@@ -28,7 +26,11 @@
   aspect-ratio: 5 / 7;
   border-radius: var(--radius);
   transform: rotateX(var(--ty, 0deg)) rotateY(var(--tx, 0deg));
-  transform-style: preserve-3d;
+  /* Flat on purpose: the card tilts as one piece, and its layers (body, tap
+     button, arrow) keep a strict z-index order. With preserve-3d they would
+     share one depth and the browser could hand a click on the arrow to the
+     button beneath it. */
+  transform-style: flat;
   transition: transform 0.5s var(--ease-out), box-shadow 0.6s var(--ease-out);
   box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.85);
 }
@@ -283,38 +285,6 @@
   opacity: 0.5;
 }
 
-/* ------------------------------------------------------ holo and glare */
-.holo {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  background:
-    linear-gradient(
-      115deg,
-      transparent 20%,
-      rgb(127 240 196 / 0.32) 34%,
-      rgb(233 207 138 / 0.34) 44%,
-      rgb(0 168 107 / 0.28) 54%,
-      rgb(255 255 255 / 0.18) 60%,
-      transparent 72%
-    )
-    calc(var(--mx, 50%) * 1.6 - 30%) 0 / 260% 100%;
-  mix-blend-mode: color-dodge;
-  opacity: calc(var(--lit, 1) * 0.75);
-  transition: opacity 0.5s var(--ease-out);
-}
-
-.glare {
-  position: absolute;
-  inset: 0;
-  z-index: 6;
-  pointer-events: none;
-  background: radial-gradient(circle at var(--mx, 50%) var(--my, 30%), rgb(255 255 255 / 0.28), transparent 45%);
-  mix-blend-mode: overlay;
-  opacity: calc(var(--lit, 1) * 0.9);
-}
-
 /* Invisible "bring to front" button covering the card (under the arrow). */
 .overlay {
   position: absolute;
@@ -357,15 +327,10 @@
   outline-offset: 4px;
 }
 
-/* Cards behind the front one: no foil animation or blend layers (they are
-   dimmed anyway) — keeps sliding smooth on phones. */
+/* Cards behind the front one: no foil animation (they are dimmed anyway) —
+   keeps sliding smooth on phones. */
 .card:not([data-active]) .foil {
   animation: none;
-}
-
-.card:not([data-active]) .holo,
-.card:not([data-active]) .glare {
-  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

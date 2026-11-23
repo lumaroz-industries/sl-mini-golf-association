@@ -137,20 +137,18 @@ export function TopSeven({ slots, revealLabel }: TopSevenProps) {
 
   useEffect(() => () => window.clearTimeout(hoverTimer.current), []);
 
-  // Pointer tilt + holo on the front card (mouse only).
+  // Pointer tilt on the front card (mouse only).
   const tilt = (e: React.PointerEvent<HTMLElement>) => {
     if (e.pointerType !== "mouse") return;
     const el = e.currentTarget;
     const r = el.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width;
     const py = (e.clientY - r.top) / r.height;
-    el.style.setProperty("--mx", `${(px * 100).toFixed(1)}%`);
-    el.style.setProperty("--my", `${(py * 100).toFixed(1)}%`);
     el.style.setProperty("--tx", `${((px - 0.5) * 16).toFixed(2)}deg`);
     el.style.setProperty("--ty", `${((0.5 - py) * 14).toFixed(2)}deg`);
   };
   const untilt = (e: React.PointerEvent<HTMLElement>) => {
-    for (const v of ["--mx", "--my", "--tx", "--ty"]) e.currentTarget.style.removeProperty(v);
+    for (const v of ["--tx", "--ty"]) e.currentTarget.style.removeProperty(v);
   };
 
   return (
@@ -217,7 +215,6 @@ export function TopSeven({ slots, revealLabel }: TopSevenProps) {
               className={styles.slot}
               data-front={isFront || undefined}
               data-side={slot.side}
-              style={{ "--lit": isFront ? 1 : 0 } as React.CSSProperties}
               onPointerEnter={(e) => {
                 if (e.pointerType !== "mouse") return;
                 window.clearTimeout(hoverTimer.current);

@@ -14,7 +14,7 @@ interface PlayerCardProps {
   overlay?: React.ReactNode;
   /** Hide the profile arrow (cards behind the front one). */
   arrowHidden?: boolean;
-  /** Front/featured card: runs the foil animation and holographic layers. */
+  /** Front/featured card: runs the foil animation. */
   active?: boolean;
 }
 
@@ -90,8 +90,6 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
           </ul>
         </div>
 
-        <span className={styles.holo} aria-hidden="true" />
-        <span className={styles.glare} aria-hidden="true" />
       </div>
 
       {overlay && <div className={styles.overlay}>{overlay}</div>}
