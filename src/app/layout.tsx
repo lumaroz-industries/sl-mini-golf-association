@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Manrope } from "next/font/google";
-import { SiteHeader } from "@/components/nav/SiteHeader";
-import { SiteFooter } from "@/components/footer/SiteFooter";
-import { getActiveSocialLinks, getSiteSettings } from "@/content/repository";
+import { getSiteSettings } from "@/content/repository";
 import { getBaseUrl } from "@/lib/site-url";
 import "@/styles/globals.css";
 
@@ -48,35 +46,10 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const site = await getSiteSettings();
-  const social = await getActiveSocialLinks();
-  const base = await getBaseUrl();
-  // Structured data: lets search engines connect the site to its official profiles.
-  const organization = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: site.name,
-    description: site.description,
-    url: base.toString(),
-    logo: new URL("/brand/icon-512.png", base).toString(),
-    ...(site.contact.email ? { email: site.contact.email } : {}),
-    ...(social.length ? { sameAs: social.map((s) => s.url) } : {}),
-  };
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-IN" className={`${clash.variable} ${manrope.variable}`} suppressHydrationWarning>
-      <body id="top">
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, "\\u003c") }} />
-        <a href="#main-content" className="skip-link">
-          Skip to content
-        </a>
-        <SiteHeader siteName={site.name} tagline={site.tagline} email={site.contact.email} social={social} />
-        <main id="main-content" tabIndex={-1}>
-          {children}
-        </main>
-        <SiteFooter />
-      </body>
+      <body id="top">{children}</body>
     </html>
   );
 }

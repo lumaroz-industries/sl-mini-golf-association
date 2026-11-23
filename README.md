@@ -26,10 +26,13 @@ npm run typecheck
 
 ```
 src/
-  app/                  routes, root layout (nav + footer), SEO files
-    players/ articles/ updates/ gallery/ social-media/ contact/
-                        → branded "Coming soon" placeholders (noindex)
+  app/                  root layout, SEO files
+    (site)/             the public website (nav + footer layout) and its pages
+    admin/              the admin (/admin) — sign-in and editors
+    api/                contact form and admin endpoints
+  lib/admin/             admin: sign-in, publishing (GitHub or local files), content checks
   components/
+    admin/              admin forms and editors
     nav/                floating glass header + full-screen menu
     footer/             global footer
     placeholder/        shared Coming-soon page
@@ -263,6 +266,58 @@ the key or the address).
 Without a verified domain, Resend's test sender only delivers to the email
 address that owns the Resend account, so create the Resend account with the
 association's official inbox. See `.env.example`.
+
+## Admin
+
+`/admin` lets the owner and the developer post, edit and delete **updates**,
+**articles** and **gallery albums** without touching code. (Players are not
+in the admin yet.)
+
+- **No database.** Everything is saved as the same files described above
+  (Markdown, `album.yaml`, images). On the live site, **Publish** makes one
+  commit to the GitHub repository through the GitHub API; Vercel sees it and
+  rebuilds, so the change is live about 1–2 minutes later — the admin shows
+  “Live on the website” when it is.
+- Every save is checked with the same rules as the website build (required
+  fields, dates, links, photo descriptions, linked articles), so a publish
+  cannot break the site.
+- Photos are shrunk in the browser, then resized on the server to the same
+  web sizes as `npm run gallery` (WebP, blur placeholders, link-preview
+  collage), with hidden metadata such as GPS location removed. Images an item
+  no longer uses are deleted with it.
+- **Drafts:** “Save draft” stores it without showing it on the site.
+  Web addresses are fixed after the first save so shared links never break.
+- Article and update text has formatting buttons (headings, bold, links,
+  lists, quotes, photos and galleries, YouTube/Instagram) and a **Preview**
+  that renders exactly like the website. Videos are YouTube/Instagram links —
+  video files are not uploaded (the repository and Vercel are not built for
+  large files).
+
+**Security:** one shared password (`ADMIN_PASSWORD`); a signed, HttpOnly
+session cookie for 12 hours; changes must come from the site itself; 8 wrong
+passwords lock sign-in for 15 minutes. `/admin` is hidden from search engines.
+Changing `ADMIN_PASSWORD` signs everyone out.
+
+### Switching it on (once)
+
+1. **Password** — Vercel → Project → Settings → Environment Variables: add
+   `ADMIN_PASSWORD` (a long password, at least 8 characters).
+2. **GitHub token** — on GitHub: Settings → Developer settings → Personal
+   access tokens → **Fine-grained tokens** → Generate new token.
+   - Repository access: *Only select repositories* → this repository.
+   - Permissions → Repository permissions → **Contents: Read and write**.
+   - Expiration: the longest you are comfortable with (set a reminder).
+   Add it in Vercel as `ADMIN_GITHUB_TOKEN`. (`ADMIN_GITHUB_REPO` and
+   `ADMIN_GITHUB_BRANCH` are only needed if Vercel does not deploy this
+   repository's `main` branch.)
+3. Redeploy, then open `/admin` on the live site.
+
+Each publish is a normal commit (“Admin: Publish update …”), so the full
+history is in GitHub and anything can be restored from there. Pull before
+editing code locally, since the admin commits to `main`.
+
+**Locally** (`npm run dev` with `ADMIN_PASSWORD` set and no token) the admin
+writes straight into this folder, which is handy for trying it out.
 
 ## Brand assets
 
