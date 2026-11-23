@@ -69,8 +69,15 @@
   transform-style: preserve-3d;
   will-change: transform;
   backface-visibility: hidden;
-  pointer-events: auto;
+  /* The wrapper stays flat while the card inside tilts towards the pointer,
+     so a tilted edge can sit behind the wrapper's own plane. Only the card
+     itself takes the pointer; hover events still reach this element. */
+  pointer-events: none;
   --dim: 0.4;
+}
+
+.slot > * {
+  pointer-events: auto;
 }
 
 /* Darkens cards further back (opacity only, cheap to animate). */

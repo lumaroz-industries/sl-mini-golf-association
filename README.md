@@ -170,6 +170,7 @@ without a player show "Reveal soon".
 
 - `side`: `left` (up to 3, listed far-left first), `center` (1) or
   `right` (up to 3, listed nearest the centre first).
+  This is layout only — the site never ranks or numbers the players.
 - Leave a medal count out (rather than 0) if it is not known — the card
   shows "–".
 - Put a portrait photo (about 4:5) in `public/players/`.
