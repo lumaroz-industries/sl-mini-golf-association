@@ -65,8 +65,11 @@ export const SCENES = {
 
 export type SceneId = keyof typeof SCENES;
 
-/** Scroll position to jump to with "Skip intro" (start of the introduction). */
-export const SKIP_TO = SCENES.intro.from + 0.012;
+/** "Skip intro" jumps to the end of the journey: the finale with the SL logo. */
+export const SKIP_TO = 0.99;
+
+/** The skip button is offered until the finale begins. */
+export const SKIP_UNTIL = SCENES.finale.from - 0.01;
 
 /**
  * Held frames for visitors who prefer reduced motion: the experience cuts

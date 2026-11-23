@@ -94,6 +94,8 @@ To add Suyash's portrait: put the image in `public/people/` and add a
 - Everything is generated in code: geometry, turf/stone/concrete textures,
   ball dimples, typography. No downloaded 3D assets.
 - Text overlay timings live in `src/experience/timeline/chapters.ts`.
+- "Skip intro" (shown until the finale) fades out, jumps straight to the
+  finale with the SL logo, and fades back in (`SKIP_TO` in `chapters.ts`).
 - Fallbacks: without WebGL2 or JavaScript the same content renders as stacked
   sections. With reduced motion, the 3D view cuts between held stills.
 

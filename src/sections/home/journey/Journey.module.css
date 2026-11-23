@@ -210,7 +210,13 @@
   height: var(--journey-length);
 }
 
+:global(:root[data-journey="cinematic"]) .journey[data-skipping] .stage {
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-out);
+}
+
 :global(:root[data-journey="cinematic"]) .stage {
+  transition: opacity 0.7s var(--ease-out);
   position: sticky;
   top: 0;
   height: 100svh;

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { HomeContent } from "@/content/schema";
-import { SCENES, SKIP_TO, quantizeToStill, sceneOpacity, type SceneId } from "@/experience/timeline/chapters";
+import { SCENES, SKIP_TO, SKIP_UNTIL, quantizeToStill, sceneOpacity, type SceneId } from "@/experience/timeline/chapters";
 import styles from "./Journey.module.css";
 
 interface JourneyProps {
@@ -15,6 +15,7 @@ interface JourneyProps {
 export function Journey({ hero, intro, visionMission, community }: JourneyProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const lenisRef = useRef<import("lenis").default | undefined>(undefined);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -51,7 +52,7 @@ export function Journey({ hero, intro, visionMission, community }: JourneyProps)
         el.style.visibility = o > 0.001 ? "visible" : "hidden";
         el.style.setProperty("--o", String(o));
       }
-      root.toggleAttribute("data-past-intro", p > SKIP_TO - 0.02);
+      root.toggleAttribute("data-past-intro", p > SKIP_UNTIL);
       engine?.setProgress(reduced ? quantizeToStill(p) : p);
     };
 
@@ -97,6 +98,7 @@ export function Journey({ hero, intro, visionMission, community }: JourneyProps)
             anchors: true,
             prevent: (node: HTMLElement) => Boolean(node.closest?.("#site-menu")),
           });
+          lenisRef.current = lenis;
         }
       } catch (err) {
         // Fall back to the static layout; the content is all still there.
@@ -122,17 +124,32 @@ export function Journey({ hero, intro, visionMission, community }: JourneyProps)
       window.removeEventListener("resize", onResize);
       lockObserver.disconnect();
       lenis?.destroy();
+      lenisRef.current = undefined;
       engine?.dispose();
     };
   }, [hero]);
 
+  /**
+   * Skip to the finale (SL logo over the lit course): a quick fade to black,
+   * an instant jump, then fade back in — rather than racing through the whole
+   * animation.
+   */
   const skipIntro = () => {
     const root = rootRef.current;
-    if (!root) return;
+    if (!root || root.hasAttribute("data-skipping")) return;
     const top = root.getBoundingClientRect().top + window.scrollY;
     const y = top + SKIP_TO * (root.offsetHeight - window.innerHeight);
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
+    const jump = () => {
+      if (lenisRef.current) lenisRef.current.scrollTo(y, { immediate: true, force: true });
+      else window.scrollTo({ top: y, behavior: "instant" });
+    };
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return jump();
+    root.setAttribute("data-skipping", "");
+    window.setTimeout(() => {
+      jump();
+      // Let the new frame render before fading back in.
+      requestAnimationFrame(() => requestAnimationFrame(() => root.removeAttribute("data-skipping")));
+    }, 320);
   };
 
   return (
