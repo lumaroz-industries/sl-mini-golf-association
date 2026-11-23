@@ -183,7 +183,7 @@
 /* "MH" monogram: formal script in the card's champagne-gold foil. */
 .state {
   padding: 0 6px 4px 4px;
-  font-size: calc(var(--w) * 0.17);
+  font-size: calc(var(--w) * 0.12);
   line-height: 1;
   background: linear-gradient(165deg, #fff6d8 0%, #f0d894 28%, #c9a24f 55%, #fff0c2 72%, #a97f34 100%);
   -webkit-background-clip: text;
