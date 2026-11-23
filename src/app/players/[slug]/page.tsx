@@ -42,7 +42,6 @@ export default async function PlayerPage({ params }: Params) {
   if (!player) notFound();
   const counts = MEDALS.map((m) => player.medals[m.kind]);
   const total = counts.every((n) => n !== undefined) ? counts.reduce<number>((a, b) => a + (b ?? 0), 0) : undefined;
-  const others = content.featured.filter((p) => p.slug !== player.slug);
   const paragraphs = player.bio?.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean) ?? [];
 
   const jsonLd = {
@@ -95,19 +94,6 @@ export default async function PlayerPage({ params }: Params) {
                 <p key={i}>{p}</p>
               ))}
             </div>
-          )}
-
-          {others.length > 0 && (
-            <nav className={styles.others} aria-label={`More of ${content.heading}`}>
-              <span className={styles.othersLabel}>More of the Top 7</span>
-              <ul>
-                {others.map((o) => (
-                  <li key={o.slug}>
-                    <Link href={`/players/${o.slug}`}>{o.name}</Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
           )}
         </div>
       </div>
