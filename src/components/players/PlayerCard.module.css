@@ -180,10 +180,11 @@
   box-shadow: 0 4px 14px -4px rgb(233 207 138 / 0.6);
 }
 
-/* "MH" monogram: formal script in metallic saffron. Hovering the card sweeps
-   a shine across it and turns it gold. The gradient is three times wider than
-   the text: orange on the left third, a bright band, gold on the right third;
-   sliding it across is what makes the shine pass over the letters.
+/* "MH" monogram: formal script in metallic champagne gold. When a card comes
+   to the front (hover on laptops, tap / arrows / swipe on phones) a shine
+   sweeps across it. The gradient is three times wider than the text, gold at
+   both ends with a bright band in the middle; sliding it from one end to the
+   other is what moves the shine over the letters.
    Italianno has one weight, so a thin matching stroke makes it bolder. */
 .state {
   padding: 0 6px 4px 4px;
@@ -191,14 +192,14 @@
   line-height: 1;
   background: linear-gradient(
     105deg,
-    #ffd6a0 0%,
-    #f7963a 9%,
-    #e8660f 18%,
-    #ffb466 27%,
-    #f27a1a 33%,
-    #fff3d6 44%,
+    #fff1c4 0%,
+    #e2bb63 10%,
+    #b88a36 20%,
+    #f6dc96 28%,
+    #d9ad52 33%,
+    #fff6dc 44%,
     #ffffff 47%,
-    #fff3d6 50%,
+    #fff6dc 50%,
     #f6dc96 61%,
     #d9ad52 70%,
     #fff1c4 80%,
@@ -210,18 +211,17 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  -webkit-text-stroke: 0.6px #f5892c;
-  filter: drop-shadow(0 1px 0 rgb(70 25 0 / 0.75)) drop-shadow(0 3px 8px rgb(0 0 0 / 0.55));
+  -webkit-text-stroke: 0.6px #d8b25c;
+  filter: drop-shadow(0 1px 0 rgb(60 40 8 / 0.75)) drop-shadow(0 3px 8px rgb(0 0 0 / 0.55));
   transition:
     background-position 0.9s var(--ease-out),
-    -webkit-text-stroke-color 0.6s var(--ease-out),
     filter 0.6s var(--ease-out);
 }
 
+.card[data-active] .state,
 .card:hover .state,
 .card:focus-within .state {
   background-position: 100% 50%;
-  -webkit-text-stroke-color: #e2bb63;
   filter: drop-shadow(0 1px 0 rgb(60 40 8 / 0.75)) drop-shadow(0 0 10px rgb(240 210 130 / 0.35))
     drop-shadow(0 3px 8px rgb(0 0 0 / 0.55));
 }
