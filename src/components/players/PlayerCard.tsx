@@ -15,7 +15,7 @@ interface PlayerCardProps {
   overlay?: React.ReactNode;
   /** Hide the profile arrow (cards behind the front one). */
   arrowHidden?: boolean;
-  /** Front/featured card: runs the foil animation. */
+  /** Front/featured card (the line-up marks the card in front). */
   active?: boolean;
 }
 
@@ -57,8 +57,10 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
           <span className={styles.photoFade} aria-hidden="true" />
         </div>
 
+        <span className={styles.corners} aria-hidden="true" />
+
         <div className={styles.top} aria-hidden="true">
-          <span className={styles.badge}>Top 7</span>
+          <span className={styles.badge}><span>Top 7</span></span>
           <span className={`${styles.state} ${mhFont.className}`} title="Maharashtra">
             MH
           </span>
@@ -76,6 +78,8 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
               <span className={styles.last}>To be announced</span>
             </p>
           )}
+
+          <span className={styles.rule} aria-hidden="true" />
 
           <ul className={styles.medals} aria-label="Medals">
             {MEDALS.map(({ kind, label }) => {

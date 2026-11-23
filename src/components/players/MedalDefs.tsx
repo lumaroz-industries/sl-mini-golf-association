@@ -25,8 +25,8 @@ export type MedalKind = "gold" | "silver" | "bronze";
 export function MedalIcon({ kind, size = 26 }: { kind: MedalKind; size?: number }) {
   return (
     <svg width={size} height={size * 1.25} viewBox="0 0 24 30" aria-hidden="true" focusable="false">
-      <path d="M6 1h4.5l2.2 8.5L10.5 13 6 1Z" fill="#00a86b" />
-      <path d="M18 1h-4.5l-2.2 8.5 2.2 3.5L18 1Z" fill="#00764b" />
+      <path d="M6 1h4.5l2.2 8.5L10.5 13 6 1Z" fill="#0b6b47" />
+      <path d="M18 1h-4.5l-2.2 8.5 2.2 3.5L18 1Z" fill="#06432c" />
       <circle cx="12" cy="19.5" r="9" fill={`url(#medal-${kind})`} />
       <circle cx="12" cy="19.5" r="6.4" fill="none" stroke="rgba(0,0,0,0.22)" strokeWidth="1" />
       <path d="m12 15.2 1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4Z" fill="rgba(255,255,255,0.55)" />
