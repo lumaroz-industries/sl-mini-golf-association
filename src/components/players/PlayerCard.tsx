@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MedalIcon, type MedalKind } from "./MedalDefs";
 import type { CardPlayer } from "./types";
+import { mhFont } from "./fonts";
 import styles from "./PlayerCard.module.css";
 
 interface PlayerCardProps {
@@ -58,7 +59,21 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
 
         <div className={styles.top} aria-hidden="true">
           <span className={styles.badge}>Top 7</span>
-          <span className={styles.state}>Maharashtra</span>
+          {/* Maharashtra: "MH" on a saffron swallowtail pennant (Maratha-flag inspired). */}
+          <span className={styles.state} title="Maharashtra">
+            <svg className={styles.pennant} viewBox="0 0 64 34" aria-hidden="true" focusable="false">
+              <defs>
+                <linearGradient id="mh-saffron" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stopColor="#ffb347" />
+                  <stop offset="0.45" stopColor="#ff8a1f" />
+                  <stop offset="1" stopColor="#d9580a" />
+                </linearGradient>
+              </defs>
+              <path d="M2 2h60l-9 7.5 9 7.5-9 7.5 9 7.5H2z" fill="url(#mh-saffron)" />
+              <path d="M2 2h60l-9 7.5 9 7.5-9 7.5 9 7.5H2z" fill="none" stroke="rgb(255 236 200 / 0.55)" strokeWidth="1" />
+            </svg>
+            <span className={`${styles.stateText} ${mhFont.className}`}>MH</span>
+          </span>
         </div>
 
         <div className={styles.plate}>
