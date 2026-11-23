@@ -59,19 +59,48 @@
   pointer-events: none;
 }
 
+/* Position, depth, angle and scale are written every frame by the spring
+   in TopSeven.tsx (transform only — compositor-friendly, no filters). */
 .slot {
   position: absolute;
   left: 50%;
   top: 0;
-  transform: translateX(-50%) translateX(var(--x)) translateZ(var(--z)) rotateY(var(--r)) scale(var(--s));
+  transform: translate3d(-50%, 0, -400px);
   transform-style: preserve-3d;
-  filter: brightness(var(--b)) saturate(calc(0.6 + var(--b) * 0.4));
-  transition:
-    transform 0.75s cubic-bezier(0.2, 0.8, 0.2, 1),
-    filter 0.6s var(--ease-out);
-  -webkit-box-reflect: below 14px linear-gradient(transparent 76%, rgb(255 255 255 / 0.12));
   will-change: transform;
+  backface-visibility: hidden;
   pointer-events: auto;
+  --dim: 0.4;
+}
+
+/* Darkens cards further back (opacity only, cheap to animate). */
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  border-radius: 22px;
+  background: #020604;
+  opacity: var(--dim);
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .shade {
+    border-radius: 18px;
+  }
+}
+
+/* Soft contact shadow on the floor instead of a costly mirror reflection. */
+.shadow {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -22px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.7), transparent);
+  transform: translateZ(-1px);
+  pointer-events: none;
 }
 
 .pick {
@@ -103,8 +132,3 @@
   color: var(--fg-subtle);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .slot {
-    transition: none;
-  }
-}

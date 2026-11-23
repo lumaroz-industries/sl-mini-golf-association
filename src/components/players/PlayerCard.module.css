@@ -361,6 +361,17 @@
   outline-offset: 4px;
 }
 
+/* Cards behind the front one: no foil animation or blend layers (they are
+   dimmed anyway) — keeps sliding smooth on phones. */
+.card:not([data-active]) .foil {
+  animation: none;
+}
+
+.card:not([data-active]) .holo,
+.card:not([data-active]) .glare {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .foil {
     animation: none;

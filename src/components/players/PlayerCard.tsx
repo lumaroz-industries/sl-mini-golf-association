@@ -14,6 +14,8 @@ interface PlayerCardProps {
   overlay?: React.ReactNode;
   /** Hide the profile arrow (cards behind the front one). */
   arrowHidden?: boolean;
+  /** Front/featured card: runs the foil animation and holographic layers. */
+  active?: boolean;
 }
 
 const MEDALS: Array<{ kind: MedalKind; label: string }> = [
@@ -26,10 +28,10 @@ const MEDALS: Array<{ kind: MedalKind; label: string }> = [
  * Collectible-style player card: photo, name and medal counts — nothing
  * else. Cards without an announced player show the SL mark and "Reveal soon".
  */
-export function PlayerCard({ player, revealLabel, large = false, priority = false, overlay, arrowHidden = false }: PlayerCardProps) {
+export function PlayerCard({ player, revealLabel, large = false, priority = false, overlay, arrowHidden = false, active = true }: PlayerCardProps) {
   const [first, ...rest] = (player?.name ?? "").split(/\s+/);
   return (
-    <div className={styles.card} data-large={large || undefined} data-empty={!player || undefined} data-arrow-hidden={arrowHidden || undefined}>
+    <div className={styles.card} data-large={large || undefined} data-empty={!player || undefined} data-arrow-hidden={arrowHidden || undefined} data-active={active || undefined}>
       <div className={styles.foil} aria-hidden="true" />
       <div className={styles.body}>
         <div className={styles.photo}>
