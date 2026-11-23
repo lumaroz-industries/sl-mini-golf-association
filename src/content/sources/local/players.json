@@ -31,6 +31,12 @@
         "silver": 1,
         "bronze": 2
       }
+    },
+    {
+      "slug": "nehal-bagmar",
+      "name": "Nehal Bagmar",
+      "side": "right",
+      "place": 1
     }
   ]
 }
