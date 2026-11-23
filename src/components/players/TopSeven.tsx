@@ -249,8 +249,34 @@ export function TopSeven({ slots, revealLabel }: TopSevenProps) {
           );
         })}
       </ul>
+      {!wide && (
+        <>
+          <button
+            type="button"
+            className={`${styles.nav} ${styles.navPrev}`}
+            aria-label="Previous card"
+            disabled={front <= MIN}
+            onClick={() => bringForward(front - 1)}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m15 5-7 7 7 7" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className={`${styles.nav} ${styles.navNext}`}
+            aria-label="Next card"
+            disabled={front >= MAX}
+            onClick={() => bringForward(front + 1)}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m9 5 7 7-7 7" />
+            </svg>
+          </button>
+        </>
+      )}
       <p className={styles.hint} aria-hidden="true">
-        {wide ? "Hover a card to bring it forward · ↗ opens the player" : "Swipe or tap to bring a card forward · ↗ opens the player"}
+        {wide ? "Hover a card to bring it forward · ↗ opens the player" : "Use the arrows, swipe or tap a card · ↗ opens the player"}
       </p>
     </div>
   );
