@@ -37,6 +37,18 @@
       "name": "Nehal Bagmar",
       "side": "right",
       "place": 1
+    },
+    {
+      "slug": "suyash-lahane",
+      "name": "Suyash Lahane",
+      "side": "right",
+      "place": 3,
+      "photo": {
+        "src": "/people/suyash-lahane-v2.webp",
+        "alt": "Portrait of Suyash Lahane",
+        "width": 800,
+        "height": 1000
+      }
     }
   ]
 }
