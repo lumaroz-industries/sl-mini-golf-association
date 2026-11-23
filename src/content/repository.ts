@@ -9,7 +9,7 @@
 import "server-only";
 import { cache } from "react";
 import { z } from "zod";
-import { ArticleCategory, ArticlesPageContent, GalleryPageContent, UpdatesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
+import { ArticleCategory, ArticlesPageContent, GalleryPageContent, PlayersPageContent, UpdatesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
 import { loadArticles, type RawArticle } from "./articles";
 import { loadUpdates, type RawUpdate } from "./updates";
 import { loadGallery, type GalleryAlbum } from "./gallery";
@@ -22,6 +22,7 @@ import articlesPageJson from "./sources/local/articles.json";
 import articleCategoriesJson from "./sources/local/article-categories.json";
 import updatesPageJson from "./sources/local/updates.json";
 import galleryPageJson from "./sources/local/gallery.json";
+import playersJson from "./sources/local/players.json";
 
 interface ContentSource {
   site(): Promise<unknown>;
@@ -36,6 +37,7 @@ interface ContentSource {
   updates(): Promise<RawUpdate[]>;
   galleryPage(): Promise<unknown>;
   gallery(): Promise<GalleryAlbum[]>;
+  players(): Promise<unknown>;
 }
 
 const localSource: ContentSource = {
@@ -51,6 +53,7 @@ const localSource: ContentSource = {
   updates: loadUpdates,
   galleryPage: async () => galleryPageJson,
   gallery: loadGallery,
+  players: async () => playersJson,
 };
 
 const source: ContentSource = localSource;
@@ -206,5 +209,15 @@ export const getAlbums = cache(async (): Promise<GalleryAlbum[]> => source.galle
 
 export async function getAlbum(slug: string): Promise<GalleryAlbum | undefined> {
   return (await getAlbums()).find((a) => a.slug === slug);
+}
+
+/* ----------------------------------------------------------------- players */
+
+export const getPlayersPageContent = cache(async (): Promise<PlayersPageContent> =>
+  parse(PlayersPageContent, await source.players(), "players page"),
+);
+
+export async function getFeaturedPlayer(slug: string) {
+  return (await getPlayersPageContent()).featured.find((p) => p.slug === slug);
 }
 

@@ -142,6 +142,39 @@ option. Types: announcement, tournament, result, community, platform.
   published article to link to).
 - Drafts and validation work exactly like articles.
 
+## Players
+
+`/players` opens with **Maharashtra's Top 7**: seven collectible-style
+cards in a 3D line-up — three girls on the left, a girl in the centre, three
+boys on the right. The centre card is in front by default; hovering (laptop)
+or tapping / swiping (phone) brings a card forward and slides its neighbours
+aside. Only the front card shows its ↗ arrow, which opens the player's own
+page (`/players/<slug>`) with a large card, medal tally and optional bio.
+
+Cards show only the photo, name and gold / silver / bronze counts. Places
+without a player show "Reveal soon".
+
+**Adding a player** — in `src/content/sources/local/players.json`, add to
+`featured`:
+
+```json
+{
+  "slug": "first-last",
+  "name": "First Last",
+  "side": "left",
+  "photo": { "src": "/players/first-last.webp", "alt": "First Last", "width": 800, "height": 1000 },
+  "medals": { "gold": 3, "silver": 1, "bronze": 2 },
+  "bio": "Optional. Separate paragraphs with a blank line."
+}
+```
+
+- `side`: `left` (up to 3, listed far-left first), `center` (1) or
+  `right` (up to 3, listed nearest the centre first).
+- Leave a medal count out (rather than 0) if it is not known — the card
+  shows "–".
+- Put a portrait photo (about 4:5) in `public/players/`.
+- The heading, intro and note are in the same file.
+
 ## Gallery
 
 `/gallery` is one justified photo wall of every album, with album filter

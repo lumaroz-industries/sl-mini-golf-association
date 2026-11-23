@@ -357,3 +357,43 @@ export const GalleryPageContent = z.object({
 });
 export type GalleryPageContent = z.infer<typeof GalleryPageContent>;
 
+/* ----------------------------------------------------------------- players */
+
+const medalCount = z.number().int().min(0).max(999).optional();
+
+/** One of the featured players at the top of the Players page. */
+export const FeaturedPlayer = z.object({
+  slug,
+  name: z.string().min(1).max(60),
+  /** Where the card sits in the line-up: girls on the left and centre, boys on the right. */
+  side: z.enum(["left", "center", "right"]),
+  /** Real photograph only (portrait works best). Without one, the card shows the SL mark. */
+  photo: ImageAsset.optional(),
+  /** Leave a count out (rather than 0) when it is not known yet — the card shows "–". */
+  medals: z.object({ gold: medalCount, silver: medalCount, bronze: medalCount }).default({}),
+  /** Optional short paragraphs for the player's own page. */
+  bio: optionalText,
+});
+export type FeaturedPlayer = z.infer<typeof FeaturedPlayer>;
+
+export const PlayersPageContent = z
+  .object({
+    kicker: z.string().min(1),
+    heading: z.string().min(1),
+    intro: z.string().min(1),
+    /** Small line under the cards, e.g. how the players were chosen. */
+    note: z.string().min(1),
+    /** Shown on cards whose player has not been announced yet. */
+    revealLabel: z.string().min(1),
+    featured: z.array(FeaturedPlayer).max(7),
+  })
+  .superRefine((c, ctx) => {
+    const count = (side: string) => c.featured.filter((p) => p.side === side).length;
+    if (count("left") > 3) ctx.addIssue({ code: "custom", path: ["featured"], message: "At most 3 players on the left." });
+    if (count("right") > 3) ctx.addIssue({ code: "custom", path: ["featured"], message: "At most 3 players on the right." });
+    if (count("center") > 1) ctx.addIssue({ code: "custom", path: ["featured"], message: "Only 1 player in the centre." });
+    const slugs = c.featured.map((p) => p.slug);
+    if (new Set(slugs).size !== slugs.length) ctx.addIssue({ code: "custom", path: ["featured"], message: "Each player needs a unique slug." });
+  });
+export type PlayersPageContent = z.infer<typeof PlayersPageContent>;
+

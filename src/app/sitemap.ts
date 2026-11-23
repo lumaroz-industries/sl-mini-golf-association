@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
 import { navigation } from "@/config/navigation";
-import { getAlbums, getArticles, getUpdates } from "@/content/repository";
+import { getAlbums, getArticles, getPlayersPageContent, getUpdates } from "@/content/repository";
 import { getBaseUrl } from "@/lib/site-url";
 
 /** Live routes, articles, updates and gallery albums (with images); placeholders are excluded. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [base, articles, updates, albums] = await Promise.all([getBaseUrl(), getArticles(), getUpdates(), getAlbums()]);
+  const [base, articles, updates, albums, players] = await Promise.all([getBaseUrl(), getArticles(), getUpdates(), getAlbums(), getPlayersPageContent()]);
   const pages: MetadataRoute.Sitemap = navigation
     .filter((item) => item.status === "live")
     .map((item) => ({ url: new URL(item.href, base).toString(), changeFrequency: "monthly", priority: item.href === "/" ? 1 : 0.7 }));
@@ -28,5 +28,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
     images: a.photos.slice(0, 50).map((p) => new URL(p.src, base).toString()),
   }));
-  return [...pages, ...posts, ...news, ...galleries];
+  const people: MetadataRoute.Sitemap = players.featured.map((p) => ({ url: new URL(`/players/${p.slug}`, base).toString(), changeFrequency: "monthly", priority: 0.6 }));
+  return [...pages, ...people, ...posts, ...news, ...galleries];
 }

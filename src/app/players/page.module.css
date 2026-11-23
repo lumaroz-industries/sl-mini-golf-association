@@ -1,0 +1,93 @@
+.page {
+  position: relative;
+  padding-block: calc(var(--nav-h) + clamp(56px, 8vw, 104px)) var(--section-y);
+  overflow: clip;
+  isolation: isolate;
+}
+
+.glow {
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 8%;
+  width: min(1400px, 180vw);
+  aspect-ratio: 1.6;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, rgb(0 168 107 / 0.16), transparent 70%),
+    radial-gradient(30% 30% at 50% 45%, rgb(233 207 138 / 0.06), transparent);
+  pointer-events: none;
+}
+
+.featured {
+  display: grid;
+  gap: clamp(20px, 3vw, 36px);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #e9cf8a;
+}
+
+.kicker::before,
+.kicker::after {
+  content: "";
+  width: 34px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e9cf8a);
+}
+
+.kicker::after {
+  transform: scaleX(-1);
+}
+
+.title {
+  max-width: 100%;
+  font-size: clamp(2rem, 9.2vw, 7.5rem);
+  text-transform: uppercase;
+  line-height: 0.9;
+  text-wrap: balance;
+}
+
+.foilNumber {
+  display: inline-block;
+  margin-left: 0.08em;
+  background: linear-gradient(135deg, #fff3c4 0%, #e9cf8a 30%, #7ff0c4 60%, #00a86b 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 24px rgb(233 207 138 / 0.35));
+}
+
+.intro {
+  max-width: 52ch;
+  font-size: var(--fs-md);
+  color: var(--fg-muted);
+}
+
+.stageWrap {
+  overflow: clip;
+  padding-top: clamp(8px, 2vw, 24px);
+}
+
+.note {
+  text-align: center;
+  font-size: var(--fs-xs);
+  color: var(--fg-subtle);
+  max-width: 70ch;
+}
