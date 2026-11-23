@@ -36,7 +36,13 @@
       "slug": "nehal-bagmar",
       "name": "Nehal Bagmar",
       "side": "right",
-      "place": 1
+      "place": 1,
+      "photo": {
+        "src": "/players/nehal-bagmar.webp",
+        "alt": "Nehal Bagmar in an India team blazer, holding up a medal",
+        "width": 960,
+        "height": 1200
+      }
     },
     {
       "slug": "suyash-lahane",
