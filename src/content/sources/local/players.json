@@ -20,6 +20,16 @@
         "silver": 1,
         "bronze": 2
       }
+    },
+    {
+      "slug": "saurabh-pise",
+      "name": "Saurabh Pise",
+      "side": "right",
+      "medals": {
+        "gold": 3,
+        "silver": 1,
+        "bronze": 2
+      }
     }
   ]
 }
