@@ -1,4 +1,4 @@
-import { Kaushan_Script } from "next/font/google";
+import { Italianno } from "next/font/google";
 
-/** Brush-script display face, used only for the "MH" state mark on player cards. */
-export const mhFont = Kaushan_Script({ weight: "400", subsets: ["latin"], display: "swap" });
+/** Formal copperplate script, used only for the "MH" state mark on player cards. */
+export const mhFont = Italianno({ weight: "400", subsets: ["latin"], display: "swap" });
