@@ -2,7 +2,13 @@
   {
     "id": "suyash-lahane",
     "name": "Suyash Lahane",
-    "role": "Founder & Owner"
+    "role": "Founder & Owner",
+    "portrait": {
+      "src": "/people/suyash-lahane.webp",
+      "alt": "Portrait of Suyash Lahane",
+      "width": 765,
+      "height": 956
+    }
   },
   {
     "id": "chaitanya-payghan",
