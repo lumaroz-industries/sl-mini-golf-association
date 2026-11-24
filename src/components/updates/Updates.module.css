@@ -103,6 +103,10 @@
   padding-bottom: 40px;
 }
 
+.timeline:has(.builtBy) {
+  padding-bottom: 92px;
+}
+
 @media (max-width: 640px) {
   .timeline {
     --rail: 9px;
@@ -152,6 +156,114 @@
   border-radius: 50%;
   background: #010302;
   box-shadow: 0 0 14px rgb(0 168 107 / 0.55), inset 0 2px 4px rgb(0 0 0 / 0.9);
+}
+
+/* Ball in the cup. */
+.timeline[data-holed] .ball {
+  transform: translateY(5px) scale(0.55);
+  opacity: 0.7;
+  transition: transform 0.35s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.35s;
+}
+
+/* "Built by" sign: a gold flag pin standing in the cup, with the credit beside it. */
+.builtBy {
+  position: absolute;
+  left: calc(var(--rail) - 1px);
+  bottom: 16px;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px 14px;
+  flex-wrap: wrap;
+  padding-left: 22px;
+  font-size: var(--fs-xs);
+  color: var(--fg-muted);
+}
+
+/* Same sign, placed in the page flow (empty Updates page). */
+.builtByStatic {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  min-height: 58px;
+  margin-top: 28px;
+  margin-left: 22px;
+}
+
+.flagPin {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 2px;
+  height: 58px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #fbecc4, #b38d45);
+}
+
+/* The flag on the pin. */
+.flagPin::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0;
+  width: 18px;
+  height: 12px;
+  background: linear-gradient(135deg, #fbecc4, #e3c27a 50%, #b38d45);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  transform-origin: left center;
+  animation: wave 2.6s ease-in-out infinite;
+}
+
+@keyframes wave {
+  50% {
+    transform: scaleX(0.82) skewY(-4deg);
+  }
+}
+
+.builtText {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.builtText b {
+  font-weight: 800;
+  word-spacing: 0.15em;
+  background: linear-gradient(90deg, #e3c27a, #fff6dc, #e3c27a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.builtHandle {
+  font-weight: 700;
+  color: #e3c27a;
+}
+
+.builtBy:hover .builtHandle {
+  color: #fff6dc;
+}
+
+.builtBy:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.timeline[data-holed] .builtText b {
+  animation: glintText 1.2s ease 1;
+}
+
+@keyframes glintText {
+  50% {
+    filter: brightness(1.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flagPin::after {
+    animation: none;
+  }
 }
 
 .rows {

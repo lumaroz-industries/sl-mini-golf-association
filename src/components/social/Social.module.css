@@ -629,7 +629,7 @@
 }
 
 /* Spotlight — the website's designer: gold rim, warm light, bigger photo. */
-.profile[data-spotlight] {
+.profile[data-spotlight="gold"] {
   border: 1px solid transparent;
   background:
     radial-gradient(110% 90% at 100% 0%, rgb(227 194 122 / 0.16), transparent 55%),
@@ -639,29 +639,62 @@
   box-shadow: 0 30px 70px -36px rgb(227 194 122 / 0.35), 0 24px 50px -28px rgb(0 0 0 / 0.9);
 }
 
-.profile[data-spotlight] .chip {
+.profile[data-spotlight="gold"] .chip {
   border-color: rgb(227 194 122 / 0.55);
   color: #f0d48a;
   background: rgb(227 194 122 / 0.08);
 }
 
-.profile[data-spotlight] .profileHandle {
+.profile[data-spotlight="gold"] .profileHandle {
   color: #f0d48a;
 }
 
-.profile[data-spotlight] .avatar {
+.profile[data-spotlight="gold"] .avatar {
   --size: 104px;
 }
 
-.profile[data-spotlight] .avatar[data-ring]::before {
+.profile[data-spotlight="gold"] .avatar[data-ring]::before {
   padding: 3px;
   background: conic-gradient(from 210deg, #fbecc4, #e3c27a, #6b5020, #e3c27a, #fbecc4);
 }
 
-.profile[data-spotlight] .avatarImg {
+.profile[data-spotlight="gold"] .avatarImg {
   object-position: 50% 18%;
 }
 
-.profile[data-spotlight] .profileCta {
+.profile[data-spotlight="gold"] .profileCta {
   color: #f0d48a;
+}
+
+/* Silver spotlight — the same look as gold, a step quieter (no warm glow). */
+.profile[data-spotlight="silver"] {
+  border: 1px solid transparent;
+  background:
+    radial-gradient(110% 90% at 100% 0%, rgb(201 206 209 / 0.08), transparent 55%),
+    linear-gradient(160deg, #0f1312, #070a09) padding-box,
+    linear-gradient(140deg, rgb(230 236 239 / 0.7), rgb(201 206 209 / 0.18) 30%, rgb(255 255 255 / 0.04) 60%, rgb(201 206 209 / 0.45)) border-box;
+  box-shadow: 0 24px 50px -28px rgb(0 0 0 / 0.9);
+}
+
+.profile[data-spotlight="silver"] .chip {
+  border-color: rgb(201 206 209 / 0.4);
+  color: #dfe4e6;
+}
+
+.profile[data-spotlight="silver"] .profileHandle,
+.profile[data-spotlight="silver"] .profileCta {
+  color: #c9ced1;
+}
+
+.profile[data-spotlight="silver"] .avatar {
+  --size: 96px;
+}
+
+.profile[data-spotlight="silver"] .avatar[data-ring]::before {
+  padding: 2px;
+  background: conic-gradient(from 210deg, #ffffff, #c9ced1, #5f6a70, #c9ced1, #ffffff);
+}
+
+.profile[data-spotlight="silver"] .avatarImg {
+  object-position: 50% 18%;
 }

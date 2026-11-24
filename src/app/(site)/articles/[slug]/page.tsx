@@ -11,6 +11,7 @@ import { ReadingProgress } from "@/components/articles/ReadingProgress";
 import { ShareBar } from "@/components/articles/ShareBar";
 import { Toc } from "@/components/articles/Toc";
 import { Avatar } from "@/components/social/Avatar";
+import { WebsiteBy } from "@/components/credits/WebsiteBy";
 import a from "@/components/articles/Articles.module.css";
 import styles from "./page.module.css";
 import prose from "@/styles/prose.module.css";
@@ -145,6 +146,7 @@ export default async function ArticlePage({ params }: Params) {
               </ul>
             )}
             <ShareBar url={url} title={article.title} />
+            <WebsiteBy />
           </div>
 
           <div className={styles.authorCard}>

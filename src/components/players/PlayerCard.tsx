@@ -3,7 +3,12 @@ import Link from "next/link";
 import { MedalIcon, type MedalKind } from "./MedalDefs";
 import type { CardPlayer } from "./types";
 import { mhFont } from "./fonts";
+import people from "@/content/sources/local/people.json";
+import site from "@/content/sources/local/site.json";
 import styles from "./PlayerCard.module.css";
+
+/** The card's designer, credited small at the foot of every card (like the artist line on collectible cards). */
+const DESIGNER = people.find((p) => p.id === site.credits.developerId)?.name;
 
 interface PlayerCardProps {
   player?: CardPlayer;
@@ -95,8 +100,13 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
               );
             })}
           </ul>
-        </div>
 
+          {DESIGNER && (
+            <span className={styles.credit}>
+              <span className={styles.creditLabel}>Card design ·</span> {DESIGNER}
+            </span>
+          )}
+        </div>
       </div>
 
       {overlay && <div className={styles.overlay}>{overlay}</div>}

@@ -363,21 +363,23 @@
   height: 40px;
   padding: 0 16px;
   border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgb(5 9 8 / 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  /* Gold, so it is easy to spot over the 3D scene. */
+  border: 1px solid transparent;
+  background:
+    linear-gradient(135deg, #fbecc4, #e3c27a 40%, #b38d45 75%, #e9cf8a) padding-box,
+    linear-gradient(135deg, #fff6dc, #8c6a2e) border-box;
+  box-shadow: 0 10px 26px -10px rgb(227 194 122 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.5);
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--fg-muted);
-  transition: color var(--dur-fast), border-color var(--dur-fast), opacity var(--dur), visibility var(--dur);
+  color: #1a1206;
+  transition: transform var(--dur-fast), filter var(--dur-fast), opacity var(--dur), visibility var(--dur);
 }
 
 :global(:root[data-journey="cinematic"]) .skip:hover {
-  color: var(--fg);
-  border-color: var(--line-accent);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
 }
 
 :global(:root[data-journey="cinematic"]) .journey[data-past-intro] .skip {

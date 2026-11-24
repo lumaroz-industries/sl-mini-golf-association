@@ -33,7 +33,9 @@
       "type": "person",
       "platform": "instagram",
       "url": "https://www.instagram.com/suyashx01/",
-      "personId": "suyash-lahane"
+      "personId": "suyash-lahane",
+      "spotlight": "silver",
+      "description": "Founder & Owner of SL Mini Golf Association."
     },
     {
       "id": "chaitanya-payghan-instagram",
@@ -41,7 +43,7 @@
       "platform": "instagram",
       "url": "https://www.instagram.com/chaitux2859/",
       "personId": "chaitanya-payghan",
-      "spotlight": true,
+      "spotlight": "gold",
       "description": "Designed and built this website. Website design and full-stack development — DM on Instagram."
     },
     {

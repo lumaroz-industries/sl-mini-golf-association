@@ -284,3 +284,80 @@ export function textTexture(opts: TextOptions): { texture: Texture; aspect: numb
   texture.anisotropy = 8;
   return { texture, aspect: w / h };
 }
+
+/**
+ * Trackside LED advertising board (like the boards along a race track or a
+ * cricket boundary): a dark panel of LED pixels. Layout, left to right:
+ * description · NAME (gold, centred) · handle — so the name stays in view
+ * even when the camera only catches part of the board.
+ */
+export function ledBoardTexture(opts: { font: string; name: string; line: string; tail?: string }): { texture: Texture; aspect: number } {
+  const H = 160;
+  const W = 1600;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = "#030504";
+  ctx.fillRect(0, 0, W, H);
+  ctx.textBaseline = "middle";
+  const y = H / 2 + 2;
+
+  /** Letter-spaced text; spaces are widened (the display face's space is very narrow). */
+  const measure = (txt: string, size: number, spacing: number) => {
+    ctx.font = `600 ${size}px ${opts.font}`;
+    let w = 0;
+    for (const ch of txt) w += (ch === " " ? size * 0.38 : ctx.measureText(ch).width) + spacing * size;
+    return w - spacing * size;
+  };
+  const draw = (txt: string, x: number, size: number, spacing: number, fill: string | CanvasGradient) => {
+    ctx.font = `600 ${size}px ${opts.font}`;
+    ctx.fillStyle = fill;
+    for (const ch of txt) {
+      if (ch !== " ") ctx.fillText(ch, x, y);
+      x += (ch === " " ? size * 0.38 : ctx.measureText(ch).width) + spacing * size;
+    }
+  };
+  const diamond = (x: number) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.PI / 4);
+    ctx.fillStyle = "#19d18c";
+    ctx.fillRect(-6, -6, 12, 12);
+    ctx.restore();
+  };
+
+  const nameSize = 66;
+  const smallSize = 28;
+  const nameW = measure(opts.name, nameSize, 0.05);
+  const nameX = (W - nameW) / 2;
+  const gold = ctx.createLinearGradient(0, y - nameSize / 2, 0, y + nameSize / 2);
+  gold.addColorStop(0, "#fff3d0");
+  gold.addColorStop(0.5, "#f0cd7c");
+  gold.addColorStop(1, "#c39a4c");
+  draw(opts.name, nameX, nameSize, 0.05, gold);
+
+  const gap = 44;
+  const lineW = measure(opts.line, smallSize, 0.2);
+  diamond(nameX - gap);
+  draw(opts.line, nameX - gap * 2 - lineW, smallSize, 0.2, "#e6ecea");
+  if (opts.tail) {
+    diamond(nameX + nameW + gap);
+    draw(opts.tail, nameX + nameW + gap * 2, smallSize, 0.2, "#e3c27a");
+  }
+
+  // Thin gold rules top and bottom, like a board's trim.
+  ctx.fillStyle = "rgba(227,194,122,0.55)";
+  ctx.fillRect(0, 6, W, 3);
+  ctx.fillRect(0, H - 9, W, 3);
+
+  // LED pixel grid over everything.
+  ctx.fillStyle = "rgba(0,0,0,0.5)";
+  for (let gx = 0; gx < W; gx += 5) ctx.fillRect(gx, 0, 1.6, H);
+  for (let gy = 0; gy < H; gy += 5) ctx.fillRect(0, gy, W, 1.6);
+
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  texture.anisotropy = 8;
+  return { texture, aspect: W / H };
+}

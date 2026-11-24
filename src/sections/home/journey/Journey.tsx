@@ -10,9 +10,11 @@ interface JourneyProps {
   intro: HomeContent["intro"];
   visionMission: HomeContent["visionMission"];
   community: HomeContent["community"];
+  /** Trackside LED boards on the 3D course (the website's credit). */
+  trackside?: { name: string; line: string; tail?: string };
 }
 
-export function Journey({ hero, intro, visionMission, community }: JourneyProps) {
+export function Journey({ hero, intro, visionMission, community, trackside }: JourneyProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lenisRef = useRef<import("lenis").default | undefined>(undefined);
@@ -86,7 +88,7 @@ export function Journey({ hero, intro, visionMission, community }: JourneyProps)
         engine = new Experience({
           canvas,
           quality: detectQuality(),
-          text: { title: hero.title, taglineTop: hero.taglineLines[0], taglineBottom: hero.taglineLines[1], font },
+          text: { title: hero.title, taglineTop: hero.taglineLines[0], taglineBottom: hero.taglineLines[1], font, trackside },
         });
         engine.setProgress(reduced ? quantizeToStill(progress()) : progress());
         engine.renderNow();

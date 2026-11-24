@@ -17,15 +17,15 @@ export interface ProfileCardProps {
   /** Use the SL mark as the avatar (the association's own accounts). */
   brand?: boolean;
   wide?: boolean;
-  /** Gold-highlighted card (the site's designer). */
-  spotlight?: boolean;
+  /** Highlighted card: "gold" (the site's designer) or "silver" (a step quieter). */
+  spotlight?: "gold" | "silver";
 }
 
 /** A whole-card link styled like a social profile. */
 export function ProfileCard({ platform, url, name, handle, tags, detail, portrait, brand, wide, spotlight }: ProfileCardProps) {
   const info = PLATFORMS[platform];
   return (
-    <a className={styles.profile} data-wide={wide || undefined} data-spotlight={spotlight || undefined} href={url} target="_blank" rel="noopener noreferrer">
+    <a className={styles.profile} data-wide={wide || undefined} data-spotlight={spotlight} href={url} target="_blank" rel="noopener noreferrer">
       <span className={styles.spot} aria-hidden="true" />
       <span className={styles.profileTop}>
         <Avatar name={name} portrait={portrait} brand={brand} size="lg" />

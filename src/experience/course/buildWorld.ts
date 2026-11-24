@@ -45,6 +45,7 @@ import {
   textTexture,
   turfTextures,
   rippleTexture,
+  ledBoardTexture,
 } from "../materials/textures";
 import { CUP, CUP_RADIUS, FLOOR_Y, GREEN_SHAPE, OBSTACLES, type CoursePath, type Frame } from "./path";
 import { archProfile, rectProfile, sweep, type Profile, type SweepFrame } from "./sweep";
@@ -62,6 +63,8 @@ export interface WorldText {
   font: string;
   /** Portrait screens: wall typography is set on two lines so it fits the frame. */
   compact?: boolean;
+  /** Trackside LED boards along the outdoor course (the website's credit). */
+  trackside?: { name: string; line: string; tail?: string };
 }
 
 /** Splits a line at the space nearest its middle. */
@@ -826,6 +829,62 @@ export function buildWorld(scene: Scene, path: CoursePath, q: QualitySettings, t
   };
   const greens = ["#0f3a26", "#12462d", "#0b2e1f", "#174f33", "#0d3523"].map((c) => new Color(c));
 
+  /* ----- trackside LED boards (the website's credit), like a race track's boards */
+  const boardSpots: Vector3[] = [];
+  if (text.trackside) {
+    const tex = ledBoardTexture({ font: text.font, ...text.trackside });
+    const L = 2.1; // board length (m)
+    const H = L / tex.aspect;
+    const face = new MeshBasicMaterial({ map: tex.texture, color: new Color("#ffffff").multiplyScalar(1.05), toneMapped: false });
+    const frameGeo = new BoxGeometry(L + 0.06, H + 0.06, 0.05);
+    const lift = 0.42; // on posts, so the board clears the garden lights in front of it
+    const legGeo = new BoxGeometry(0.035, lift, 0.035);
+    // Two boards in a row along the straight after the rotating gate, where
+    // the camera looks along the track side (measured from its actual view).
+    // [distance along the course, side of the track, extra distance from the edge]
+    const wanted: Array<[number, number, number]> = [
+      [path.segStart.obstacles + 6.6, 1, 1.3],
+      [path.segStart.obstacles + 8.6, 1, 1.3],
+    ];
+    const Z = new Vector3(0, 0, 1);
+    for (const [s0, wantSide, off] of wanted) {
+      const f = path.frameAt(s0);
+      const Th = new Vector3(f.T.x, 0, f.T.z).normalize();
+      const Rh = new Vector3(f.R.x, 0, f.R.z).normalize();
+      // Pick the side with more free space (the outside of the bend), away from water and other track.
+      let best: { p: Vector3; side: number; room: number } | undefined;
+      for (const side of [wantSide, -wantSide]) {
+        const p = f.pos.clone().addScaledVector(Rh, side * (f.width / 2 + off)).setY(FLOOR_Y);
+        const ends = [p, p.clone().addScaledVector(Th, L / 2), p.clone().addScaledVector(Th, -L / 2)];
+        if (ends.some((e) => inWater(e.x, e.z) || inHall(e.x, e.z))) continue;
+        const room = Math.min(...ends.map((e) => nearestCourse(e.x, e.z)));
+        if (room > 0.8) {
+          best = { p, side, room };
+          break;
+        }
+      }
+      if (!best) continue;
+      const toTrack = Rh.clone().multiplyScalar(-best.side);
+      const q = new Quaternion().setFromUnitVectors(Z, toTrack);
+      const board = new Group();
+      const panel = shadowed(new Mesh(frameGeo, darkMetal));
+      panel.position.set(0, lift + (H + 0.06) / 2, 0);
+      const screen = new Mesh(new PlaneGeometry(L, H), face);
+      screen.position.set(0, lift + (H + 0.06) / 2, 0.026);
+      board.add(panel, screen);
+      for (const lx of [-L / 2 + 0.15, L / 2 - 0.15]) {
+        const leg = shadowed(new Mesh(legGeo, darkMetal));
+        leg.position.set(lx, lift / 2, 0);
+        board.add(leg);
+      }
+      board.position.copy(best.p);
+      board.quaternion.copy(q);
+      group.add(board);
+      boardSpots.push(best.p);
+    }
+  }
+  const nearBoard = (x: number, z: number) => boardSpots.some((b) => (b.x - x) ** 2 + (b.z - z) ** 2 < 1.4 * 1.4);
+
   const bushGeo = blobGeometry(2, 7);
   const bushMatrices: Matrix4[] = [];
   const outdoorStart = path.segEnd.tunnel - 1;
@@ -837,7 +896,7 @@ export function buildWorld(scene: Scene, path: CoursePath, q: QualitySettings, t
     const lat = f.width / 2 + 0.9 + rand() * 3.2;
     const x = f.pos.x + f.R.x * side * lat;
     const z = f.pos.z + f.R.z * side * lat;
-    if (inHall(x, z) || inWater(x, z) || nearestCourse(x, z) < 0.9) continue;
+    if (inHall(x, z) || inWater(x, z) || nearestCourse(x, z) < 0.9 || nearBoard(x, z)) continue;
     const sc = 0.22 + rand() * 0.45;
     bushMatrices.push(new Matrix4().compose(new Vector3(x, FLOOR_Y + sc * 0.45, z), new Quaternion().setFromAxisAngle(UP, rand() * 6.28), new Vector3(sc * (1 + rand() * 0.6), sc, sc * (1 + rand() * 0.6))));
   }
@@ -897,7 +956,7 @@ export function buildWorld(scene: Scene, path: CoursePath, q: QualitySettings, t
       const lat = (rand() - 0.5) * 2 * (f.width / 2 + 5);
       const x = f.pos.x + f.R.x * lat;
       const z = f.pos.z + f.R.z * lat;
-      if (inWater(x, z) || inHall(x, z)) continue;
+      if (inWater(x, z) || inHall(x, z) || nearBoard(x, z)) continue;
       const sc = 0.7 + rand() * 0.9;
       mats.push(new Matrix4().compose(new Vector3(x, FLOOR_Y, z), new Quaternion().setFromAxisAngle(UP, rand() * 6.28), new Vector3(sc, sc, sc)));
     }

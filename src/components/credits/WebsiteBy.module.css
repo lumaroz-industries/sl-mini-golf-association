@@ -1,0 +1,60 @@
+.card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 16px;
+  margin-top: 22px;
+  padding: 14px 18px 14px 14px;
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  background:
+    linear-gradient(160deg, #0f1412, #070a09) padding-box,
+    linear-gradient(140deg, rgb(251 236 196 / 0.55), rgb(227 194 122 / 0.12) 40%, rgb(0 168 107 / 0.2) 75%, rgb(227 194 122 / 0.4)) border-box;
+}
+
+.photo {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  padding: 2px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #fbecc4, #e3c27a 30%, #6b5020 55%, #e3c27a 80%, #fbecc4);
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  border: 2px solid #070a09;
+}
+
+.text {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.kicker {
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #e3c27a;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  word-spacing: 0.2em;
+  line-height: 1.1;
+}
+
+.role {
+  font-size: var(--fs-xs);
+  color: var(--fg-muted);
+}

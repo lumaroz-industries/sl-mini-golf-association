@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { findNavItem } from "@/config/navigation";
-import { getUpdates, getUpdatesPageContent } from "@/content/repository";
+import { getPeopleByIds, getPeopleInstagram, getSiteSettings, getUpdates, getUpdatesPageContent } from "@/content/repository";
 import { updateTypes } from "@/content/schema";
 import { renderMarkdown } from "@/lib/markdown/render";
 import { UpdateCard } from "@/components/updates/UpdateCard";
@@ -18,7 +18,9 @@ export const metadata: Metadata = {
 };
 
 export default async function UpdatesPage() {
-  const [content, updates] = await Promise.all([getUpdatesPageContent(), getUpdates()]);
+  const [content, updates, site, instagram] = await Promise.all([getUpdatesPageContent(), getUpdates(), getSiteSettings(), getPeopleInstagram()]);
+  const [dev] = await getPeopleByIds([site.credits.developerId]);
+  const devInsta = instagram[dev.id];
   const bodies = await Promise.all(updates.map((x) => renderMarkdown(x.body)));
   const card = (i: number) => <UpdateCard update={updates[i]} typeLabel={content.typeLabels[updates[i].type]} body={bodies[i].content} />;
   const pinned = updates.map((x, i) => ({ x, i })).filter(({ x }) => x.pinned);
@@ -42,6 +44,7 @@ export default async function UpdatesPage() {
         </header>
 
         {updates.length === 0 ? (
+          <>
           <div className={styles.emptyRow}>
             <div className={`${u.timeline} ${styles.emptyLine}`} aria-hidden="true">
               <span className={u.line} />
@@ -55,6 +58,19 @@ export default async function UpdatesPage() {
               </p>
             </div>
           </div>
+            {dev && devInsta && (
+              <a className={`${u.builtBy} ${u.builtByStatic}`} href={devInsta.url} target="_blank" rel="noopener noreferrer">
+                <span className={u.flagPin} aria-hidden="true" />
+                <span className={u.builtText}>
+                  Built by <b>{dev.name}</b>
+                </span>
+                <span className={u.builtHandle}>
+                  {devInsta.handle} <span aria-hidden="true">↗</span>
+                  <span className="visually-hidden"> on Instagram (opens in a new tab)</span>
+                </span>
+              </a>
+            )}
+          </>
         ) : (
           <div className={styles.body}>
             {pinned.length > 0 && (
@@ -66,6 +82,7 @@ export default async function UpdatesPage() {
             )}
             {rest.length > 0 && (
               <UpdatesTimeline
+                credit={dev && devInsta ? { name: dev.name, url: devInsta.url, handle: devInsta.handle } : undefined}
                 allLabel={content.allLabel}
                 types={updateTypes.map((t) => ({ id: t, label: content.typeLabels[t], count: rest.filter(({ x }) => x.type === t).length }))}
                 items={rest.map(({ x, i }) => ({ slug: x.slug, type: x.type, publishedAt: x.publishedAt, card: card(i) }))}

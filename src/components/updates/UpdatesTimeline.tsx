@@ -11,6 +11,8 @@ interface TimelineItem {
 }
 
 interface UpdatesTimelineProps {
+  /** "Built by" sign beside the cup at the end of the line. */
+  credit?: { name: string; url: string; handle: string };
   allLabel: string;
   types: Array<{ id: string; label: string; count: number }>;
   items: TimelineItem[];
@@ -26,7 +28,7 @@ const monthLabel = (iso: string) => {
  * type filters kept in the URL, and a ball that rolls down the line as you
  * scroll.
  */
-export function UpdatesTimeline({ allLabel, types, items }: UpdatesTimelineProps) {
+export function UpdatesTimeline({ allLabel, types, items, credit }: UpdatesTimelineProps) {
   const [active, setActive] = useState("all");
   const lineRef = useRef<HTMLDivElement>(null);
 
@@ -46,6 +48,8 @@ export function UpdatesTimeline({ allLabel, types, items }: UpdatesTimelineProps
       const anchor = window.innerHeight * 0.45;
       const p = Math.min(1, Math.max(0, (anchor - r.top) / Math.max(1, r.height)));
       el.style.setProperty("--p", p.toFixed(4));
+      // The ball drops into the cup at the end of the line.
+      el.toggleAttribute("data-holed", p > 0.985);
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
@@ -117,6 +121,18 @@ export function UpdatesTimeline({ allLabel, types, items }: UpdatesTimelineProps
           )}
         </ol>
         <span className={styles.cup} aria-hidden="true" />
+        {credit && (
+          <a className={styles.builtBy} href={credit.url} target="_blank" rel="noopener noreferrer">
+            <span className={styles.flagPin} aria-hidden="true" />
+            <span className={styles.builtText}>
+              Built by <b>{credit.name}</b>
+            </span>
+            <span className={styles.builtHandle}>
+              {credit.handle} <span aria-hidden="true">↗</span>
+              <span className="visually-hidden"> on Instagram (opens in a new tab)</span>
+            </span>
+          </a>
+        )}
       </div>
     </div>
   );
