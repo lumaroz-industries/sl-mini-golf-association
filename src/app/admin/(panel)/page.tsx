@@ -3,6 +3,10 @@ import { listAlbums, listEntries } from "@/lib/admin/content";
 import { githubConfig } from "@/lib/admin/storage";
 import { attempt, PageHead, SetupNotice } from "@/components/admin/Page";
 import s from "@/components/admin/admin.module.css";
+import c from "@/components/admin/credits.module.css";
+import { Greeting } from "@/components/admin/Greeting";
+import { TeamCard } from "@/components/admin/TeamCard";
+import { getTeam } from "@/lib/admin/team";
 
 export const metadata = { title: "Dashboard" };
 
@@ -13,6 +17,7 @@ export default async function Dashboard() {
     const [u, a, g] = await Promise.all([listEntries("updates"), listEntries("articles"), listAlbums()]);
     return { updates: u.length, articles: a.length, gallery: g.length };
   });
+  const { owner, dev } = await getTeam();
   const tiles = [
     { href: "/admin/updates", title: "Updates", text: "Short news, tournament announcements, results and events.", n: counts.data?.updates, unit: "update" },
     { href: "/admin/articles", title: "Articles", text: "Longer stories with photos, galleries and videos.", n: counts.data?.articles, unit: "article" },
@@ -21,6 +26,9 @@ export default async function Dashboard() {
   return (
     <>
       <PageHead kicker="SL Mini Golf Association" title="Admin" lede="Write, edit and publish. Everything you publish appears on the website about a minute or two later." />
+      <div style={{ marginBottom: 28 }}>
+        <Greeting dev={{ name: dev.name, url: dev.instagram?.url }} />
+      </div>
       {onVercel && !gh.token && (
         <SetupNotice>
           <b>Publishing is not switched on yet.</b> Add <code>ADMIN_GITHUB_TOKEN</code> in Vercel → Settings → Environment Variables and redeploy (see the README, “Admin”).
@@ -37,6 +45,17 @@ export default async function Dashboard() {
           </Link>
         ))}
       </div>
+
+      <section className={c.team} aria-label="The team">
+        <p className={c.teamHead}>The team behind SL Admin</p>
+        <TeamCard
+          person={dev}
+          finish="diamond"
+          kicker="Built & maintained by"
+          text="Designed and engineered this admin panel and the website. Found a bug or want something new? Message me directly."
+        />
+        <TeamCard person={owner} finish="gold" kicker="Founder & Owner" text="SL Mini Golf Association — putting Indian mini golf and its players in the spotlight." />
+      </section>
     </>
   );
 }

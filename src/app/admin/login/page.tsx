@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { adminConfigured, isSignedIn } from "@/lib/admin/auth";
 import { LoginForm } from "@/components/admin/LoginForm";
 import s from "@/components/admin/admin.module.css";
+import c from "@/components/admin/credits.module.css";
+import { getTeam } from "@/lib/admin/team";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Sign in" };
@@ -9,6 +11,7 @@ export const metadata = { title: "Sign in" };
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ expired?: string }> }) {
   if (await isSignedIn()) redirect("/admin");
   const { expired } = await searchParams;
+  const { dev } = await getTeam();
   return (
     <div className={s.login}>
       <div className={s.loginCard}>
@@ -27,6 +30,12 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         ) : (
           <LoginForm expired={!!expired} />
         )}
+        <p className={c.secure}>
+          <span aria-hidden="true">🔒</span> Secure access · Engineered by{" "}
+          <a href={dev.instagram?.url ?? "#"} target="_blank" rel="noopener noreferrer">
+            {dev.name}
+          </a>
+        </p>
       </div>
     </div>
   );

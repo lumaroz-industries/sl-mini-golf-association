@@ -1,0 +1,345 @@
+/* Credits around the admin: top-bar signature, footer, app badge, loading. */
+
+.signature {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: linear-gradient(90deg, #b38d45, #fbecc4 50%, #b38d45) 0 0 / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: glint 5s ease-in-out infinite;
+}
+
+.signature:hover {
+  filter: brightness(1.25);
+}
+
+@keyframes glint {
+  0%,
+  60% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* ---------------------------------------------------------------- footer */
+.footer {
+  margin-top: 40px;
+  border-top: 1px solid rgb(227 194 122 / 0.14);
+  background: linear-gradient(180deg, rgb(227 194 122 / 0.03), transparent 60%);
+}
+
+.footerInner {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
+  padding: 26px var(--gutter) 30px;
+}
+
+.credits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 0;
+}
+
+.credit {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding-right: 28px;
+  margin-right: 28px;
+  border-right: 1px solid var(--line);
+}
+
+.credit:last-child {
+  border-right: 0;
+  margin-right: 0;
+  padding-right: 0;
+}
+
+.creditRole {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-subtle);
+}
+
+.creditName {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  word-spacing: 0.18em;
+}
+
+.creditName[data-dev] {
+  background: linear-gradient(100deg, #ffffff, #dff1ff 40%, #f1e6ff 60%, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.creditName[data-owner] {
+  background: linear-gradient(180deg, #fff6dc, #e3c27a 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  font-size: var(--fs-xs);
+  color: var(--fg-subtle);
+}
+
+.bottom b {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .credits {
+    flex-direction: column;
+  }
+  .credit {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    border-right: 0;
+    margin-right: 0;
+    padding-right: 0;
+  }
+}
+
+/* ------------------------------------------------ app badge (installed) */
+.badge {
+  display: none;
+}
+
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  .badge {
+    position: fixed;
+    z-index: 60;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px 6px 10px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(#0b0d10, #0b0d10) padding-box,
+      conic-gradient(from var(--badge-turn, 0deg), #ffffff, #bfe6ff, #e9d8ff, #ffffff, #b9fff0, #d4e4ff, #ffffff) border-box;
+    box-shadow: 0 10px 24px -10px rgb(0 0 0 / 0.9);
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #e8f3ff;
+    animation: badgeTurn 6s linear infinite;
+  }
+}
+
+@property --badge-turn {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes badgeTurn {
+  to {
+    --badge-turn: 360deg;
+  }
+}
+
+.badge i {
+  color: #cfeaff;
+  font-style: normal;
+}
+
+/* --------------------------------------------------------------- loading */
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+}
+
+.loadingText {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #5b5f63 0%, #5b5f63 35%, #fbecc4 50%, #5b5f63 65%, #5b5f63 100%) 0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -150% 0;
+  }
+}
+
+/* ---------------------------------------------------------- login line */
+.secure {
+  display: block;
+  text-align: center;
+  line-height: 1.9;
+  padding-top: 6px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-subtle);
+}
+
+.secure a {
+  background: linear-gradient(90deg, #e3c27a, #fff6dc, #e3c27a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ------------------------------------------------------------- team cards */
+.team {
+  display: grid;
+  gap: 16px;
+  margin-top: 36px;
+}
+
+.teamHead {
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background: rgb(255 255 255 / 0.04);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--fg);
+  transition: background var(--dur-fast), transform var(--dur-fast);
+}
+
+.actionBtn:hover {
+  background: rgb(255 255 255 / 0.1);
+  transform: translateY(-1px);
+}
+
+.actionBtn[data-primary="diamond"] {
+  border-color: transparent;
+  background:
+    linear-gradient(120deg, #ffffff, #dff1ff 45%, #efe4ff) padding-box,
+    conic-gradient(#ffffff, #bfe6ff, #e9d8ff, #ffffff) border-box;
+  color: #0b0e13;
+}
+
+.actionBtn[data-primary="gold"] {
+  border-color: transparent;
+  background: linear-gradient(135deg, #fbecc4, #e3c27a 45%, #b38d45);
+  color: #1a1206;
+}
+
+.greet {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+  font-weight: 600;
+}
+
+.greetSub {
+  margin-top: 6px;
+  font-size: var(--fs-sm);
+  color: var(--fg-muted);
+}
+
+.greetSub a {
+  font-weight: 700;
+  background: linear-gradient(100deg, #ffffff, #dff1ff 40%, #f1e6ff 60%, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* help page */
+.steps {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.steps li {
+  position: relative;
+  padding-left: 44px;
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+
+.steps li b {
+  color: var(--fg);
+}
+
+.steps li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgb(227 194 122 / 0.45);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signature,
+  .badge,
+  .loadingText {
+    animation: none;
+  }
+}

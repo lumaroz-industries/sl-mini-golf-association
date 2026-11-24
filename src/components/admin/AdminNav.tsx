@@ -4,23 +4,32 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { api } from "./client";
 import s from "./admin.module.css";
+import c from "./credits.module.css";
 
 const LINKS = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/updates", label: "Updates" },
   { href: "/admin/articles", label: "Articles" },
   { href: "/admin/gallery", label: "Gallery" },
+  { href: "/admin/help", label: "Help" },
 ];
 
-export function AdminNav() {
+export function AdminNav({ signature }: { signature?: { name: string; url?: string } }) {
   const path = usePathname();
   return (
     <header className={s.bar}>
-      <Link href="/admin" className={s.brand}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/slmga-icon-dark.svg" alt="SL" />
-        <span>Admin</span>
-      </Link>
+      <span>
+        <Link href="/admin" className={s.brand}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/slmga-icon-dark.svg" alt="SL" />
+          <span>Admin</span>
+        </Link>
+        {signature && (
+          <a className={c.signature} href={signature.url ?? "#"} target="_blank" rel="noopener noreferrer">
+            Crafted by {signature.name} ◆
+          </a>
+        )}
+      </span>
       <nav className={s.nav} aria-label="Admin">
         {LINKS.map((l) => (
           <Link key={l.href} href={l.href} aria-current={(l.href === "/admin" ? path === l.href : path.startsWith(l.href)) ? "page" : undefined}>
