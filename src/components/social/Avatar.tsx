@@ -17,7 +17,7 @@ export function initials(name: string): string {
 interface AvatarProps {
   name: string;
   portrait?: ImageAsset;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   ring?: boolean;
   /** Show the SL mark instead of initials (the association itself). */
   brand?: boolean;
@@ -34,7 +34,7 @@ export function Avatar({ name, portrait, size = "md", ring = true, brand = false
           // eslint-disable-next-line @next/next/no-img-element
           <img src="/brand/slmga-icon-dark.svg" alt="" width={60} height={20} className={styles.brandMark} />
         ) : portrait ? (
-          <Image src={portrait.src} alt="" width={240} height={240} sizes="128px" className={styles.avatarImg} data-whole={whole || undefined} />
+          <Image src={portrait.src} alt="" width={480} height={480} sizes={size === "xl" ? "260px" : "128px"} className={styles.avatarImg} data-whole={whole || undefined} />
         ) : (
           <span className={styles.monogram} data-len={initials(name).length}>
             {initials(name)}

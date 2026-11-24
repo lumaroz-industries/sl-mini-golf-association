@@ -19,19 +19,29 @@ export interface ProfileCardProps {
   wide?: boolean;
   /** The portrait is a ready-made profile picture: show it whole. */
   wholePhoto?: boolean;
-  /** Highlighted card: "gold" (the site's designer), "diamond" (the founder) or "silver". */
-  spotlight?: "gold" | "diamond" | "silver";
+  /** Highlighted finish: "diamond", "gold", "silver" or "tricolor". */
+  spotlight?: "gold" | "diamond" | "silver" | "tricolor";
+  /** Full-row card: details on the left, a large photo or monogram on the right. */
+  full?: boolean;
 }
 
 /** A whole-card link styled like a social profile. */
-export function ProfileCard({ platform, url, name, handle, tags, detail, portrait, brand, wide, spotlight, wholePhoto }: ProfileCardProps) {
+export function ProfileCard({ platform, url, name, handle, tags, detail, portrait, brand, wide, spotlight, wholePhoto, full }: ProfileCardProps) {
   const info = PLATFORMS[platform];
   return (
-    <a className={styles.profile} data-wide={wide || undefined} data-spotlight={spotlight} href={url} target="_blank" rel="noopener noreferrer">
+    <a className={styles.profile} data-wide={wide || undefined} data-full={full || undefined} data-spotlight={spotlight} href={url} target="_blank" rel="noopener noreferrer">
       <span className={styles.spot} aria-hidden="true" />
       {spotlight === "diamond" && <span className={styles.sparkles} aria-hidden="true" />}
+      {spotlight === "diamond" && <span className={styles.sheen} aria-hidden="true" />}
+      {spotlight === "tricolor" && <span className={styles.tricolor} aria-hidden="true" />}
+      {full && (
+        <span className={styles.fullSide}>
+          <span className={styles.halo} aria-hidden="true" />
+          <Avatar name={name} portrait={portrait} brand={brand} size="xl" whole={wholePhoto} />
+        </span>
+      )}
       <span className={styles.profileTop}>
-        <Avatar name={name} portrait={portrait} brand={brand} size="lg" whole={wholePhoto} />
+        {!full && <Avatar name={name} portrait={portrait} brand={brand} size="lg" whole={wholePhoto} />}
         <span className={styles.platformBadge} title={info.label}>
           <SocialIcon platform={platform} size={18} />
         </span>

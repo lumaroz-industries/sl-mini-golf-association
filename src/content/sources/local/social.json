@@ -10,7 +10,8 @@
       "url": "https://www.instagram.com/minigolf_federation_of_india/",
       "name": "Minigolf Federation of India",
       "label": "India",
-      "featured": true
+      "spotlight": "tricolor",
+      "span": "full"
     },
     {
       "id": "pune-minigolf-association",
@@ -18,7 +19,8 @@
       "platform": "instagram",
       "url": "https://www.instagram.com/pune_minigolf_association/",
       "name": "Pune Minigolf Association",
-      "label": "Pune"
+      "label": "Pune",
+      "span": "half"
     },
     {
       "id": "nagpur-minigolf-association",
@@ -26,7 +28,8 @@
       "platform": "instagram",
       "url": "https://www.instagram.com/nagpur_minigolf_association/",
       "name": "Nagpur Minigolf Association",
-      "label": "Nagpur"
+      "label": "Nagpur",
+      "span": "half"
     },
     {
       "id": "suyash-lahane-instagram",
@@ -34,8 +37,9 @@
       "platform": "instagram",
       "url": "https://www.instagram.com/suyashx01/",
       "personId": "suyash-lahane",
-      "spotlight": "diamond",
-      "description": "Founder & Owner of SL Mini Golf Association."
+      "spotlight": "gold",
+      "description": "Founder & Owner of SL Mini Golf Association.",
+      "span": "full"
     },
     {
       "id": "chaitanya-payghan-instagram",
@@ -43,14 +47,15 @@
       "platform": "instagram",
       "url": "https://www.instagram.com/chaitux2859/",
       "personId": "chaitanya-payghan",
-      "spotlight": "gold",
+      "spotlight": "diamond",
       "description": "Designed and built this website. Website design and full-stack development — DM on Instagram.",
       "avatar": {
         "src": "/social/chaitanya-payghan-instagram.webp",
         "alt": "Chaitanya Payghan's Instagram profile picture",
         "width": 480,
         "height": 480
-      }
+      },
+      "span": "full"
     },
     {
       "id": "the-mini-golf-journey",

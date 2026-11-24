@@ -184,8 +184,10 @@ export const SocialAccount = z
     featured: z.boolean().optional().default(false),
     /** Profile picture for this account's card (e.g. the Instagram photo); otherwise the person's portrait. */
     avatar: ImageAsset.optional(),
-    /** Highlighted card with the person's photo: "gold" (the site's designer, full width), "diamond" (the founder) or "silver". */
-    spotlight: z.enum(["gold", "diamond", "silver"]).optional(),
+    /** Card width in the grid: a third (default), half, two-thirds ("wide") or the full row. */
+    span: z.enum(["normal", "half", "wide", "full"]).optional(),
+    /** Highlighted finish: "diamond" (the site's designer), "gold" (the founder), "silver", or "tricolor" (national body). */
+    spotlight: z.enum(["diamond", "gold", "silver", "tricolor"]).optional(),
   })
   .superRefine((acc, ctx) => {
     if (!urlMatchesPlatform(acc.platform, acc.url)) {

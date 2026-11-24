@@ -22,7 +22,7 @@ type Card =
   | {
       kind: "profile";
       id: string;
-      span: "normal" | "wide" | "full";
+      span: "normal" | "half" | "wide" | "full";
       platform: SocialPlatform;
       url: string;
       name: string;
@@ -53,8 +53,8 @@ export default async function SocialMediaPage() {
     return p;
   };
 
-  // Cards use initials rather than photos (a deliberate, uniform look) — except a
-  // "spotlight" account (the site's designer), which is wide, gold and shows the photo.
+  // Cards use initials rather than photos (a deliberate, uniform look) — except
+  // spotlight people (designer: diamond, founder: gold), who show their photo.
   // The association's own accounts lead the grid, then everything else in content order.
   const cards: Card[] = [
     ...official.map<Card>((link) => ({
@@ -79,10 +79,9 @@ export default async function SocialMediaPage() {
       return {
         kind: "profile",
         id: a.id,
-        // The gold spotlight (the site's designer) takes the full width of the grid.
-        span: a.spotlight === "gold" ? "full" : a.featured || a.spotlight ? "wide" : "normal",
+        span: a.span ?? (a.featured ? "wide" : "normal"),
         spotlight: a.spotlight,
-        portrait: a.avatar ?? (a.spotlight ? p?.portrait : undefined),
+        portrait: a.avatar ?? (a.spotlight && a.spotlight !== "tricolor" ? p?.portrait : undefined),
         wholePhoto: Boolean(a.avatar),
         platform: a.platform,
         url: a.url,
@@ -128,7 +127,7 @@ export default async function SocialMediaPage() {
                 {c.kind === "channel" ? (
                   <ChannelFeature url={c.url} name={c.name} handle={c.handle} owner={c.owner} description={c.description} />
                 ) : (
-                  <ProfileCard {...c} wide={c.span !== "normal"} />
+                  <ProfileCard {...c} wide={c.span !== "normal"} full={c.span === "full"} />
                 )}
               </li>
             ))}
