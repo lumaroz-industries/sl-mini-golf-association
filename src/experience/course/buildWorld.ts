@@ -45,7 +45,7 @@ import {
   textTexture,
   turfTextures,
   rippleTexture,
-  ledBoardTexture,
+  ledRibbonTexture,
 } from "../materials/textures";
 import { CUP, CUP_RADIUS, FLOOR_Y, GREEN_SHAPE, OBSTACLES, type CoursePath, type Frame } from "./path";
 import { archProfile, rectProfile, sweep, type Profile, type SweepFrame } from "./sweep";
@@ -63,7 +63,7 @@ export interface WorldText {
   font: string;
   /** Portrait screens: wall typography is set on two lines so it fits the frame. */
   compact?: boolean;
-  /** Trackside LED boards along the outdoor course: [0] the website's designer, [1] the founder. */
+  /** LED band along the course's side rails: [0] the website's designer (twice per repeat), [1] the founder. */
   trackside?: Array<{ name: string; line: string; tail?: string }>;
 }
 
@@ -334,6 +334,39 @@ export function buildWorld(scene: Scene, path: CoursePath, q: QualitySettings, t
   const ledL = sweep(trackFrames, (i) => [[-w(i) / 2 - 0.034, 0.0705], [-w(i) / 2 - 0.016, 0.0705]], { withArcLength: true });
   const ledR = sweep(trackFrames, (i) => [[w(i) / 2 + 0.016, 0.0705], [w(i) / 2 + 0.034, 0.0705]], { withArcLength: true });
   group.add(new Mesh(mergeGeometries([ledL, ledR]), ledMaterial));
+
+  /* ----- LED band on the rails, like the perimeter boards around a stadium:
+     a thin strip of text on the inner and outer face of both side rails,
+     from the first tee to the green. */
+  const ribbon = text.trackside?.length ? ledRibbonTexture({ font: text.font, people: text.trackside }) : undefined;
+  const ribbonMat = ribbon
+    ? new MeshBasicMaterial({ map: ribbon.texture, color: new Color("#ffffff").multiplyScalar(1.3), toneMapped: false, side: DoubleSide })
+    : undefined;
+  const B0 = 0.006; // band from just above the turf…
+  const B1 = 0.064; // …to just under the rail's light strip
+  const tile = ribbon ? (B1 - B0) * ribbon.aspect : 1; // metres per repeat of the text
+  /** A band on a face at lateral offset `a`; `flip` mirrors it so it reads left-to-right from where it is seen. */
+  const band = (fr: SweepFrame[], a: (i: number) => number, flip: boolean) => {
+    const g = sweep(fr, (i) => [[a(i), B0], [a(i), B1]], { uScale: tile, vScale: B1 - B0 });
+    if (flip) {
+      const uv = g.getAttribute("uv");
+      for (let k = 0; k < uv.count; k++) uv.setX(k, -uv.getX(k));
+    }
+    return g;
+  };
+  if (ribbonMat) {
+    group.add(
+      new Mesh(
+        mergeGeometries([
+          band(trackFrames, (i) => -w(i) / 2 + 0.0015, false), // left rail, inner face
+          band(trackFrames, (i) => w(i) / 2 - 0.0015, true), // right rail, inner face
+          band(trackFrames, (i) => -w(i) / 2 - 0.0515, true), // left rail, outer face
+          band(trackFrames, (i) => w(i) / 2 + 0.0515, false), // right rail, outer face
+        ]),
+        ribbonMat,
+      ),
+    );
+  }
 
   const slab = sweep(trackFrames, (i) => {
     const h = path.pos[i].y - FLOOR_Y;
@@ -745,6 +778,7 @@ export function buildWorld(scene: Scene, path: CoursePath, q: QualitySettings, t
     const railMesh = new Mesh(sweep(gf, () => railProfile), railMat.clone());
     (railMesh.material as MeshStandardMaterial).side = DoubleSide;
     group.add(shadowed(railMesh));
+    if (ribbonMat) group.add(new Mesh(band(gf, () => -0.0015, true), ribbonMat)); // inner face of the green's rail
     const greenLed = new Mesh(sweep(gf, () => [[0.012, 0.0755], [0.048, 0.0755]]), emerald);
     (greenLed.material as Material).side = DoubleSide;
     group.add(greenLed);
@@ -829,73 +863,6 @@ export function buildWorld(scene: Scene, path: CoursePath, q: QualitySettings, t
   };
   const greens = ["#0f3a26", "#12462d", "#0b2e1f", "#174f33", "#0d3523"].map((c) => new Color(c));
 
-  /* ----- trackside LED boards, like the boards along a race track */
-  const boardSpots: Vector3[] = [];
-  if (text.trackside?.length) {
-    const L = 2.4; // board length (m)
-    const lift = 0.42; // on posts, so the board clears the garden lights in front of it
-    const faces = text.trackside.map((t) => {
-      const tex = ledBoardTexture({ font: text.font, ...t });
-      // Bright enough to catch the bloom: the boards glow a little in the night scene.
-      return { mat: new MeshBasicMaterial({ map: tex.texture, color: new Color("#ffffff").multiplyScalar(1.35), toneMapped: false }), H: L / tex.aspect };
-    });
-    const H = faces[0].H;
-    const frameGeo = new BoxGeometry(L + 0.06, H + 0.06, 0.05);
-    const legGeo = new BoxGeometry(0.035, lift, 0.035);
-    const glowGeo = new BoxGeometry(L, 0.012, 0.03);
-    const glowMat = new MeshBasicMaterial({ color: EMERALD.clone().multiplyScalar(2.6), toneMapped: false });
-    // Spots measured from the camera's actual view (on screen, facing it, with
-    // nothing in the way), from the S-curves to the final green.
-    // [distance along the course, side, extra distance from the edge, which board]
-    const C = 0; // designer
-    const F = 1; // founder
-    const wanted: Array<[number, number, number, number]> = [
-      [path.segStart.curves + 11.5, 1, 1.9, C],
-      [path.segStart.curves + 13, -1, 0.95, F],
-      [path.segStart.obstacles + 1.8, -1, 0.95, F],
-      [path.segStart.obstacles + 1.8, 1, 0.95, C],
-      [path.segStart.obstacles + 4.3, 1, 1.4, C],
-      [path.segStart.obstacles + 6.8, 1, 1.9, C],
-      [path.segStart.green + 0.65, 1, 1.9, C],
-    ];
-    const Z = new Vector3(0, 0, 1);
-    for (const [s0, wantSide, off, which] of wanted) {
-      const face = faces[Math.min(which, faces.length - 1)];
-      const f = path.frameAt(s0);
-      const Th = new Vector3(f.T.x, 0, f.T.z).normalize();
-      const Rh = new Vector3(f.R.x, 0, f.R.z).normalize();
-      let best: { p: Vector3; side: number } | undefined;
-      for (const side of [wantSide, -wantSide]) {
-        const p = f.pos.clone().addScaledVector(Rh, side * (f.width / 2 + off)).setY(FLOOR_Y);
-        const ends = [p, p.clone().addScaledVector(Th, L / 2), p.clone().addScaledVector(Th, -L / 2)];
-        if (ends.some((e) => inWater(e.x, e.z) || inHall(e.x, e.z))) continue;
-        if (Math.min(...ends.map((e) => nearestCourse(e.x, e.z))) > 0.8) {
-          best = { p, side };
-          break;
-        }
-      }
-      if (!best) continue;
-      const board = new Group();
-      const y = lift + (H + 0.06) / 2;
-      const panel = shadowed(new Mesh(frameGeo, darkMetal));
-      panel.position.set(0, y, 0);
-      const screen = new Mesh(new PlaneGeometry(L, face.H), face.mat);
-      screen.position.set(0, y, 0.026);
-      const glow = new Mesh(glowGeo, glowMat); // LED strip along the bottom edge
-      glow.position.set(0, lift - 0.004, 0.012);
-      board.add(panel, screen, glow);
-      for (const lx of [-L / 2 + 0.2, L / 2 - 0.2]) {
-        const leg = shadowed(new Mesh(legGeo, darkMetal));
-        leg.position.set(lx, lift / 2, 0);
-        board.add(leg);
-      }
-      board.position.copy(best.p);
-      board.quaternion.copy(new Quaternion().setFromUnitVectors(Z, Rh.clone().multiplyScalar(-best.side)));
-      group.add(board);
-      boardSpots.push(best.p);
-    }
-  }
-  const nearBoard = (x: number, z: number) => boardSpots.some((b) => (b.x - x) ** 2 + (b.z - z) ** 2 < 1.6 * 1.6);
 
   const bushGeo = blobGeometry(2, 7);
   const bushMatrices: Matrix4[] = [];
@@ -908,7 +875,7 @@ export function buildWorld(scene: Scene, path: CoursePath, q: QualitySettings, t
     const lat = f.width / 2 + 0.9 + rand() * 3.2;
     const x = f.pos.x + f.R.x * side * lat;
     const z = f.pos.z + f.R.z * side * lat;
-    if (inHall(x, z) || inWater(x, z) || nearestCourse(x, z) < 0.9 || nearBoard(x, z)) continue;
+    if (inHall(x, z) || inWater(x, z) || nearestCourse(x, z) < 0.9) continue;
     const sc = 0.22 + rand() * 0.45;
     bushMatrices.push(new Matrix4().compose(new Vector3(x, FLOOR_Y + sc * 0.45, z), new Quaternion().setFromAxisAngle(UP, rand() * 6.28), new Vector3(sc * (1 + rand() * 0.6), sc, sc * (1 + rand() * 0.6))));
   }
@@ -968,7 +935,7 @@ export function buildWorld(scene: Scene, path: CoursePath, q: QualitySettings, t
       const lat = (rand() - 0.5) * 2 * (f.width / 2 + 5);
       const x = f.pos.x + f.R.x * lat;
       const z = f.pos.z + f.R.z * lat;
-      if (inWater(x, z) || inHall(x, z) || nearBoard(x, z)) continue;
+      if (inWater(x, z) || inHall(x, z)) continue;
       const sc = 0.7 + rand() * 0.9;
       mats.push(new Matrix4().compose(new Vector3(x, FLOOR_Y, z), new Quaternion().setFromAxisAngle(UP, rand() * 6.28), new Vector3(sc, sc, sc)));
     }
