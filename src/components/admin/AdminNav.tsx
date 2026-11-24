@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/admin/articles", label: "Articles" },
   { href: "/admin/gallery", label: "Gallery" },
   { href: "/admin/players", label: "Players" },
+  { href: "/admin/photo-studio", label: "Photo Studio" },
   { href: "/admin/help", label: "Help" },
 ];
 

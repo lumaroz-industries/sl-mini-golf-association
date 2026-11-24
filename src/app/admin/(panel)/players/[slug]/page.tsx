@@ -17,7 +17,7 @@ export default async function EditPlayer({ params }: { params: Promise<{ slug: s
   return (
     <>
       <PageHead kicker={inTop ? "Edit player · Top 7" : "Edit player"} title={initial.name ?? slug} />
-      <PlayerEditor key={slug} isNew={false} initial={{ ...initial, slug }} />
+      <PlayerEditor key={slug} isNew={false} initial={{ ...initial, slug, draft: initial.draft === true }} />
       {!inTop && (
         <div style={{ marginTop: 40 }}>
           <DeleteButton collection="players" slug={slug} title={initial.name ?? slug} after="/admin/players" />

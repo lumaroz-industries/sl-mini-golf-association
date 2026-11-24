@@ -385,6 +385,7 @@ export interface PlayerListItem {
   slug: string;
   name: string;
   district?: string;
+  gender?: "female" | "male";
   draft: boolean;
   results: number;
   photo?: string;
@@ -407,6 +408,7 @@ export async function listPlayers(): Promise<PlayerListItem[]> {
         slug,
         name: String(d.name ?? slug),
         district: d.district ? String(d.district) : undefined,
+        gender: d.gender === "female" || d.gender === "male" ? d.gender : undefined,
         draft: d.draft === true,
         results: Array.isArray(d.results) ? d.results.length : 0,
         photo: (d.photo as { src?: string } | undefined)?.src,

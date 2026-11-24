@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { STUDIO_HANDOFF, type StudioHandoff } from "@/lib/admin/studio";
 import { slugify } from "@/lib/admin/shared";
 import { Choice, Field, ImageField, Section, SlugField, TextArea, TextInput, Toggle, type ImageValue, type Upload } from "./fields";
 import { PublishBar } from "./PublishBar";
@@ -67,6 +69,22 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
   const [rows, setRows] = useState<ResultRow[]>((initial.results ?? []).map(toRow));
   const [bio, setBio] = useState(initial.bio ?? "");
   const [uploads, setUploads] = useState<Upload[]>([]);
+  const [studioPreview, setStudioPreview] = useState<string>();
+
+  // A photo made in the Photo Studio for this player: put it in, ready to publish.
+  useEffect(() => {
+    let h: StudioHandoff | null = null;
+    try {
+      h = JSON.parse(sessionStorage.getItem(STUDIO_HANDOFF) ?? "null") as StudioHandoff | null;
+      if (h?.slug === initial.slug) sessionStorage.removeItem(STUDIO_HANDOFF);
+    } catch {}
+    if (!h || h.slug !== initial.slug) return;
+    const got = h;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-off pick-up from sessionStorage after navigation
+    setPhoto(got.photo);
+    setUploads((x) => [...x, got.upload]);
+    setStudioPreview(got.preview);
+  }, [initial.slug]);
 
   const effectiveSlug = slugTouched ? slug : slugify(name);
   const setRow = (i: number, p: Partial<ResultRow>) => setRows((list) => list.map((r, k) => (k === i ? { ...r, ...p } : r)));
@@ -128,7 +146,13 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
       </Section>
 
       <Section title="Photo" hint="A portrait photo (about 4:5) works best. Without one, the card shows the player's initials.">
-        <ImageField label="Photo" value={photo} onChange={setPhoto} onUploaded={(u) => setUploads((x) => [...x, u])} collection="players" slug={effectiveSlug} withCredit={false} />
+        {studioPreview && photo && <p className={`${s.help} ${s.ok}`}>New photo from the Photo Studio — press Publish (or Save draft) to put it on the card.</p>}
+        <ImageField label="Photo" value={photo} onChange={(v) => (v?.src !== photo?.src && setStudioPreview(undefined), setPhoto(v))} onUploaded={(u) => setUploads((x) => [...x, u])} collection="players" slug={effectiveSlug} withCredit={false} previewSrc={studioPreview} />
+        {!isNew && (
+          <p className={s.help}>
+            No good photo? <Link href={`/admin/photo-studio?player=${effectiveSlug}`} style={{ color: "var(--gold)", textDecoration: "underline" }}>Make a studio portrait in the Photo Studio</Link>.
+          </p>
+        )}
       </Section>
 
       <Section title={`Results (${rows.length})`} hint="Every competition result. These power the Level and Year filters and the player's results list.">

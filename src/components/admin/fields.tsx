@@ -147,6 +147,7 @@ export function ImageField({
   collection,
   slug,
   withCredit = true,
+  previewSrc,
 }: {
   label: string;
   help?: string;
@@ -156,6 +157,8 @@ export function ImageField({
   collection: "updates" | "articles" | "players";
   slug: string;
   withCredit?: boolean;
+  /** Local preview for a photo uploaded elsewhere (not live until Publish). */
+  previewSrc?: string;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -202,7 +205,7 @@ export function ImageField({
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          {(preview || value?.src) && <img src={preview || value?.src} alt="" />}
+          {(preview || previewSrc || value?.src) && <img src={preview || previewSrc || value?.src} alt="" />}
           <span style={{ position: "relative", padding: 12, background: value ? "rgb(0 0 0 / 0.55)" : undefined, borderRadius: 8 }}>
             {busy ? "Uploading…" : value ? "Replace photo" : "Choose or drop a photo"}
           </span>

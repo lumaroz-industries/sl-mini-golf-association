@@ -334,6 +334,21 @@ editing code locally, since the admin commits to `main`.
 **Locally** (`npm run dev` with `ADMIN_PASSWORD` set and no token) the admin
 writes straight into this folder, which is handy for trying it out.
 
+### Photo Studio
+
+`/admin/photo-studio` turns any phone photo into a front-facing studio portrait framed for the player card. It costs nothing:
+
+1. **Build the prompt.** Pick the player, Women/Men and an outfit. The prompt locks the face, skin tone, hair and build and sets the exact framing: 4:5, waist-up, head centred, top of the hair at 10%, head 28% of the width, plain dark backdrop. India outfits only show their prompt once an admin ticks "has represented India". Short "fix" prompts cover the usual problems (face changed, skin tone, framing, text on clothes, hands).
+2. **Make the photo** in the free Gemini app (or ChatGPT): attach the photo, paste the prompt, download the result.
+3. **Card photo maker.** Upload the result. It does the following in the browser, so the photo never leaves the device:
+   - removes the background with MODNet (Apache-2.0, `public/models/modnet/`) on ONNX Runtime Web (MIT, `public/vendor/ort/`);
+   - finds the head and frames it the same way every time (960 × 1200 WebP);
+   - previews the photo on the card.
+
+   **Use for this player** puts it in the player's editor, ready to Publish.
+
+**Adding the real outfits:** put a front photo of each outfit in `public/studio/outfits/` and set its `reference` in `src/lib/admin/studio.ts`. The prompt then tells the app to copy that outfit exactly, logos included, as IMAGE 2. Until then the outfits are described in words, with no logos or text.
+
 ## SL Admin app (Android APK)
 
 The admin is also an Android app, **SL Admin**. The app holds no copy of the
