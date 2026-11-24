@@ -321,6 +321,7 @@
   line-height: 1.05;
   text-transform: uppercase;
   text-wrap: balance;
+  word-spacing: 0.2em;
 }
 
 .profileHandle {
@@ -625,4 +626,42 @@
   .soon i {
     animation: none;
   }
+}
+
+/* Spotlight — the website's designer: gold rim, warm light, bigger photo. */
+.profile[data-spotlight] {
+  border: 1px solid transparent;
+  background:
+    radial-gradient(110% 90% at 100% 0%, rgb(227 194 122 / 0.16), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(0 168 107 / 0.1), transparent 60%),
+    linear-gradient(160deg, #101513, #070a09) padding-box,
+    linear-gradient(140deg, #fbecc4, rgb(227 194 122 / 0.35) 30%, rgb(255 255 255 / 0.06) 60%, #e3c27a) border-box;
+  box-shadow: 0 30px 70px -36px rgb(227 194 122 / 0.35), 0 24px 50px -28px rgb(0 0 0 / 0.9);
+}
+
+.profile[data-spotlight] .chip {
+  border-color: rgb(227 194 122 / 0.55);
+  color: #f0d48a;
+  background: rgb(227 194 122 / 0.08);
+}
+
+.profile[data-spotlight] .profileHandle {
+  color: #f0d48a;
+}
+
+.profile[data-spotlight] .avatar {
+  --size: 104px;
+}
+
+.profile[data-spotlight] .avatar[data-ring]::before {
+  padding: 3px;
+  background: conic-gradient(from 210deg, #fbecc4, #e3c27a, #6b5020, #e3c27a, #fbecc4);
+}
+
+.profile[data-spotlight] .avatarImg {
+  object-position: 50% 18%;
+}
+
+.profile[data-spotlight] .profileCta {
+  color: #f0d48a;
 }

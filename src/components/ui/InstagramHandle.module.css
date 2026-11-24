@@ -1,0 +1,49 @@
+.handle {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 6px 12px 6px 6px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(255 255 255 / 0.03);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--fg);
+  transition: border-color var(--dur-fast), background var(--dur-fast), transform var(--dur) var(--ease-out);
+}
+
+.handle[data-size="sm"] {
+  gap: 6px;
+  padding: 4px 10px 4px 4px;
+  font-size: var(--fs-xs);
+}
+
+/* Instagram's own gradient on the icon. */
+.icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: #fff;
+  background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
+}
+
+.handle[data-size="sm"] .icon {
+  width: 22px;
+  height: 22px;
+}
+
+.handle:hover {
+  border-color: rgb(214 36 159 / 0.55);
+  background: rgb(214 36 159 / 0.08);
+  transform: translateY(-1px);
+}
+
+.handle:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}

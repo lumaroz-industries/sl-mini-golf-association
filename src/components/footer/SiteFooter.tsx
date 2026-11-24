@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { navigation } from "@/config/navigation";
-import { getActiveSocialLinks, getPeopleByIds, getSiteSettings } from "@/content/repository";
+import { getActiveSocialLinks, getPeopleByIds, getPeopleInstagram, getSiteSettings } from "@/content/repository";
+import { InstagramHandle } from "@/components/ui/InstagramHandle";
 import { Logo } from "@/components/ui/Logo";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import styles from "./SiteFooter.module.css";
@@ -9,6 +10,7 @@ export async function SiteFooter() {
   const site = await getSiteSettings();
   const social = await getActiveSocialLinks();
   const [owner, developer] = await getPeopleByIds([site.credits.ownerId, site.credits.developerId]);
+  const instagram = await getPeopleInstagram();
   const year = new Date().getFullYear();
   const email = site.contact.email;
 
@@ -55,6 +57,7 @@ export async function SiteFooter() {
           <div key={person.id} className={styles.credit}>
             <span className={styles.creditRole}>{person.role}</span>
             <span className={styles.creditName}>{person.name}</span>
+            {instagram[person.id] && <InstagramHandle {...instagram[person.id]} name={person.name} size="sm" />}
           </div>
         ))}
       </div>

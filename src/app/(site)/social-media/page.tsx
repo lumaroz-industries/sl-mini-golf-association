@@ -53,7 +53,8 @@ export default async function SocialMediaPage() {
     return p;
   };
 
-  // Every card uses initials rather than photos (a deliberate, uniform look).
+  // Cards use initials rather than photos (a deliberate, uniform look) — except a
+  // "spotlight" account (the site's designer), which is wide, gold and shows the photo.
   // The association's own accounts lead the grid, then everything else in content order.
   const cards: Card[] = [
     ...official.map<Card>((link) => ({
@@ -78,7 +79,9 @@ export default async function SocialMediaPage() {
       return {
         kind: "profile",
         id: a.id,
-        span: a.featured ? "wide" : "normal",
+        span: a.featured || a.spotlight ? "wide" : "normal",
+        spotlight: a.spotlight,
+        portrait: a.spotlight ? p?.portrait : undefined,
         platform: a.platform,
         url: a.url,
         name,

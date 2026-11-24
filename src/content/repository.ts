@@ -8,6 +8,7 @@
  */
 import "server-only";
 import { cache } from "react";
+import { deriveHandle } from "@/config/social-platforms";
 import { z } from "zod";
 import { ArticleCategory, ArticlesPageContent, GalleryPageContent, PlayersPageContent, UpdatesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
 import { loadArticles, type RawArticle } from "./articles";
@@ -85,6 +86,19 @@ export const getSocialPageContent = cache(async (): Promise<SocialPageContent> =
 export const getPeople = cache(async (): Promise<Person[]> =>
   parse(z.array(Person), await source.people(), "people"),
 );
+
+/**
+ * Each person's Instagram, taken from the Social Media page's list
+ * (social.json → accounts with a personId), so a handle lives in one place.
+ */
+export const getPeopleInstagram = cache(async (): Promise<Record<string, { url: string; handle: string }>> => {
+  const { accounts } = await getSocialPageContent();
+  const out: Record<string, { url: string; handle: string }> = {};
+  for (const a of accounts) {
+    if (a.platform === "instagram" && a.personId && !out[a.personId]) out[a.personId] = { url: a.url, handle: a.handle ?? deriveHandle("instagram", a.url) ?? "Instagram" };
+  }
+  return out;
+});
 
 export async function getPeopleByIds(ids: string[]): Promise<Person[]> {
   const people = await getPeople();

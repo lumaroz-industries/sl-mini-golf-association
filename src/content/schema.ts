@@ -182,6 +182,8 @@ export const SocialAccount = z
     description: optionalText,
     /** Shown as a wider card. */
     featured: z.boolean().optional().default(false),
+    /** Wide, gold-highlighted card with the person's photo (used for the site's designer). */
+    spotlight: z.boolean().optional().default(false),
   })
   .superRefine((acc, ctx) => {
     if (!urlMatchesPlatform(acc.platform, acc.url)) {

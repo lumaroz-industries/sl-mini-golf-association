@@ -1,4 +1,4 @@
-import { getHomeContent, getPeopleByIds } from "@/content/repository";
+import { getHomeContent, getPeopleByIds, getPeopleInstagram } from "@/content/repository";
 import { Journey } from "@/sections/home/journey/Journey";
 import { PeopleSection } from "@/sections/home/PeopleSection";
 
@@ -11,13 +11,13 @@ const JOURNEY_MODE = `try{if(document.createElement('canvas').getContext('webgl2
 
 export default async function HomePage() {
   const home = await getHomeContent();
-  const people = await getPeopleByIds(home.people.memberIds);
+  const [people, instagram] = await Promise.all([getPeopleByIds(home.people.memberIds), getPeopleInstagram()]);
 
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: JOURNEY_MODE }} />
       <Journey hero={home.hero} intro={home.intro} visionMission={home.visionMission} community={home.community} />
-      <PeopleSection content={home.people} people={people} />
+      <PeopleSection content={home.people} people={people} instagram={instagram} />
     </>
   );
 }

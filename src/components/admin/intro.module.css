@@ -259,6 +259,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  word-spacing: 0.2em;
   background: linear-gradient(180deg, #ffffff 30%, #c9ced1);
   -webkit-background-clip: text;
   background-clip: text;

@@ -103,6 +103,7 @@
 
 .caption {
   display: grid;
+  justify-items: start;
   gap: 4px;
   padding-inline: 4px;
 }
@@ -120,4 +121,6 @@
   font-size: var(--fs-lg);
   font-weight: 600;
   text-transform: uppercase;
+  word-spacing: 0.22em; /* the display face's space is very narrow in capitals */
+  margin-bottom: 8px;
 }

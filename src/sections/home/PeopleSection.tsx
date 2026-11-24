@@ -1,11 +1,13 @@
 import Image from "next/image";
 import type { HomeContent, Person } from "@/content/schema";
 import { Reveal } from "@/components/ui/Reveal";
+import { InstagramHandle } from "@/components/ui/InstagramHandle";
 import styles from "./PeopleSection.module.css";
 
 interface PeopleSectionProps {
   content: HomeContent["people"];
   people: Person[];
+  instagram?: Record<string, { url: string; handle: string }>;
 }
 
 /**
@@ -13,7 +15,7 @@ interface PeopleSectionProps {
  * Equal cards and portrait sizes for everyone. A person without a real
  * photograph gets a reserved branded frame — never a generated face.
  */
-export function PeopleSection({ content, people }: PeopleSectionProps) {
+export function PeopleSection({ content, people, instagram = {} }: PeopleSectionProps) {
   return (
     <section className={styles.section} aria-labelledby="people-title">
       <div className="container">
@@ -50,6 +52,7 @@ export function PeopleSection({ content, people }: PeopleSectionProps) {
                 <figcaption className={styles.caption}>
                   <span className={styles.role}>{person.role}</span>
                   <span className={styles.name}>{person.name}</span>
+                  {instagram[person.id] && <InstagramHandle {...instagram[person.id]} name={person.name} />}
                 </figcaption>
               </figure>
             </Reveal>
