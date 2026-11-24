@@ -38,6 +38,7 @@ export function PeopleSection({ content, people, instagram = {} }: PeopleSection
                       width={person.portrait.width}
                       height={person.portrait.height}
                       sizes="(max-width: 720px) 92vw, 520px"
+                      quality={92}
                       className={styles.photo}
                     />
                   ) : (
