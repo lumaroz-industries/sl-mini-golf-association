@@ -193,7 +193,7 @@
 .people {
   display: flex;
   justify-content: center;
-  gap: clamp(28px, 7vw, 72px);
+  gap: clamp(14px, 5vw, 80px);
 }
 
 .person {
@@ -201,7 +201,7 @@
   align-content: start;
   justify-items: center;
   gap: 8px;
-  width: clamp(130px, 36vw, 190px);
+  width: clamp(150px, 44vw, 280px);
   animation: personIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) calc(2.45s + var(--i) * 0.16s) both;
 }
 
@@ -215,14 +215,14 @@
 
 /* Portrait in a brushed-gold ring. */
 .ring {
-  --size: clamp(96px, 26vw, 132px);
+  --size: clamp(140px, 40vw, 240px);
   position: relative;
   display: block;
   width: var(--size);
   height: var(--size);
   flex-shrink: 0;
   margin-bottom: 6px;
-  padding: 3px;
+  padding: 4px;
   border-radius: 50%;
   background: linear-gradient(145deg, #fbecc4, #e3c27a 30%, #6b5020 55%, #e3c27a 80%, #fbecc4);
   box-shadow: 0 18px 40px -16px rgb(0 0 0 / 0.9), 0 0 0 6px rgb(227 194 122 / 0.06);
@@ -255,7 +255,7 @@
 
 .name {
   font-family: var(--font-display);
-  font-size: clamp(1rem, 0.9rem + 0.6vw, 1.25rem);
+  font-size: clamp(1.0625rem, 0.95rem + 0.8vw, 1.5rem);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -266,7 +266,7 @@
 }
 
 .role {
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 800;
   letter-spacing: 0.2em;
   text-transform: uppercase;
