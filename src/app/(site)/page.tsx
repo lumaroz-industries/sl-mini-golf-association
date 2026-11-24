@@ -12,10 +12,12 @@ const JOURNEY_MODE = `try{if(document.createElement('canvas').getContext('webgl2
 export default async function HomePage() {
   const home = await getHomeContent();
   const [people, instagram, site] = await Promise.all([getPeopleByIds(home.people.memberIds), getPeopleInstagram(), getSiteSettings()]);
-  const [dev] = await getPeopleByIds([site.credits.developerId]);
-  const devInsta = instagram[dev.id];
-  // The website's credit on the 3D course's trackside LED boards.
-  const trackside = { name: dev.name.toUpperCase(), line: "WEBSITE DESIGN & DEVELOPMENT", tail: devInsta?.handle.toUpperCase() };
+  const [owner, dev] = await getPeopleByIds([site.credits.ownerId, site.credits.developerId]);
+  // Trackside LED boards on the 3D course: mostly the website's designer, a couple for the founder.
+  const trackside = [
+    { name: dev.name.toUpperCase(), line: "WEBSITE DESIGN & DEVELOPMENT", tail: instagram[dev.id]?.handle.toUpperCase() },
+    { name: owner.name.toUpperCase(), line: "FOUNDER & OWNER", tail: instagram[owner.id]?.handle.toUpperCase() },
+  ];
 
   return (
     <>

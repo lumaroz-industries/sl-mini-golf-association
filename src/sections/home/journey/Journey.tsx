@@ -10,8 +10,8 @@ interface JourneyProps {
   intro: HomeContent["intro"];
   visionMission: HomeContent["visionMission"];
   community: HomeContent["community"];
-  /** Trackside LED boards on the 3D course (the website's credit). */
-  trackside?: { name: string; line: string; tail?: string };
+  /** Trackside LED boards on the 3D course: [0] the website's designer, [1] the founder. */
+  trackside?: Array<{ name: string; line: string; tail?: string }>;
 }
 
 export function Journey({ hero, intro, visionMission, community, trackside }: JourneyProps) {
