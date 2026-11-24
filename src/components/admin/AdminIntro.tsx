@@ -9,7 +9,8 @@ export interface IntroPerson {
   portrait?: string;
 }
 
-const KEY = "slmga-admin-intro";
+/** In the installed app, coming back after this long counts as opening it again. */
+const REOPEN_AFTER_MS = 60_000;
 
 /**
  * Opening animation for the admin (website and the SL Admin app, which opens
@@ -17,28 +18,44 @@ const KEY = "slmga-admin-intro";
  * then the people behind the platform, then a fade into the admin.
  *
  * It is rendered on the server and runs on pure CSS, so it is on screen from
- * the very first frame (no blank screen while scripts load). It plays once
- * per visit — opening the app or a new tab — not on every page change or
- * refresh. Tap anywhere to skip.
+ * the very first frame (no blank screen while scripts load). On the website
+ * it plays when /admin itself is loaded or refreshed (and on the sign-in page
+ * that /admin leads to when signed out) — not when another admin page such
+ * as Updates or Gallery is refreshed, and never when moving between pages.
+ * The app always starts at /admin, so it plays every time the app opens; it also
+ * plays when the app is reopened from the background after a minute away
+ * (short switches, like picking a photo to upload, don't trigger it).
+ * Tap anywhere to skip.
  */
 export function AdminIntro({ people }: { people: IntroPerson[] }) {
   const [gone, setGone] = useState(false);
   const [skip, setSkip] = useState(false);
+  const [run, setRun] = useState(0);
 
   useEffect(() => {
-    if (document.documentElement.dataset.adminIntro === "seen") setGone(true);
+    if (document.documentElement.dataset.adminIntro === "skip") setGone(true);
+    const app = window.matchMedia("(display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui)");
+    let hiddenAt = 0;
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") hiddenAt = Date.now();
+      else if (app.matches && hiddenAt && Date.now() - hiddenAt > REOPEN_AFTER_MS) {
+        delete document.documentElement.dataset.adminIntro;
+        setSkip(false);
+        setGone(false);
+        setRun((n) => n + 1); // remount: CSS animations start again
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
   }, []);
 
   if (gone) return null;
   return (
     <>
-      {/* Runs before the overlay is painted: a repeat visit in the same session skips it entirely. */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `try{if(sessionStorage.getItem("${KEY}")){document.documentElement.dataset.adminIntro="seen"}else{sessionStorage.setItem("${KEY}","1")}}catch(e){}`,
-        }}
-      />
+      {/* Runs before the overlay is painted, so other admin pages never flash it. */}
+      <script dangerouslySetInnerHTML={{ __html: `if(!/^\\/admin(\\/login)?\\/?$/.test(location.pathname))document.documentElement.dataset.adminIntro="skip"` }} />
       <div
+        key={run}
         className={s.intro}
         data-skip={skip || undefined}
         aria-hidden="true"

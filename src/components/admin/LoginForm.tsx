@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { api } from "./client";
 import s from "./admin.module.css";
 
 export function LoginForm({ expired }: { expired: boolean }) {
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(expired ? "Your session ended — please sign in again." : "");
@@ -16,7 +18,9 @@ export function LoginForm({ expired }: { expired: boolean }) {
     const r = await api("POST", "/api/admin/session", { password });
     setBusy(false);
     if (!r.ok) return setError(r.message ?? "Could not sign in.");
-    window.location.href = "/admin";
+    // Move on without a full reload, so the opening animation doesn't play twice.
+    router.replace("/admin");
+    router.refresh();
   }
 
   return (
