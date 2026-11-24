@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { PLATFORMS } from "@/config/social-platforms";
 import type { ImageAsset, SocialPlatform } from "@/content/schema";
 import { SocialIcon } from "@/components/ui/SocialIcon";
@@ -29,15 +30,21 @@ export interface ProfileCardProps {
 export function ProfileCard({ platform, url, name, handle, tags, detail, portrait, brand, wide, spotlight, wholePhoto, full }: ProfileCardProps) {
   const info = PLATFORMS[platform];
   return (
-    <a className={styles.profile} data-wide={wide || undefined} data-full={full || undefined} data-spotlight={spotlight} href={url} target="_blank" rel="noopener noreferrer">
+    <a className={styles.profile} data-wide={wide || undefined} data-full={full || undefined} data-photo={(full && portrait) || undefined} data-spotlight={spotlight} href={url} target="_blank" rel="noopener noreferrer">
       <span className={styles.spot} aria-hidden="true" />
       {spotlight === "diamond" && <span className={styles.sparkles} aria-hidden="true" />}
       {spotlight === "diamond" && <span className={styles.sheen} aria-hidden="true" />}
       {spotlight === "tricolor" && <span className={styles.tricolor} aria-hidden="true" />}
-      {full && (
+      {full && portrait && (
+        // A person's photo: large, borderless, fading softly into the card.
+        <span className={styles.fullPhoto} aria-hidden="true">
+          <Image src={portrait.src} alt="" width={portrait.width} height={portrait.height} sizes="(max-width: 760px) 100vw, 45vw" />
+        </span>
+      )}
+      {full && !portrait && (
         <span className={styles.fullSide}>
           <span className={styles.halo} aria-hidden="true" />
-          <Avatar name={name} portrait={portrait} brand={brand} size="xl" whole={wholePhoto} />
+          <Avatar name={name} brand={brand} size="xl" />
         </span>
       )}
       <span className={styles.profileTop}>
