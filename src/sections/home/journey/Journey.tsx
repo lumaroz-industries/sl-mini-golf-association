@@ -3,7 +3,30 @@
 import { useEffect, useRef } from "react";
 import type { HomeContent } from "@/content/schema";
 import { SCENES, SKIP_TO, SKIP_UNTIL, quantizeToStill, sceneOpacity, type SceneId } from "@/experience/timeline/chapters";
+import { detectQuality } from "@/experience/quality";
+import { prefetchSurfaces } from "@/experience/materials/surfaceCache";
 import styles from "./Journey.module.css";
+
+/**
+ * Start fetching the 3D engine and preparing the course textures as soon as
+ * this script runs — before the page has finished hydrating.
+ */
+const early =
+  typeof window !== "undefined"
+    ? (() => {
+        try {
+          if (!document.createElement("canvas").getContext("webgl2")) return undefined;
+        } catch {
+          return undefined;
+        }
+        const quality = detectQuality();
+        return {
+          quality,
+          engine: import("@/experience/engine/Experience"),
+          surfaces: prefetchSurfaces(quality.textureSize),
+        };
+      })()
+    : undefined;
 
 /** The SL Mini Golf Association logo (public/brand/slmga-logo-dark.svg), inlined. */
 const FINALE_LOGO = `<path fill="#FFFFFF" transform="matrix(1 0 -0.43 1 107.88 0)" d="M337 0L322 52H99A23 23 0 0 0 76 75V75A23 23 0 0 0 99 98H267A62 62 0 0 1 329 160V186A62 62 0 0 1 267 248H0L15 196H238A23 23 0 0 0 261 173V173A23 23 0 0 0 238 150H70A62 62 0 0 1 8 88V62A62 62 0 0 1 70 0ZM359 0H427V173A23 23 0 0 0 450 196H605V248H359Z"/>
@@ -92,24 +115,28 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
 
     (async () => {
       try {
-        const [{ Experience }, { detectQuality }, LenisModule] = await Promise.all([
-          import("@/experience/engine/Experience"),
-          import("@/experience/quality"),
+        const quality = early?.quality ?? detectQuality();
+        const [{ Experience }, LenisModule] = await Promise.all([
+          early?.engine ?? import("@/experience/engine/Experience"),
           reduced ? Promise.resolve(undefined) : import("lenis"),
+          early?.surfaces ?? prefetchSurfaces(quality.textureSize),
         ]);
         if (cancelled) return;
         await document.fonts.ready;
         const font = getComputedStyle(document.documentElement).getPropertyValue("--font-clash").trim() || "sans-serif";
         await document.fonts.load(`600 100px ${font}`).catch(() => undefined);
         if (cancelled) return;
-        const create = () => {
-          engine = new Experience({
+        const create = async () => {
+          const e = new Experience({
             canvas,
-            quality: detectQuality(),
+            quality,
             text: { title: hero.title, taglineTop: hero.taglineLines[0], taglineBottom: hero.taglineLines[1], font, trackside },
           });
-          engine.setProgress(reduced ? quantizeToStill(progress()) : progress());
-          engine.renderNow();
+          engine = e;
+          await e.prepare();
+          if (cancelled || engine !== e) return;
+          e.setProgress(reduced ? quantizeToStill(progress()) : progress());
+          e.renderNow();
           root.setAttribute("data-ready", "");
         };
         rebuild = () => {
@@ -119,9 +146,9 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
           } catch {
             /* already gone */
           }
-          create();
+          void create();
         };
-        create();
+        await create();
         if (LenisModule) {
           lenis = new LenisModule.default({
             lerp: 0.085,

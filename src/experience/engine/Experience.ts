@@ -61,7 +61,7 @@ export class Experience {
   private progress = 0;
   private dirty = true;
   private raf = 0;
-  private envTexture: Texture;
+  private envTexture?: Texture;
   private disposed = false;
 
   constructor(private readonly opts: ExperienceOptions) {
@@ -81,10 +81,8 @@ export class Experience {
     this.renderer.shadowMap.type = PCFShadowMap;
     this.scene.background = new Color("#020403");
 
-    const pmrem = new PMREMGenerator(this.renderer);
-    this.envTexture = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    pmrem.dispose();
-    this.scene.environment = this.envTexture;
+    // The soft environment light is added just after the first frame (see
+    // prepare), so it doesn't delay the course appearing.
     this.scene.environmentIntensity = 0.14;
 
     this.path = buildCoursePath();
@@ -109,6 +107,31 @@ export class Experience {
     this.resize();
     this.loop = this.loop.bind(this);
     this.raf = requestAnimationFrame(this.loop);
+  }
+
+  /**
+   * Gets the scene ready to show: shaders are compiled in parallel where the
+   * browser supports it (instead of freezing the page on the first frame),
+   * then the environment light is prepared once the course is on screen.
+   */
+  async prepare(): Promise<void> {
+    try {
+      await this.renderer.compileAsync(this.scene, this.camera);
+    } catch {
+      /* compiled on first render instead */
+    }
+    if (this.disposed) return;
+    const addEnvironment = () => {
+      if (this.disposed) return;
+      const pmrem = new PMREMGenerator(this.renderer);
+      this.envTexture = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+      pmrem.dispose();
+      this.scene.environment = this.envTexture;
+      this.dirty = true;
+    };
+    const idle = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    if (idle) idle(addEnvironment, { timeout: 600 });
+    else setTimeout(addEnvironment, 120);
   }
 
   setProgress(p: number) {
@@ -246,7 +269,7 @@ export class Experience {
         m.dispose();
       });
     });
-    this.envTexture.dispose();
+    this.envTexture?.dispose();
     this.composer?.dispose();
     this.renderer.dispose();
   }
