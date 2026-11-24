@@ -294,7 +294,8 @@ in the admin yet.)
   large files).
 
 **Security:** one shared password (`ADMIN_PASSWORD`); a signed, HttpOnly
-session cookie for 12 hours; changes must come from the site itself; 8 wrong
+session cookie that keeps a device signed in until **Sign out** (up to 400
+days, the browser limit); changes must come from the site itself; 8 wrong
 passwords lock sign-in for 15 minutes. `/admin` is hidden from search engines.
 Changing `ADMIN_PASSWORD` signs everyone out.
 

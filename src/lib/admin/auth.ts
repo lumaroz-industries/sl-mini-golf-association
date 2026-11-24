@@ -5,11 +5,13 @@ import { cookies, headers } from "next/headers";
 /**
  * Admin sign-in: one shared password (ADMIN_PASSWORD in Vercel), no accounts
  * and no database. A successful sign-in sets a signed, HttpOnly cookie that
- * lasts 12 hours. Changing ADMIN_PASSWORD signs everyone out.
+ * keeps the device signed in until "Sign out" (browsers allow at most 400
+ * days). Changing ADMIN_PASSWORD signs every device out.
  */
 
 export const SESSION_COOKIE = "slmga_admin";
-const SESSION_HOURS = 12;
+/** Effectively "until you sign out": 400 days is the longest browsers keep a cookie. */
+const SESSION_HOURS = 400 * 24;
 
 const password = () => process.env.ADMIN_PASSWORD?.trim() ?? "";
 export const adminConfigured = () => password().length >= 8;
@@ -47,7 +49,10 @@ export async function isSignedIn(): Promise<boolean> {
 export const sessionCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "strict" as const,
+  // "lax", not "strict": the admin must stay signed in when opened from a link
+  // in another app (WhatsApp, email). Changes are still protected by the
+  // same-origin check on every admin API call.
+  sameSite: "lax" as const,
   path: "/",
   maxAge: SESSION_HOURS * 3600,
 };
