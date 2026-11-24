@@ -71,13 +71,7 @@
       "platform": "youtube",
       "url": "https://www.youtube.com/@TheMiniGolfJourney",
       "name": "The Mini Golf Journey",
-      "personId": "suyash-lahane",
-      "avatar": {
-        "src": "/social/the-mini-golf-journey-cover.webp",
-        "alt": "A golf ball rolling towards the cup on a lit putting green",
-        "width": 1280,
-        "height": 800
-      }
+      "personId": "suyash-lahane"
     }
   ],
   "emptyState": "Social media accounts will be listed here soon.",

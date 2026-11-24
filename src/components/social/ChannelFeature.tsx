@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { ImageAsset } from "@/content/schema";
 import { SocialIcon } from "@/components/ui/SocialIcon";
 import { Avatar } from "./Avatar";
@@ -10,28 +9,23 @@ interface ChannelFeatureProps {
   handle?: string;
   owner?: { name: string; portrait?: ImageAsset };
   description?: string;
-  /** Cover picture shown in the video panel, like a thumbnail. */
-  cover?: ImageAsset;
 }
 
 /** Cinematic feature panel for a YouTube channel. */
-export function ChannelFeature({ url, name, handle, owner, description, cover }: ChannelFeatureProps) {
+export function ChannelFeature({ url, name, handle, owner, description }: ChannelFeatureProps) {
   return (
     <a className={styles.channel} href={url} target="_blank" rel="noopener noreferrer">
       <span className={styles.spot} aria-hidden="true" />
-      <span className={styles.screen} aria-hidden="true">
-        {cover && <Image className={styles.screenCover} src={cover.src} alt="" width={cover.width} height={cover.height} sizes="(max-width: 900px) 100vw, 55vw" />}
-        <span className={styles.screenGlow} />
-        <span className={styles.screenFloor} />
-        <span className={styles.screenCup} />
-        <span className={styles.screenBall} />
-        <span className={styles.play}>
-          <svg viewBox="0 0 24 24" width="30" height="30">
-            <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+      {/* A simple YouTube logo animation: the play button pops in, then pulses. */}
+      <span className={`${styles.screen} ${styles.ytScreen}`} aria-hidden="true">
+        <span className={styles.ytGlow} />
+        <span className={styles.ytRing} />
+        <span className={styles.ytRing} style={{ animationDelay: "1.2s" }} />
+        <span className={styles.ytLogo}>
+          <svg viewBox="0 0 68 48" width="150" height="106">
+            <path d="M66.5 7.5A8.5 8.5 0 0 0 60.5 1.5C55.2 0 34 0 34 0S12.8 0 7.5 1.5A8.5 8.5 0 0 0 1.5 7.5C0 12.8 0 24 0 24s0 11.2 1.5 16.5a8.5 8.5 0 0 0 6 6C12.8 48 34 48 34 48s21.2 0 26.5-1.5a8.5 8.5 0 0 0 6-6C68 35.2 68 24 68 24s0-11.2-1.5-16.5Z" fill="#ff0033" />
+            <path d="M27 34.3 45 24 27 13.7Z" fill="#fff" />
           </svg>
-        </span>
-        <span className={styles.screenBar}>
-          <span />
         </span>
       </span>
       <span className={styles.channelInfo}>

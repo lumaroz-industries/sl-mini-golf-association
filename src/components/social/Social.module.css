@@ -1397,3 +1397,95 @@
   position: relative;
   z-index: 1;
 }
+
+
+/* ============================================ YouTube logo animation */
+.ytScreen {
+  display: grid;
+  place-items: center;
+  background: radial-gradient(70% 70% at 50% 50%, #2a0a10 0%, #120607 60%, #080404 100%);
+}
+
+.ytGlow {
+  position: absolute;
+  width: 60%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 0 51 / 0.35), transparent 70%);
+  animation: ytBreathe 3s ease-in-out infinite;
+}
+
+.ytRing {
+  position: absolute;
+  width: 150px;
+  height: 106px;
+  border-radius: 30%;
+  border: 2px solid rgb(255 0 51 / 0.6);
+  animation: ytRing 2.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+.ytLogo {
+  position: relative;
+  display: grid;
+  filter: drop-shadow(0 18px 40px rgb(255 0 51 / 0.5));
+  animation: ytIn 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both, ytPulse 2.4s ease-in-out 0.9s infinite;
+}
+
+@keyframes ytIn {
+  from {
+    opacity: 0;
+    transform: scale(0.4) rotate(-8deg);
+  }
+}
+
+@keyframes ytPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  12% {
+    transform: scale(1.07);
+  }
+  24% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ytRing {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+@keyframes ytBreathe {
+  50% {
+    opacity: 0.55;
+    transform: scale(1.12);
+  }
+}
+
+@media (hover: hover) {
+  .channel:hover .ytLogo svg {
+    transform: scale(1.06);
+  }
+}
+
+.ytLogo svg {
+  transition: transform var(--dur) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ytGlow,
+  .ytRing,
+  .ytLogo {
+    animation: none;
+  }
+  .ytRing {
+    display: none;
+  }
+}
