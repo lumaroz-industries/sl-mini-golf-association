@@ -18,7 +18,6 @@ export const metadata: Metadata = {
 export default async function ArticlesPage() {
   const [content, articles, categories] = await Promise.all([getArticlesPageContent(), getArticles(), getArticleCategories()]);
   const lead = articles.find((x) => x.featured) ?? articles[0];
-  const rest = articles.filter((x) => x !== lead);
 
   return (
     <div className={styles.page}>
@@ -32,14 +31,20 @@ export default async function ArticlesPage() {
 
         {lead ? (
           <div className={styles.body}>
-            <ArticleCard article={lead} lead />
-            {rest.length > 0 && (
-              <ArticleBrowser
-                allLabel={content.allLabel}
-                categories={categories.map((c) => ({ id: c.id, label: c.label, count: rest.filter((x) => x.category.id === c.id).length }))}
-                items={rest.map((x) => ({ slug: x.slug, category: x.category.id, card: <ArticleCard article={x} /> }))}
-              />
-            )}
+            <ArticleBrowser
+              allLabel={content.allLabel}
+              categories={categories.map((c) => ({ id: c.id, label: c.label, description: c.description }))}
+              lead={{ slug: lead.slug, card: <ArticleCard article={lead} lead /> }}
+              items={articles.map((x) => ({
+                slug: x.slug,
+                category: x.category.id,
+                title: x.title,
+                publishedAt: x.publishedAt,
+                minutes: x.readingMinutes,
+                text: [x.title, x.excerpt, x.category.label, x.author.name, ...x.tags].join(" ").toLowerCase(),
+                card: <ArticleCard article={x} />,
+              }))}
+            />
           </div>
         ) : (
           <div className={a.empty}>

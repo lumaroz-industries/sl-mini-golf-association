@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { readAlbum } from "@/lib/admin/content";
 import { AlbumEditor } from "@/components/admin/AlbumEditor";
+import galleryCategories from "@/content/sources/local/gallery-categories.json";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { attempt, PageHead, SetupNotice } from "@/components/admin/Page";
 
@@ -21,7 +22,7 @@ export default async function EditAlbum({ params }: { params: Promise<{ slug: st
   return (
     <>
       <PageHead kicker="Edit album" title={album.title} />
-      <AlbumEditor key={slug} isNew={false} initial={{ ...album, slug, photos }} />
+      <AlbumEditor key={slug} isNew={false} initial={{ ...album, slug, photos }} categories={galleryCategories} />
       <div style={{ marginTop: 40 }}>
         <DeleteButton collection="gallery" slug={slug} title={album.title} after="/admin/gallery" />
       </div>

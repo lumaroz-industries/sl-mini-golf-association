@@ -104,8 +104,9 @@ To add Suyash's portrait: put the image in `public/people/` and add a
 
 ## Articles
 
-`/articles` lists published articles (a featured lead, then a filterable
-grid); `/articles/<slug>` is the reading page with contents list, reading
+`/articles` lists published articles: the featured article, then one section
+per category; search, category tabs and sorting (newest, oldest, A–Z, quick
+reads) switch to a single filtered grid, all kept in the URL; `/articles/<slug>` is the reading page with contents list, reading
 progress, tap-to-load embeds, share links, related articles, structured data
 and an auto-generated link preview image.
 
@@ -190,8 +191,11 @@ without a player show "Reveal soon".
 
 ## Gallery
 
-`/gallery` is one justified photo wall of every album, with album filter
-chips (kept in the URL). Each album also has its own page
+`/gallery` has two views: **Albums** (grouped by category — Tournaments,
+Players, Events, Community; categories live in `gallery-categories.json`) and
+**All photos** (one justified photo wall). Both have category tabs, sorting
+(newest, oldest, A–Z, most photos) and a city filter, all kept in the URL.
+Set an album's category in the admin, or `category:` in its `album.yaml`. Each album also has its own page
 (`/gallery/<album>`) with a cover header, a share-preview collage and a
 "want a photo removed?" note. Tapping a photo opens a full-screen viewer:
 swipe or arrow keys to move, swipe down / Esc / Back to close, double-tap or

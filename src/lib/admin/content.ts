@@ -4,6 +4,7 @@ import { z } from "zod";
 import sharp from "sharp";
 import { ArticleFrontmatter, GalleryAlbumFile, GalleryManifest, UpdateFrontmatter } from "@/content/schema";
 import articleCategories from "@/content/sources/local/article-categories.json";
+import galleryCategories from "@/content/sources/local/gallery-categories.json";
 import people from "@/content/sources/local/people.json";
 import { getStorage, type Change } from "./storage";
 import { nameFrom } from "./shared";
@@ -286,7 +287,7 @@ export async function processGalleryPhoto(album: string, file: string, data: Buf
 export interface SaveAlbumInput {
   mode: "create" | "edit";
   slug: string;
-  album: { title: string; date: string; city?: string; description?: string; cover?: string; draft: boolean; photos: Array<{ file: string; alt: string; caption?: string }> };
+  album: { title: string; date: string; category?: string; city?: string; description?: string; cover?: string; draft: boolean; photos: Array<{ file: string; alt: string; caption?: string }> };
   newPhotos?: Record<string, { entry: ManifestEntry; blobs: Upload[] }>;
 }
 
@@ -304,6 +305,7 @@ export async function saveAlbum(input: SaveAlbumInput): Promise<{ slug: string; 
   const parsed = GalleryAlbumFile.safeParse(album);
   if (!parsed.success) throw new ContentError("Some details need fixing.", issuesOf(parsed.error));
   if (album.cover && !album.photos.some((p) => p.file === album.cover)) delete album.cover;
+  if (album.category && !galleryCategories.some((c) => c.id === album.category)) throw new ContentError(`Unknown category "${album.category}".`);
 
   // Photo sizes: from new uploads or the existing manifest.
   const manifest: GalleryManifest = {};

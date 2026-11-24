@@ -323,9 +323,14 @@ export const GalleryPhotoEntry = z.object({
 });
 
 /** album.yaml — the editable details of an album. */
+export const GalleryCategory = z.object({ id: slug, label: z.string().min(1), description: z.string().min(1) });
+export type GalleryCategory = z.infer<typeof GalleryCategory>;
+
 export const GalleryAlbumFile = z.object({
   title: z.string().min(1).max(100),
   date: isoDate,
+  /** One of gallery-categories.json (e.g. tournaments, players). Optional: uncategorised albums are grouped under "More albums". */
+  category: slug.optional(),
   city: optionalText,
   description: optionalText,
   /** File name of the cover photo; defaults to the first photo. */

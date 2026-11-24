@@ -213,6 +213,7 @@ export async function getUpdate(slug: string): Promise<Update | undefined> {
 /* ----------------------------------------------------------------- gallery */
 
 export type { GalleryAlbum, GalleryPhoto } from "./gallery";
+export { GALLERY_CATEGORIES } from "./gallery";
 
 export const getGalleryPageContent = cache(async (): Promise<GalleryPageContent> =>
   parse(GalleryPageContent, await source.galleryPage(), "gallery page"),

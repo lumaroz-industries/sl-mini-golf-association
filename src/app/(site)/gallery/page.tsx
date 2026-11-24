@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { findNavItem } from "@/config/navigation";
-import { getAlbums, getGalleryPageContent } from "@/content/repository";
-import { PhotoWall } from "@/components/gallery/PhotoWall";
+import { GALLERY_CATEGORIES, getAlbums, getGalleryPageContent } from "@/content/repository";
+import { GalleryBrowser } from "@/components/gallery/GalleryBrowser";
 import { toWall } from "@/components/gallery/toWall";
 import g from "@/components/gallery/Gallery.module.css";
 import styles from "./page.module.css";
@@ -42,7 +42,7 @@ export default async function GalleryPage() {
         </header>
 
         {photos.length > 0 ? (
-          <PhotoWall photos={photos} albums={metas} filterable allLabel={content.allLabel} />
+          <GalleryBrowser photos={photos} albums={metas} categories={GALLERY_CATEGORIES} allLabel={content.allLabel} />
         ) : (
           <div className={g.empty}>
             <div className={g.emptyWall} aria-hidden="true">

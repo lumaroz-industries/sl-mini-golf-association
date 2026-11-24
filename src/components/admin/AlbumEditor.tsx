@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { nameFrom, slugify } from "@/lib/admin/shared";
 import { todayInIndia, uploadPhoto } from "./client";
-import { Section, SlugField, TextArea, TextInput, Toggle } from "./fields";
+import { Choice, Section, SlugField, TextArea, TextInput, Toggle } from "./fields";
 import { PublishBar } from "./PublishBar";
 import s from "./admin.module.css";
 
@@ -32,6 +32,7 @@ export interface AlbumInitial {
   slug?: string;
   title?: string;
   date?: string;
+  category?: string;
   city?: string;
   description?: string;
   cover?: string;
@@ -39,7 +40,7 @@ export interface AlbumInitial {
   photos?: Array<{ file: string; alt: string; caption?: string; id: string; blur: string; thumb: string }>;
 }
 
-export function AlbumEditor({ initial, isNew: startsNew }: { initial: AlbumInitial; isNew: boolean }) {
+export function AlbumEditor({ initial, isNew: startsNew, categories }: { initial: AlbumInitial; isNew: boolean; categories: Array<{ id: string; label: string; description: string }> }) {
   const [isNew, setIsNew] = useState(startsNew);
   const [isDraft, setIsDraft] = useState(initial.draft ?? true);
   const [title, setTitle] = useState(initial.title ?? "");
@@ -47,6 +48,7 @@ export function AlbumEditor({ initial, isNew: startsNew }: { initial: AlbumIniti
   const [slugTouched, setSlugTouched] = useState(!isNew);
   const [date, setDate] = useState(initial.date ?? todayInIndia());
   const [city, setCity] = useState(initial.city ?? "");
+  const [category, setCategory] = useState(initial.category ?? categories[0]?.id ?? "");
   const [description, setDescription] = useState(initial.description ?? "");
   const [cover, setCover] = useState(initial.cover ?? "");
   const [photos, setPhotos] = useState<Photo[]>((initial.photos ?? []).map((p) => ({ ...p, caption: p.caption ?? "", state: "ready" })));
@@ -112,6 +114,7 @@ export function AlbumEditor({ initial, isNew: startsNew }: { initial: AlbumIniti
       album: {
         title,
         date,
+        category,
         city,
         description,
         cover: ready.some((p) => p.file === cover) ? cover : undefined,
@@ -131,6 +134,7 @@ export function AlbumEditor({ initial, isNew: startsNew }: { initial: AlbumIniti
           <TextInput label="Date" type="date" value={date} onChange={setDate} help="When the photos were taken." />
           <TextInput label="City" optional value={city} onChange={setCity} placeholder="e.g. Pune" />
         </div>
+        <Choice label="Category" value={category} onChange={setCategory} options={categories.map((c) => ({ value: c.id, label: c.label }))} help={categories.find((c) => c.id === category)?.description} />
         <TextArea label="About this album" optional value={description} onChange={setDescription} rows={2} help="One or two sentences about the event." />
       </Section>
 

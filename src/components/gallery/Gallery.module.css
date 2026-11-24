@@ -465,3 +465,118 @@ a.lbAlbum:hover {
     animation: none;
   }
 }
+
+/* =========================================================== browser */
+.browser {
+  display: grid;
+  gap: 28px;
+}
+
+.albumGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 1080px) {
+  .albumGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .albumGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.albumCell {
+  display: grid;
+  animation: albumIn var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+@keyframes albumIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.albumCard {
+  display: grid;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  transition: border-color var(--dur-fast), transform var(--dur) var(--ease-out);
+}
+
+.albumCard:hover {
+  border-color: var(--line-accent);
+  transform: translateY(-3px);
+}
+
+.albumCard:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.albumCover {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: #0c1411 center / cover no-repeat;
+}
+
+.albumCover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.albumCard:hover .albumCover img {
+  transform: scale(1.04);
+}
+
+.albumCount {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgb(5 8 7 / 0.72);
+  backdrop-filter: blur(6px);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.albumInfo {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px 18px;
+}
+
+.albumTitle {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.albumMeta {
+  font-size: var(--fs-xs);
+  color: var(--fg-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .albumCell {
+    animation: none;
+  }
+}

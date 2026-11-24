@@ -1,0 +1,6 @@
+[
+  { "id": "tournaments", "label": "Tournaments", "description": "Competition days, from local events to the international stage." },
+  { "id": "players", "label": "Players", "description": "Portraits and moments of the players behind Indian mini golf." },
+  { "id": "events", "label": "Events", "description": "Camps, meet-ups, felicitations and other occasions." },
+  { "id": "community", "label": "Community", "description": "Clubs, courses and the wider mini-golf community." }
+]

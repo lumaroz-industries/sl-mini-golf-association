@@ -4,7 +4,8 @@ import path from "node:path";
 import { cache } from "react";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod";
-import { GalleryAlbumFile, GalleryManifest } from "./schema";
+import { GalleryAlbumFile, GalleryCategory, GalleryManifest } from "./schema";
+import galleryCategories from "./sources/local/gallery-categories.json";
 import { showDrafts } from "./markdown-collection";
 
 /**
@@ -29,10 +30,13 @@ export interface GalleryPhoto {
   blur: string;
 }
 
+export const GALLERY_CATEGORIES = z.array(GalleryCategory).parse(galleryCategories);
+
 export interface GalleryAlbum {
   slug: string;
   title: string;
   date: string;
+  category?: string;
   city?: string;
   description?: string;
   cover: GalleryPhoto;
@@ -59,6 +63,8 @@ export const loadGallery = cache(async (): Promise<GalleryAlbum[]> => {
     const parsed = GalleryAlbumFile.safeParse(parseYaml(raw));
     if (!parsed.success) throw new Error(`Invalid ${where}:\n${z.prettifyError(parsed.error)}`);
     const album = parsed.data;
+    if (album.category && !GALLERY_CATEGORIES.some((c) => c.id === album.category))
+      throw new Error(`${where}: unknown category "${album.category}". Use one of: ${GALLERY_CATEGORIES.map((c) => c.id).join(", ")}.`);
     if (album.draft && !showDrafts()) continue;
     if (album.photos.length === 0) continue;
 
@@ -87,7 +93,7 @@ export const loadGallery = cache(async (): Promise<GalleryAlbum[]> => {
     });
     const cover = (album.cover && photos[album.photos.findIndex((p) => p.file === album.cover)]) || photos[0];
     if (album.cover && !album.photos.some((p) => p.file === album.cover)) throw new Error(`${where}: cover "${album.cover}" is not one of the album's photos.`);
-    albums.push({ slug, title: album.title, date: album.date, city: album.city, description: album.description, cover, photos });
+    albums.push({ slug, title: album.title, date: album.date, category: album.category, city: album.city, description: album.description, cover, photos });
   }
   return albums.sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
 });
