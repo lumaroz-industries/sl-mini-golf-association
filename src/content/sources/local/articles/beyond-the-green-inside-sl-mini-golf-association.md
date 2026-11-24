@@ -8,8 +8,8 @@ author:
   bio: The team behind the platform.
 publishedAt: "2026-11-24"
 cover:
-  src: /articles/beyond-the-green-inside-sl-mini-golf-association/cover-sl-v3.webp
-  alt: "The SL Mini Golf Association logo on black, with the line \"Connecting players, celebrating talent and taking Indian mini golf further.\""
+  src: /articles/beyond-the-green-inside-sl-mini-golf-association/cover-sl-v4.webp
+  alt: "The SL Mini Golf Association logo, large and centred on a dark background, with the line \"Connecting players, celebrating talent and taking Indian mini golf further.\""
   width: 1600
   height: 1000
 tags: [platform, website, behind the scenes]
