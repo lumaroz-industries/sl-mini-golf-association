@@ -63,7 +63,7 @@ export interface WorldText {
   font: string;
   /** Portrait screens: wall typography is set on two lines so it fits the frame. */
   compact?: boolean;
-  /** LED band along the course's side rails: [0] the website's designer (twice per repeat), [1] the founder. */
+  /** LED band along the course's side rails: one tag each, [0] the website's designer, [1] the founder. */
   trackside?: Array<{ name: string; line: string; tail?: string }>;
 }
 

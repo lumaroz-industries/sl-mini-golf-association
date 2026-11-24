@@ -287,9 +287,9 @@ export function textTexture(opts: TextOptions): { texture: Texture; aspect: numb
 
 /**
  * Repeating LED band for the course rails (like the LED boards around a
- * stadium): on a dark pixel panel, the designer's name in gold with their
- * title and handle, then their name again, then the founder's in silver —
- * so the designer appears twice per repeat. Tiles seamlessly along the rail.
+ * stadium): on a dark pixel panel, one tag per person — name, title and
+ * handle — with an empty stretch the length of a whole tag after each:
+ * designer (gold) · gap · founder (silver) · gap. Tiles seamlessly.
  */
 export function ledRibbonTexture(opts: { font: string; people: Array<{ name: string; line: string; tail?: string }> }): { texture: Texture; aspect: number } {
   const H = 128;
@@ -303,18 +303,21 @@ export function ledRibbonTexture(opts: { font: string; people: Array<{ name: str
     for (const ch of txt) w += (ch === " " ? size * 0.38 : measureCtx.measureText(ch).width) + spacing * size;
     return w - spacing * size;
   };
-  type Item = { text: string; size: number; spacing: number; fill: "gold" | "silver" | "white" | "goldSoft" } | { diamond: true };
-  const [dev, founder] = opts.people;
-  const items: Item[] = [];
-  const person = (p: { name: string; line: string; tail?: string }, metal: "gold" | "silver") => {
-    items.push({ text: p.name, size: nameSize, spacing: 0.05, fill: metal }, { diamond: true }, { text: p.line, size: smallSize, spacing: 0.2, fill: "white" }, { diamond: true });
-    if (p.tail) items.push({ text: p.tail, size: smallSize, spacing: 0.16, fill: "goldSoft" }, { diamond: true });
+  type Item = { text: string; size: number; spacing: number; fill: "gold" | "silver" | "white" | "goldSoft" } | { diamond: true } | { blank: number };
+  const widthOf = (it: Item) => ("diamond" in it ? 14 : "blank" in it ? it.blank : measure(it.text, it.size, it.spacing));
+  const tag = (p: { name: string; line: string; tail?: string }, metal: "gold" | "silver"): Item[] => {
+    const t: Item[] = [{ text: p.name, size: nameSize, spacing: 0.05, fill: metal }, { diamond: true }, { text: p.line, size: smallSize, spacing: 0.2, fill: "white" }];
+    if (p.tail) t.push({ diamond: true }, { text: p.tail, size: smallSize, spacing: 0.16, fill: metal === "gold" ? "goldSoft" : "white" });
+    return t;
   };
-  person(dev, "gold");
-  items.push({ text: dev.name, size: nameSize, spacing: 0.05, fill: "gold" }, { diamond: true });
-  if (founder) person(founder, "silver");
+  const tagWidth = (t: Item[]) => t.reduce((w, it) => w + widthOf(it) + gap, 0) - gap;
+  const items: Item[] = [];
+  for (const [k, p] of opts.people.entries()) {
+    const t = tag(p, k === 0 ? "gold" : "silver");
+    // Each tag, then an empty stretch as long as a whole tag.
+    items.push(...t, { blank: tagWidth(t) });
+  }
 
-  const widthOf = (it: Item) => ("diamond" in it ? 14 : measure(it.text, it.size, it.spacing));
   const W = Math.ceil(items.reduce((w, it) => w + widthOf(it) + gap, 0));
   const canvas = document.createElement("canvas");
   canvas.width = W;
@@ -336,7 +339,9 @@ export function ledRibbonTexture(opts: { font: string; people: Array<{ name: str
 
   let x = gap / 2;
   for (const it of items) {
-    if ("diamond" in it) {
+    if ("blank" in it) {
+      // empty stretch of LED panel
+    } else if ("diamond" in it) {
       ctx.save();
       ctx.translate(x + 7, y);
       ctx.rotate(Math.PI / 4);
