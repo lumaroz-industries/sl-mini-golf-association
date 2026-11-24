@@ -184,6 +184,8 @@ export const SocialAccount = z
     featured: z.boolean().optional().default(false),
     /** Profile picture for this account's card; for a YouTube channel, the cover picture of its video panel. */
     avatar: ImageAsset.optional(),
+    /** Cut-out photo (transparent background) shown large on a full-row card. */
+    cutout: ImageAsset.optional(),
     /** Card width in the grid: a third (default), half, two-thirds ("wide") or the full row. */
     span: z.enum(["normal", "half", "wide", "full"]).optional(),
     /** Highlighted finish: "diamond" (the site's designer), "gold" (the founder), "silver", "tricolor" (national body), "maroon", "orange". */

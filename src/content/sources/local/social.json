@@ -41,7 +41,13 @@
       "personId": "suyash-lahane",
       "spotlight": "gold",
       "description": "Founder & Owner of SL Mini Golf Association.",
-      "span": "full"
+      "span": "full",
+      "cutout": {
+        "src": "/social/suyash-lahane-cutout.webp",
+        "alt": "Suyash Lahane",
+        "width": 784,
+        "height": 914
+      }
     },
     {
       "id": "chaitanya-payghan-instagram",
@@ -51,7 +57,13 @@
       "personId": "chaitanya-payghan",
       "spotlight": "diamond",
       "description": "Designed and built this website. Website design and full-stack development — DM on Instagram.",
-      "span": "full"
+      "span": "full",
+      "cutout": {
+        "src": "/social/chaitanya-payghan-cutout.webp",
+        "alt": "Chaitanya Payghan",
+        "width": 960,
+        "height": 1088
+      }
     },
     {
       "id": "the-mini-golf-journey",
