@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { findNavItem } from "@/config/navigation";
-import { getPlayersPageContent } from "@/content/repository";
+import { getPlayers, getPlayersPageContent, getTopSeven } from "@/content/repository";
+import { PlayerDirectory } from "@/components/players/PlayerDirectory";
+import { MedalDefs } from "@/components/players/MedalDefs";
+import { initialsOf, medalTotals, totalMedals } from "@/lib/players";
 import { TopSeven } from "@/components/players/TopSeven";
 import { buildSlots } from "@/components/players/slots";
 import styles from "./page.module.css";
@@ -26,8 +29,24 @@ function Heading({ text }: { text: string }) {
 }
 
 export default async function PlayersPage() {
-  const content = await getPlayersPageContent();
-  const slots = buildSlots(content.featured);
+  const [content, top, players] = await Promise.all([getPlayersPageContent(), getTopSeven(), getPlayers()]);
+  const slots = buildSlots(top);
+  const topSlugs = new Set(top.map((t) => t.slug));
+  const directory = players.map((p) => {
+    const medals = medalTotals(p);
+    return {
+      slug: p.slug,
+      name: p.name,
+      initials: initialsOf(p.name),
+      gender: p.gender,
+      district: p.district,
+      photo: p.photo?.src,
+      medals,
+      total: totalMedals(medals),
+      results: p.results.map((r) => ({ level: r.level, year: r.year, medal: r.medal })),
+      topSeven: topSlugs.has(p.slug),
+    };
+  });
 
   return (
     <div className={styles.page}>
@@ -47,6 +66,9 @@ export default async function PlayersPage() {
 
         <p className={`container ${styles.note}`}>{content.note}</p>
       </section>
+
+      <MedalDefs />
+      <PlayerDirectory players={directory} {...content.directory} />
     </div>
   );
 }

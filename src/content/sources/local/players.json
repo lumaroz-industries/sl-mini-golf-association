@@ -7,59 +7,29 @@
   "featured": [
     {
       "slug": "pranjali-surduse",
-      "name": "Pranjali Surduse",
-      "side": "center",
-      "photo": {
-        "src": "/players/pranjali-surduse.webp",
-        "alt": "Pranjali Surduse in an India team blazer, holding up a medal",
-        "width": 960,
-        "height": 1200
-      },
-      "medals": {
-        "gold": 7,
-        "silver": 1,
-        "bronze": 2
-      }
+      "side": "center"
     },
     {
       "slug": "saurabh-pise",
-      "name": "Saurabh Pise",
       "side": "right",
-      "place": 2,
-      "medals": {
-        "gold": 3,
-        "silver": 1,
-        "bronze": 2
-      }
+      "place": 2
     },
     {
       "slug": "nehal-bagmar",
-      "name": "Nehal Bagmar",
       "side": "right",
-      "place": 1,
-      "photo": {
-        "src": "/players/nehal-bagmar.webp",
-        "alt": "Nehal Bagmar in an India team blazer, holding up a medal",
-        "width": 960,
-        "height": 1200
-      }
+      "place": 1
     },
     {
       "slug": "suyash-lahane",
-      "name": "Suyash Lahane",
       "side": "right",
-      "place": 3,
-      "photo": {
-        "src": "/people/suyash-lahane-v2.webp",
-        "alt": "Portrait of Suyash Lahane",
-        "width": 800,
-        "height": 1000
-      },
-      "medals": {
-        "gold": 3,
-        "silver": 2,
-        "bronze": 5
-      }
+      "place": 3
     }
-  ]
+  ],
+  "directory": {
+    "kicker": "All Maharashtra players",
+    "heading": "Player directory",
+    "intro": "Every Maharashtra mini-golf player we have on record. Search by name, or filter by level, year, district and more.",
+    "emptyHeading": "No players match",
+    "emptyBody": "Try a different search or clear the filters."
+  }
 }

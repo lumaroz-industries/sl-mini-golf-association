@@ -1,5 +1,8 @@
-import type { FeaturedPlayer } from "@/content/schema";
+import type { FeaturedSlot, Player } from "@/content/schema";
+import { medalTotals } from "@/lib/players";
 import type { Slot } from "./types";
+
+type Entry = FeaturedSlot & { player: Player };
 
 /**
  * The seven places in the line-up: three on the left, the centre, three on
@@ -7,10 +10,10 @@ import type { Slot } from "./types";
  * edge) goes exactly there; the rest fill the free places, nearest the centre
  * first, in the order listed. Unfilled places become "reveal soon".
  */
-function arrange(players: FeaturedPlayer[]): Array<FeaturedPlayer | undefined> {
-  const places: Array<FeaturedPlayer | undefined> = [undefined, undefined, undefined];
-  for (const p of players) if (p.place !== undefined) places[p.place - 1] = p;
-  for (const p of players) {
+function arrange(entries: Entry[]): Array<Entry | undefined> {
+  const places: Array<Entry | undefined> = [undefined, undefined, undefined];
+  for (const p of entries) if (p.place !== undefined) places[p.place - 1] = p;
+  for (const p of entries) {
     if (p.place !== undefined) continue;
     const free = places.findIndex((x) => x === undefined);
     if (free !== -1) places[free] = p;
@@ -18,9 +21,9 @@ function arrange(players: FeaturedPlayer[]): Array<FeaturedPlayer | undefined> {
   return places;
 }
 
-export function buildSlots(players: FeaturedPlayer[]): Slot[] {
-  const side = (s: FeaturedPlayer["side"]) => players.filter((p) => p.side === s);
-  const toCard = (p?: FeaturedPlayer) => p && { slug: p.slug, name: p.name, photo: p.photo, medals: p.medals };
+export function buildSlots(entries: Entry[]): Slot[] {
+  const side = (s: FeaturedSlot["side"]) => entries.filter((p) => p.side === s);
+  const toCard = (e?: Entry) => e && { slug: e.player.slug, name: e.player.name, photo: e.player.photo, medals: medalTotals(e.player) };
   const left = arrange(side("left")); // index 0 = next to the centre
   const right = arrange(side("right"));
   return [

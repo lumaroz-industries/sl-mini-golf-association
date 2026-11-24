@@ -160,18 +160,23 @@ page (`/players/<slug>`) with a large card, medal tally and optional bio.
 Cards show only the photo, name and gold / silver / bronze counts. Places
 without a player show "Reveal soon".
 
-**Adding a player** — in `src/content/sources/local/players.json`, add to
-`featured`:
+**Players are added in the admin** (Admin → Players): name, category (women /
+men), district, photo, an optional bio, and a list of results — event, year,
+level (district / state / national / international), category, place and a
+medal, a position or "participated". Medal totals are counted from the results,
+or can be entered directly. Each player is one file,
+`src/content/sources/local/players/<slug>.json`.
+
+Below the Top 7, `/players` has the **player directory**: search, level and
+year filters, district, women / men, "medallists only", and sorting (name,
+most medals, most golds, most recent result) — all kept in the URL. Every
+player has their own page with their results grouped by year.
+
+**The Top 7 line-up** is set in `players.json` → `featured`, pointing at
+player records:
 
 ```json
-{
-  "slug": "first-last",
-  "name": "First Last",
-  "side": "left",
-  "photo": { "src": "/players/first-last.webp", "alt": "First Last", "width": 800, "height": 1000 },
-  "medals": { "gold": 3, "silver": 1, "bronze": 2 },
-  "bio": "Optional. Separate paragraphs with a blank line."
-}
+{ "slug": "first-last", "side": "left", "place": 1 }
 ```
 
 - `side`: `left` (up to 3), `center` (1) or `right` (up to 3).

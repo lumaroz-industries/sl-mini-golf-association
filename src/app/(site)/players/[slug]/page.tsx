@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getFeaturedPlayer, getPlayersPageContent } from "@/content/repository";
+import { getPlayer, getPlayers, getPlayersPageContent, getTopSeven } from "@/content/repository";
+import { PLAYER_LEVEL_LABELS } from "@/content/schema";
+import { medalTotals, ordinal } from "@/lib/players";
 import { getBaseUrl } from "@/lib/site-url";
 import { MedalDefs, MedalIcon, type MedalKind } from "@/components/players/MedalDefs";
 import { PlayerCard } from "@/components/players/PlayerCard";
@@ -15,13 +17,14 @@ interface Params {
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  return (await getPlayersPageContent()).featured.map((p) => ({ slug: p.slug }));
+  return (await getPlayers()).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const [player, content] = await Promise.all([getFeaturedPlayer((await params).slug), getPlayersPageContent()]);
+  const [player, top, content] = await Promise.all([getPlayer((await params).slug), getTopSeven(), getPlayersPageContent()]);
   if (!player) return {};
-  const description = `${player.name} — one of ${content.heading}.`;
+  const inTop = top.some((t) => t.slug === player.slug);
+  const description = inTop ? `${player.name} — one of ${content.heading}.` : `${player.name} — mini-golf player from ${player.district ? `${player.district}, ` : ""}Maharashtra.`;
   return {
     title: player.name,
     description,
@@ -38,9 +41,13 @@ const MEDALS: Array<{ kind: MedalKind; label: string }> = [
 
 export default async function PlayerPage({ params }: Params) {
   const { slug } = await params;
-  const [player, content, base] = await Promise.all([getFeaturedPlayer(slug), getPlayersPageContent(), getBaseUrl()]);
+  const [player, content, base, top] = await Promise.all([getPlayer(slug), getPlayersPageContent(), getBaseUrl(), getTopSeven()]);
   if (!player) notFound();
-  const counts = MEDALS.map((m) => player.medals[m.kind]);
+  const inTop = top.some((t) => t.slug === player.slug);
+  const medals = medalTotals(player);
+  const counts = MEDALS.map((m) => medals[m.kind]);
+  const years = [...new Set(player.results.map((r) => r.year))].sort((a, b) => b - a);
+  const LEVEL_ORDER = ["international", "national", "state", "district"];
   const total = counts.every((n) => n !== undefined) ? counts.reduce<number>((a, b) => a + (b ?? 0), 0) : undefined;
   const paragraphs = player.bio?.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean) ?? [];
 
@@ -62,15 +69,19 @@ export default async function PlayerPage({ params }: Params) {
       <div className={`container ${styles.layout}`}>
         <div className={styles.cardCol}>
           <Tilt className={styles.tilt}>
-            <PlayerCard player={{ slug: player.slug, name: player.name, photo: player.photo, medals: player.medals }} revealLabel={content.revealLabel} large priority />
+            <PlayerCard player={{ slug: player.slug, name: player.name, photo: player.photo, medals }} revealLabel={content.revealLabel} large priority badge={inTop ? "Top 7" : "Player"} />
           </Tilt>
         </div>
 
         <div className={styles.info}>
-          <Link href="/players" className={styles.back}>
-            <span aria-hidden="true">←</span> {content.heading}
+          <Link href={inTop ? "/players" : "/players#directory-title"} className={styles.back}>
+            <span aria-hidden="true">←</span> {inTop ? content.heading : content.directory.heading}
           </Link>
           <h1 className={styles.name}>{player.name}</h1>
+          <p className={styles.where}>
+            {[player.district, "Maharashtra"].filter(Boolean).join(", ")}
+            {inTop && <span className={styles.topBadge}>Top 7</span>}
+          </p>
 
           <ul className={styles.tally} aria-label="Medal tally">
             {MEDALS.map(({ kind, label }, i) => (
@@ -94,6 +105,46 @@ export default async function PlayerPage({ params }: Params) {
                 <p key={i}>{p}</p>
               ))}
             </div>
+          )}
+
+          {years.length > 0 && (
+            <section className={styles.results} aria-labelledby="results-title">
+              <h2 id="results-title" className={styles.resultsTitle}>
+                Results
+              </h2>
+              {years.map((y) => (
+                <div key={y} className={styles.year}>
+                  <span className={styles.yearLabel}>{y}</span>
+                  <ul className={styles.resultList}>
+                    {player.results
+                      .filter((r) => r.year === y)
+                      .sort((a, b) => LEVEL_ORDER.indexOf(a.level) - LEVEL_ORDER.indexOf(b.level))
+                      .map((r, i) => (
+                        <li key={i} className={styles.result}>
+                          <span className={styles.resultMain}>
+                            <span className={styles.resultEvent}>{r.event}</span>
+                            <span className={styles.resultMeta}>{[r.category, r.place].filter(Boolean).join(" · ")}</span>
+                          </span>
+                          <span className={styles.resultLevel} data-level={r.level}>
+                            {PLAYER_LEVEL_LABELS[r.level]}
+                          </span>
+                          <span className={styles.resultOutcome}>
+                            {r.medal ? (
+                              <>
+                                <MedalIcon kind={r.medal} size={20} /> {r.medal[0].toUpperCase() + r.medal.slice(1)}
+                              </>
+                            ) : r.position ? (
+                              ordinal(r.position)
+                            ) : (
+                              "Participated"
+                            )}
+                          </span>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              ))}
+            </section>
           )}
         </div>
       </div>

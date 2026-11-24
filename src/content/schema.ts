@@ -374,10 +374,50 @@ export type GalleryPageContent = z.infer<typeof GalleryPageContent>;
 
 const medalCount = z.number().int().min(0).max(999).optional();
 
-/** One of the featured players at the top of the Players page. */
-export const FeaturedPlayer = z.object({
+export const playerLevels = ["district", "state", "national", "international"] as const;
+export const PlayerLevel = z.enum(playerLevels);
+export type PlayerLevel = z.infer<typeof PlayerLevel>;
+export const PLAYER_LEVEL_LABELS: Record<PlayerLevel, string> = { district: "District", state: "State", national: "National", international: "International" };
+
+/** One competition result. Give a medal, a position, or neither (= participated). */
+export const PlayerResult = z.object({
+  event: z.string().trim().min(1).max(140),
+  year: z.number().int().min(1990).max(2100),
+  level: PlayerLevel,
+  /** e.g. "Men's singles", "Junior", "Team" */
+  category: optionalText,
+  /** Where it was held, e.g. "Pran Buri, Thailand" */
+  place: optionalText,
+  medal: z.enum(["gold", "silver", "bronze"]).optional(),
+  /** Final position, e.g. 4 */
+  position: z.number().int().min(1).max(999).optional(),
+});
+export type PlayerResult = z.infer<typeof PlayerResult>;
+
+/** A player in the Maharashtra directory: src/content/sources/local/players/<slug>.json */
+export const Player = z.object({
   slug,
-  name: z.string().min(1).max(60),
+  name: z.string().trim().min(1).max(60),
+  gender: z.enum(["female", "male"]).optional(),
+  /** District in Maharashtra, e.g. "Nagpur" */
+  district: optionalText,
+  /** Real photograph only (portrait works best). Without one, cards show initials. */
+  photo: ImageAsset.optional(),
+  /**
+   * Medal totals shown on the cards. Leave a count out (rather than 0) when it
+   * is not known yet. If no totals are given, they are counted from `results`.
+   */
+  medals: z.object({ gold: medalCount, silver: medalCount, bronze: medalCount }).optional(),
+  results: z.array(PlayerResult).default([]),
+  /** Optional short paragraphs for the player's own page. */
+  bio: optionalText,
+  draft: z.boolean().default(false),
+});
+export type Player = z.infer<typeof Player>;
+
+/** A place in the Top 7 line-up, pointing at a player record. */
+export const FeaturedSlot = z.object({
+  slug,
   /** Where the card sits in the line-up: girls on the left and centre, boys on the right. */
   side: z.enum(["left", "center", "right"]),
   /**
@@ -386,14 +426,8 @@ export const FeaturedPlayer = z.object({
    * free places in the order listed. Layout only — never shown as a rank.
    */
   place: z.number().int().min(1).max(3).optional(),
-  /** Real photograph only (portrait works best). Without one, the card shows the SL mark. */
-  photo: ImageAsset.optional(),
-  /** Leave a count out (rather than 0) when it is not known yet — the card shows "–". */
-  medals: z.object({ gold: medalCount, silver: medalCount, bronze: medalCount }).default({}),
-  /** Optional short paragraphs for the player's own page. */
-  bio: optionalText,
 });
-export type FeaturedPlayer = z.infer<typeof FeaturedPlayer>;
+export type FeaturedSlot = z.infer<typeof FeaturedSlot>;
 
 export const PlayersPageContent = z
   .object({
@@ -404,20 +438,27 @@ export const PlayersPageContent = z
     note: z.string().min(1),
     /** Shown on cards whose player has not been announced yet. */
     revealLabel: z.string().min(1),
-    featured: z.array(FeaturedPlayer).max(7),
+    featured: z.array(FeaturedSlot).max(7),
+    directory: z.object({
+      kicker: z.string().min(1),
+      heading: z.string().min(1),
+      intro: z.string().min(1),
+      emptyHeading: z.string().min(1),
+      emptyBody: z.string().min(1),
+    }),
   })
   .superRefine((c, ctx) => {
     const count = (side: string) => c.featured.filter((p) => p.side === side).length;
     if (count("left") > 3) ctx.addIssue({ code: "custom", path: ["featured"], message: "At most 3 players on the left." });
     if (count("right") > 3) ctx.addIssue({ code: "custom", path: ["featured"], message: "At most 3 players on the right." });
     if (count("center") > 1) ctx.addIssue({ code: "custom", path: ["featured"], message: "Only 1 player in the centre." });
-    const slugs = c.featured.map((p) => p.slug);
     for (const side of ["left", "right"] as const) {
       const places = c.featured.filter((p) => p.side === side && p.place !== undefined).map((p) => p.place);
       if (new Set(places).size !== places.length) ctx.addIssue({ code: "custom", path: ["featured"], message: `Two players share the same place on the ${side}.` });
     }
     if (c.featured.some((p) => p.side === "center" && p.place !== undefined)) ctx.addIssue({ code: "custom", path: ["featured"], message: "The centre card does not take a place." });
-    if (new Set(slugs).size !== slugs.length) ctx.addIssue({ code: "custom", path: ["featured"], message: "Each player needs a unique slug." });
+    const slugs = c.featured.map((p) => p.slug);
+    if (new Set(slugs).size !== slugs.length) ctx.addIssue({ code: "custom", path: ["featured"], message: "Each player appears only once in the Top 7." });
   });
 export type PlayersPageContent = z.infer<typeof PlayersPageContent>;
 

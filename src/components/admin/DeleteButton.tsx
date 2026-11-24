@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import { api } from "./client";
 import s from "./admin.module.css";
 
-export function DeleteButton({ collection, slug, title, after }: { collection: "updates" | "articles" | "gallery"; slug: string; title: string; after?: string }) {
+export function DeleteButton({ collection, slug, title, after }: { collection: "updates" | "articles" | "gallery" | "players"; slug: string; title: string; after?: string }) {
   const ref = useRef<HTMLDialogElement>(null);
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const what = collection === "updates" ? "update" : collection === "articles" ? "article" : "album and all its photos";
+  const what = collection === "updates" ? "update" : collection === "articles" ? "article" : collection === "players" ? "player" : "album and all its photos";
 
   async function remove() {
     setBusy(true);

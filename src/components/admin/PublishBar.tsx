@@ -18,7 +18,7 @@ export function PublishBar({
   editPath,
   onSaved,
 }: {
-  collection: "updates" | "articles" | "gallery";
+  collection: "updates" | "articles" | "gallery" | "players";
   /** Returns the request body for the given draft state, or an error message. */
   build: (draft: boolean) => unknown | string;
   isNew: boolean;

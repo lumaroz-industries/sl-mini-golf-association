@@ -143,3 +143,133 @@
   line-height: 1.7;
   color: rgb(255 255 255 / 0.82);
 }
+
+.where {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: -12px;
+  font-size: var(--fs-sm);
+  color: var(--fg-muted);
+}
+
+.topBadge {
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #fbecc4, #e3c27a 45%, #b38d45);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #1a1206;
+}
+
+/* ---------------------------------------------------------------- results */
+.results {
+  display: grid;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.resultsTitle {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.year {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.yearLabel {
+  padding-top: 14px;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #e9cf8a;
+}
+
+.resultList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgb(233 207 138 / 0.16);
+  background: linear-gradient(175deg, #0c0d0e, #060707);
+}
+
+.resultMain {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.resultEvent {
+  font-weight: 700;
+}
+
+.resultMeta {
+  font-size: var(--fs-xs);
+  color: var(--fg-muted);
+}
+
+.resultLevel {
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.resultLevel[data-level="international"] {
+  border-color: rgb(233 207 138 / 0.5);
+  color: #e9cf8a;
+}
+
+.resultLevel[data-level="national"] {
+  border-color: rgb(255 153 51 / 0.5);
+  color: #ffc58a;
+}
+
+.resultOutcome {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 96px;
+  justify-content: flex-end;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+
+@media (max-width: 560px) {
+  .year {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .yearLabel {
+    padding-top: 0;
+  }
+  .result {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .resultLevel {
+    grid-row: 2;
+    justify-self: start;
+  }
+}

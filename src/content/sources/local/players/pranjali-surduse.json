@@ -1,0 +1,17 @@
+{
+  "slug": "pranjali-surduse",
+  "name": "Pranjali Surduse",
+  "gender": "female",
+  "photo": {
+    "src": "/players/pranjali-surduse.webp",
+    "alt": "Pranjali Surduse in an India team blazer, holding up a medal",
+    "width": 960,
+    "height": 1200
+  },
+  "medals": {
+    "gold": 7,
+    "silver": 1,
+    "bronze": 2
+  },
+  "results": []
+}

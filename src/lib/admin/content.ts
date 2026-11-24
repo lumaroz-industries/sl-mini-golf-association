@@ -2,7 +2,8 @@ import "server-only";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { z } from "zod";
 import sharp from "sharp";
-import { ArticleFrontmatter, GalleryAlbumFile, GalleryManifest, UpdateFrontmatter } from "@/content/schema";
+import { ArticleFrontmatter, GalleryAlbumFile, GalleryManifest, Player, UpdateFrontmatter } from "@/content/schema";
+import playersPage from "@/content/sources/local/players.json";
 import articleCategories from "@/content/sources/local/article-categories.json";
 import galleryCategories from "@/content/sources/local/gallery-categories.json";
 import people from "@/content/sources/local/people.json";
@@ -200,7 +201,7 @@ export async function deleteEntry(collection: Collection, slug: string): Promise
 const MAX_UPLOAD = 4 * 1024 * 1024;
 
 /** A photo for an update or article: one 1600px-wide WebP, no metadata. */
-export async function processImage(collection: Collection, slug: string, original: string, data: Buffer) {
+export async function processImage(collection: Collection | "players", slug: string, original: string, data: Buffer) {
   if (!SLUG.test(slug)) throw new ContentError("Set the web address (slug) before adding photos.");
   if (data.length > MAX_UPLOAD) throw new ContentError("This photo is too large.");
   const img = sharp(data, { failOn: "none" }).rotate();
@@ -377,3 +378,84 @@ export async function deleteAlbum(slug: string): Promise<string> {
 }
 
 export { today };
+
+/* ------------------------------------------------------------------ players */
+
+export interface PlayerListItem {
+  slug: string;
+  name: string;
+  district?: string;
+  draft: boolean;
+  results: number;
+  photo?: string;
+  topSeven: boolean;
+}
+
+const topSevenSlugs = () => new Set((playersPage.featured as Array<{ slug: string }>).map((f) => f.slug));
+
+export async function listPlayers(): Promise<PlayerListItem[]> {
+  const storage = getStorage();
+  const files = (await storage.list(`${CONTENT}/players`)).filter((f) => f.endsWith(".json"));
+  const top = topSevenSlugs();
+  const items = await Promise.all(
+    files.map(async (f): Promise<PlayerListItem | null> => {
+      const text = await storage.readText(f);
+      if (!text) return null;
+      const d = JSON.parse(text) as Record<string, unknown>;
+      const slug = f.split("/").pop()!.replace(/\.json$/, "");
+      return {
+        slug,
+        name: String(d.name ?? slug),
+        district: d.district ? String(d.district) : undefined,
+        draft: d.draft === true,
+        results: Array.isArray(d.results) ? d.results.length : 0,
+        photo: (d.photo as { src?: string } | undefined)?.src,
+        topSeven: top.has(slug),
+      };
+    }),
+  );
+  return items.filter((x): x is PlayerListItem => !!x).sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export async function readPlayer(slug: string): Promise<Record<string, unknown> | null> {
+  if (!SLUG.test(slug) || slug === "new") return null;
+  const text = await getStorage().readText(`${CONTENT}/players/${slug}.json`);
+  return text ? (JSON.parse(text) as Record<string, unknown>) : null;
+}
+
+export async function savePlayer(input: { mode: "create" | "edit"; data: Record<string, unknown>; uploads?: Upload[] }): Promise<{ slug: string; commit: string; draft: boolean }> {
+  const storage = getStorage();
+  const data = clean({ ...input.data });
+  const slug = String(data.slug ?? "");
+  if (!SLUG.test(slug) || slug === "new") throw new ContentError("Choose a web address using lowercase letters, numbers and hyphens, e.g. first-last.");
+  const file = `${CONTENT}/players/${slug}.json`;
+  const existing = await storage.readText(file);
+  if (input.mode === "create" && existing !== null) throw new ContentError(`There is already a player at this web address (${slug}). Choose another.`);
+  if (input.mode === "edit" && existing === null) throw new ContentError("This player no longer exists — they may have been deleted.");
+  const parsed = Player.safeParse(data);
+  if (!parsed.success) throw new ContentError("Some details need fixing.", issuesOf(parsed.error));
+
+  const text = JSON.stringify(data, null, 2) + "\n";
+  const folder = `public/players/${slug}`;
+  const used = (p: string) => text.includes("/" + p.replace(/^public\//, ""));
+  const changes: Change[] = [{ path: file, text }];
+  for (const u of input.uploads ?? []) {
+    if (!u.path.startsWith(`${folder}/`) || !/^[a-z0-9-]+\.webp$/.test(u.path.slice(folder.length + 1)) || !BLOB_ID.test(u.blob)) throw new ContentError("An uploaded photo is invalid — please upload it again.");
+    if (used(u.path)) changes.push({ path: u.path, blob: u.blob });
+  }
+  const uploaded = new Set((input.uploads ?? []).map((u) => u.path));
+  for (const old of await storage.list(folder)) if (!used(old) && !uploaded.has(old)) changes.push({ path: old, delete: true });
+
+  const draft = data.draft === true;
+  const commit = await storage.commit(`Admin: ${draft ? "Save draft" : input.mode === "create" ? "Add" : "Edit"} player "${String(data.name)}"`, changes);
+  return { slug, commit, draft };
+}
+
+export async function deletePlayer(slug: string): Promise<string> {
+  const p = await readPlayer(slug);
+  if (!p) throw new ContentError("This player no longer exists.");
+  if (topSevenSlugs().has(slug)) throw new ContentError("This player is in Maharashtra's Top 7. Ask the developer to take them out of the line-up first.");
+  const storage = getStorage();
+  const changes: Change[] = [{ path: `${CONTENT}/players/${slug}.json`, delete: true }, ...(await storage.list(`public/players/${slug}`)).map((x) => ({ path: x, delete: true as const }))];
+  return storage.commit(`Admin: Delete player "${String(p.name ?? slug)}"`, changes);
+}

@@ -153,7 +153,7 @@ export function ImageField({
   value?: ImageValue;
   onChange: (v: ImageValue | undefined) => void;
   onUploaded: (u: Upload) => void;
-  collection: "updates" | "articles";
+  collection: "updates" | "articles" | "players";
   slug: string;
   withCredit?: boolean;
 }) {

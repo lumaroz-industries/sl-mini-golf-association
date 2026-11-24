@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     if (size > 4 * 1024 * 1024) throw new ContentError("This photo is too large.");
     const data = Buffer.from(await req.arrayBuffer());
     if (!data.length) throw new ContentError("The photo was empty.");
-    if (collection === "updates" || collection === "articles") return json(200, { ok: true, ...(await processImage(collection, slug, name, data)) });
+    if (collection === "updates" || collection === "articles" || collection === "players") return json(200, { ok: true, ...(await processImage(collection, slug, name, data)) });
     if (collection === "gallery") return json(200, { ok: true, ...(await processGalleryPhoto(slug, name, data)) });
     return json(404, { ok: false, message: "Not found." });
   } catch (e) {

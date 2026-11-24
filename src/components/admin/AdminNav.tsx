@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/admin/updates", label: "Updates" },
   { href: "/admin/articles", label: "Articles" },
   { href: "/admin/gallery", label: "Gallery" },
+  { href: "/admin/players", label: "Players" },
   { href: "/admin/help", label: "Help" },
 ];
 

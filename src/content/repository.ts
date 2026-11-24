@@ -14,6 +14,7 @@ import { ArticleCategory, ArticlesPageContent, GalleryPageContent, PlayersPageCo
 import { loadArticles, type RawArticle } from "./articles";
 import { loadUpdates, type RawUpdate } from "./updates";
 import { loadGallery, type GalleryAlbum } from "./gallery";
+import { loadPlayers } from "./players";
 import siteJson from "./sources/local/site.json";
 import homeJson from "./sources/local/home.json";
 import peopleJson from "./sources/local/people.json";
@@ -232,7 +233,19 @@ export const getPlayersPageContent = cache(async (): Promise<PlayersPageContent>
   parse(PlayersPageContent, await source.players(), "players page"),
 );
 
-export async function getFeaturedPlayer(slug: string) {
-  return (await getPlayersPageContent()).featured.find((p) => p.slug === slug);
+/** All published players, A–Z. */
+export const getPlayers = cache(async () => loadPlayers());
+
+export async function getPlayer(slug: string) {
+  return (await getPlayers()).find((p) => p.slug === slug);
+}
+
+/** The Top 7 line-up resolved to player records (unknown or draft players leave an empty place). */
+export async function getTopSeven() {
+  const [content, players] = await Promise.all([getPlayersPageContent(), getPlayers()]);
+  return content.featured.flatMap((f) => {
+    const player = players.find((p) => p.slug === f.slug);
+    return player ? [{ ...f, player }] : [];
+  });
 }
 

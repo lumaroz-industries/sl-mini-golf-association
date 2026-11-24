@@ -20,6 +20,8 @@ interface PlayerCardProps {
   overlay?: React.ReactNode;
   /** Hide the profile arrow (cards behind the front one). */
   arrowHidden?: boolean;
+  /** Label in the top-left plaque (default "Top 7"). */
+  badge?: string;
   /** Front/featured card (the line-up marks the card in front). */
   active?: boolean;
 }
@@ -34,7 +36,7 @@ const MEDALS: Array<{ kind: MedalKind; label: string }> = [
  * Collectible-style player card: photo, name and medal counts — nothing
  * else. Cards without an announced player show the SL mark and "Reveal soon".
  */
-export function PlayerCard({ player, revealLabel, large = false, priority = false, overlay, arrowHidden = false, active = true }: PlayerCardProps) {
+export function PlayerCard({ player, revealLabel, large = false, priority = false, overlay, arrowHidden = false, active = true, badge = "Top 7" }: PlayerCardProps) {
   const [first, ...rest] = (player?.name ?? "").split(/\s+/);
   return (
     <div className={styles.card} data-large={large || undefined} data-empty={!player || undefined} data-arrow-hidden={arrowHidden || undefined} data-active={active || undefined}>
@@ -65,7 +67,7 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
         <span className={styles.corners} aria-hidden="true" />
 
         <div className={styles.top} aria-hidden="true">
-          <span className={styles.badge}><span>Top 7</span></span>
+          <span className={styles.badge}><span>{badge}</span></span>
           <span className={`${styles.state} ${mhFont.className}`} title="Maharashtra">
             MH
           </span>
