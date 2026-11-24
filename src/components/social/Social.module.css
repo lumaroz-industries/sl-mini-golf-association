@@ -709,3 +709,108 @@
 .cell[data-span="full"] .profileName {
   max-width: none;
 }
+
+/* Diamond spotlight — the founder: an icy, prismatic rim, a cool white light
+   and a few slow sparkles. */
+@property --prism {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.profile[data-spotlight="diamond"] {
+  border: 1.5px solid transparent;
+  background:
+    radial-gradient(110% 90% at 100% 0%, rgb(220 236 255 / 0.12), transparent 55%),
+    radial-gradient(80% 70% at 0% 100%, rgb(190 170 255 / 0.07), transparent 60%),
+    linear-gradient(160deg, #111518, #07090b) padding-box,
+    conic-gradient(from var(--prism), #ffffff, #bfe6ff, #e9d8ff, #ffffff, #b9fff0, #d4e4ff, #ffffff) border-box;
+  box-shadow: 0 30px 70px -36px rgb(200 225 255 / 0.35), 0 24px 50px -28px rgb(0 0 0 / 0.9);
+  animation: prism 8s linear infinite;
+}
+
+@keyframes prism {
+  to {
+    --prism: 360deg;
+  }
+}
+
+.profile[data-spotlight="diamond"] .chip {
+  border-color: rgb(210 230 255 / 0.55);
+  color: #e8f3ff;
+  background: rgb(200 225 255 / 0.08);
+}
+
+.profile[data-spotlight="diamond"] .chip::before {
+  content: "◆";
+  margin-right: 6px;
+  color: #cfeaff;
+}
+
+.profile[data-spotlight="diamond"] .profileHandle,
+.profile[data-spotlight="diamond"] .profileCta {
+  color: #d6ebff;
+}
+
+.profile[data-spotlight="diamond"] .profileName {
+  background: linear-gradient(180deg, #ffffff 35%, #cfe3f5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.profile[data-spotlight="diamond"] .avatar {
+  --size: 112px;
+}
+
+.profile[data-spotlight="diamond"] .avatar[data-ring]::before {
+  padding: 3px;
+  background: conic-gradient(from 200deg, #ffffff, #bfe6ff, #e9d8ff, #ffffff, #b9fff0, #d4e4ff, #ffffff);
+}
+
+.profile[data-spotlight="diamond"] .avatarImg {
+  object-position: 50% 18%;
+}
+
+.sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C10.6 6 14 9.4 20 10 14 10.6 10.6 14 10 20 9.4 14 6 10.6 0 10 6 9.4 9.4 6 10 0Z' fill='%23ffffff'/%3E%3C/svg%3E") 84% 16% / 18px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C10.6 6 14 9.4 20 10 14 10.6 10.6 14 10 20 9.4 14 6 10.6 0 10 6 9.4 9.4 6 10 0Z' fill='%23ffffff'/%3E%3C/svg%3E") 93% 52% / 10px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C10.6 6 14 9.4 20 10 14 10.6 10.6 14 10 20 9.4 14 6 10.6 0 10 6 9.4 9.4 6 10 0Z' fill='%23ffffff'/%3E%3C/svg%3E") 66% 10% / 9px no-repeat;
+  filter: drop-shadow(0 0 6px rgb(200 230 255 / 0.9));
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+
+.sparkles::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C10.6 6 14 9.4 20 10 14 10.6 10.6 14 10 20 9.4 14 6 10.6 0 10 6 9.4 9.4 6 10 0Z' fill='%23ffffff'/%3E%3C/svg%3E") 76% 34% / 12px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C10.6 6 14 9.4 20 10 14 10.6 10.6 14 10 20 9.4 14 6 10.6 0 10 6 9.4 9.4 6 10 0Z' fill='%23ffffff'/%3E%3C/svg%3E") 96% 84% / 14px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C10.6 6 14 9.4 20 10 14 10.6 10.6 14 10 20 9.4 14 6 10.6 0 10 6 9.4 9.4 6 10 0Z' fill='%23ffffff'/%3E%3C/svg%3E") 58% 24% / 7px no-repeat;
+  animation: twinkle 3.2s ease-in-out 1.6s infinite;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile[data-spotlight="diamond"],
+  .sparkles,
+  .sparkles::after {
+    animation: none;
+  }
+}

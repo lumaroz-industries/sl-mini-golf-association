@@ -19,8 +19,8 @@ export interface ProfileCardProps {
   wide?: boolean;
   /** The portrait is a ready-made profile picture: show it whole. */
   wholePhoto?: boolean;
-  /** Highlighted card: "gold" (the site's designer) or "silver" (a step quieter). */
-  spotlight?: "gold" | "silver";
+  /** Highlighted card: "gold" (the site's designer), "diamond" (the founder) or "silver". */
+  spotlight?: "gold" | "diamond" | "silver";
 }
 
 /** A whole-card link styled like a social profile. */
@@ -29,6 +29,7 @@ export function ProfileCard({ platform, url, name, handle, tags, detail, portrai
   return (
     <a className={styles.profile} data-wide={wide || undefined} data-spotlight={spotlight} href={url} target="_blank" rel="noopener noreferrer">
       <span className={styles.spot} aria-hidden="true" />
+      {spotlight === "diamond" && <span className={styles.sparkles} aria-hidden="true" />}
       <span className={styles.profileTop}>
         <Avatar name={name} portrait={portrait} brand={brand} size="lg" whole={wholePhoto} />
         <span className={styles.platformBadge} title={info.label}>
