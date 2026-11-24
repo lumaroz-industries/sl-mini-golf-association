@@ -1,0 +1,84 @@
+# Builds the "SL Admin" Android app (APK) and publishes it as a GitHub release.
+#
+# The app only opens the live admin page, so it does NOT need rebuilding when
+# the admin changes. Run this again only if the app's name, icon or website
+# address changes: GitHub → Actions → "SL Admin APK" → Run workflow.
+#
+# Needs these repository secrets (Settings → Secrets and variables → Actions):
+#   SL_ADMIN_KEYSTORE_BASE64   the signing key, base64-encoded
+#   SL_ADMIN_KEYSTORE_PASSWORD its password
+# Keep a backup of the key: every future version must be signed with it.
+name: SL Admin APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "android/**"
+      - ".github/workflows/sl-admin-apk.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Check the signing key is set up
+        id: key
+        env:
+          KEYSTORE: ${{ secrets.SL_ADMIN_KEYSTORE_BASE64 }}
+          PASSWORD: ${{ secrets.SL_ADMIN_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE" ] || [ -z "$PASSWORD" ]; then
+            echo "::warning::Signing key secrets are not set — doing a test build only (no APK released). See README, 'SL Admin app'."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Test build (no signing key yet)
+        if: steps.key.outputs.ready != 'true'
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+
+      - name: Build the signed APK
+        if: steps.key.outputs.ready == 'true'
+        working-directory: android
+        env:
+          SL_ADMIN_KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          SL_ADMIN_KEYSTORE_PASSWORD: ${{ secrets.SL_ADMIN_KEYSTORE_PASSWORD }}
+          SL_ADMIN_KEY_ALIAS: sladmin
+          VERSION_CODE: ${{ github.run_number }}
+        run: |
+          gradle assembleRelease --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/SL-Admin.apk"
+
+      - uses: actions/upload-artifact@v4
+        if: steps.key.outputs.ready == 'true'
+        with:
+          name: SL-Admin-apk
+          path: ${{ runner.temp }}/SL-Admin.apk
+
+      - name: Publish as a release
+        if: steps.key.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="sl-admin-v${{ github.run_number }}"
+          gh release create "$TAG" "$RUNNER_TEMP/SL-Admin.apk" \
+            --title "SL Admin app (version ${{ github.run_number }})" \
+            --notes "Android app for the SL Mini Golf Association admin. Download SL-Admin.apk on the phone, open it and allow installing. It opens the live admin, so admin changes appear without reinstalling."

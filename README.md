@@ -320,6 +320,39 @@ editing code locally, since the admin commits to `main`.
 **Locally** (`npm run dev` with `ADMIN_PASSWORD` set and no token) the admin
 writes straight into this folder, which is handy for trying it out.
 
+## SL Admin app (Android APK)
+
+The admin is also an Android app, **SL Admin**. The app holds no copy of the
+admin: it opens the live `/admin` page full-screen (a *Trusted Web Activity*,
+running on Chrome), so **every change to the admin appears in the app without
+reinstalling**. Sign-in, photo uploads and everything else work exactly as on
+the website; website and app can be used side by side.
+
+- Project: `android/` (package `com.slminigolfassociation.admin`).
+  The website address is `siteHost` in `android/app/build.gradle`.
+- Built by GitHub Actions (`.github/workflows/sl-admin-apk.yml`) whenever
+  `android/` changes, or manually: GitHub → Actions → **SL Admin APK** → Run
+  workflow. Each build is published as a GitHub **Release** with
+  `SL-Admin.apk` attached.
+- Signed with a permanent key stored as repository secrets
+  `SL_ADMIN_KEYSTORE_BASE64` and `SL_ADMIN_KEYSTORE_PASSWORD`. **Keep a backup
+  of the key** — every future version must be signed with the same key, or
+  phones will refuse to install it over the old app.
+- `public/.well-known/assetlinks.json` proves the app belongs to the site
+  (it holds the key's SHA-256 fingerprint). Without it, the app shows a
+  browser address bar.
+- **Rebuild only when** the website moves to a new domain (change `siteHost`
+  and add the new domain's `assetlinks.json`), or the name/icon changes
+  (icons: `node scripts/brand/build-admin-icons.mjs`).
+
+**Installing:** open the latest release on the phone, download
+`SL-Admin.apk`, tap it and allow “Install unknown apps” for that browser or
+file manager. A newer APK installs over the old one.
+
+**Without the APK:** on Android, open `/admin` in Chrome → ⋮ → *Install app*;
+on iPhone, open it in Safari → Share → *Add to Home Screen*. Both give the same
+“SL Admin” app icon.
+
 ## Brand assets
 
 The logo was redrawn as clean vector geometry from the approved traced logo.
