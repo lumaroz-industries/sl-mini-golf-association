@@ -182,6 +182,8 @@ export const SocialAccount = z
     description: optionalText,
     /** Shown as a wider card. */
     featured: z.boolean().optional().default(false),
+    /** Profile picture for this account's card (e.g. the Instagram photo); otherwise the person's portrait. */
+    avatar: ImageAsset.optional(),
     /** Wide, highlighted card with the person's photo: "gold" (the site's designer) or "silver" (a step quieter). */
     spotlight: z.enum(["gold", "silver"]).optional(),
   })

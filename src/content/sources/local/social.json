@@ -44,7 +44,13 @@
       "url": "https://www.instagram.com/chaitux2859/",
       "personId": "chaitanya-payghan",
       "spotlight": "gold",
-      "description": "Designed and built this website. Website design and full-stack development — DM on Instagram."
+      "description": "Designed and built this website. Website design and full-stack development — DM on Instagram.",
+      "avatar": {
+        "src": "/social/chaitanya-payghan-instagram.webp",
+        "alt": "Chaitanya Payghan's Instagram profile picture",
+        "width": 480,
+        "height": 480
+      }
     },
     {
       "id": "the-mini-golf-journey",

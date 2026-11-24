@@ -103,7 +103,7 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
 
           {DESIGNER && (
             <span className={styles.credit}>
-              <span className={styles.creditLabel}>Card design ·</span> {DESIGNER}
+              <span className={styles.creditLabel}>Card designed by</span> {DESIGNER}
             </span>
           )}
         </div>
