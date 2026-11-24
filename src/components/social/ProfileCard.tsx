@@ -31,6 +31,7 @@ export function ProfileCard({ platform, url, name, handle, tags, detail, portrai
   const info = PLATFORMS[platform];
   return (
     <a className={styles.profile} data-wide={wide || undefined} data-full={full || undefined} data-photo={(full && portrait) || undefined} data-spotlight={spotlight} href={url} target="_blank" rel="noopener noreferrer">
+      {spotlight && <span className={styles.texture} data-kind={spotlight} aria-hidden="true" />}
       <span className={styles.spot} aria-hidden="true" />
       {spotlight === "diamond" && <span className={styles.sparkles} aria-hidden="true" />}
       {spotlight === "diamond" && <span className={styles.sheen} aria-hidden="true" />}
