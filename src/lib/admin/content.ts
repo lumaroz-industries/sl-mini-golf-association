@@ -7,6 +7,7 @@ import articleCategories from "@/content/sources/local/article-categories.json";
 import people from "@/content/sources/local/people.json";
 import { getStorage, type Change } from "./storage";
 import { nameFrom } from "./shared";
+import { isProtected } from "@/config/protected-content";
 import { createHash } from "node:crypto";
 
 /**
@@ -178,6 +179,7 @@ export async function saveEntry(collection: Collection, input: SaveEntryInput): 
 
 export async function deleteEntry(collection: Collection, slug: string): Promise<string> {
   if (!SLUG.test(slug) || TEMPLATES.has(slug)) throw new ContentError("Not found.");
+  if (isProtected(collection, slug)) throw new ContentError("This article is protected and can't be deleted from the admin.");
   const storage = getStorage();
   const entry = await readEntry(collection, slug);
   if (!entry) throw new ContentError("This item no longer exists.");

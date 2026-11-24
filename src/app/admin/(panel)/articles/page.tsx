@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listEntries } from "@/lib/admin/content";
 import categories from "@/content/sources/local/article-categories.json";
 import { DeleteButton } from "@/components/admin/DeleteButton";
+import { isProtected } from "@/config/protected-content";
 import { attempt, formatDate, PageHead, SetupNotice, StatusPill } from "@/components/admin/Page";
 import s from "@/components/admin/admin.module.css";
 
@@ -32,7 +33,13 @@ export default async function ArticlesList() {
               <Link href={`/admin/articles/${a.slug}`} className={`${s.btn} ${s.small}`}>
                 Edit
               </Link>
-              <DeleteButton collection="articles" slug={a.slug} title={a.title} />
+              {isProtected("articles", a.slug) ? (
+                <span className={`${s.pill} ${s.pillLive}`} title="Can only be removed in the source code">
+                  Protected
+                </span>
+              ) : (
+                <DeleteButton collection="articles" slug={a.slug} title={a.title} />
+              )}
             </div>
           </li>
         ))}

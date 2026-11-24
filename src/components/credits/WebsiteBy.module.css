@@ -1,4 +1,7 @@
 .card {
+  /* Always its own row, under the share buttons. */
+  flex: 1 0 100%;
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;

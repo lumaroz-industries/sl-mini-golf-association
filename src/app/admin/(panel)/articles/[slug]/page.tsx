@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { readEntry } from "@/lib/admin/content";
 import { ArticleEditor, type ArticleInitial } from "@/components/admin/ArticleEditor";
 import { DeleteButton } from "@/components/admin/DeleteButton";
+import { isProtected } from "@/config/protected-content";
 import { attempt, PageHead, SetupNotice } from "@/components/admin/Page";
 import { articleEditorProps } from "../editorProps";
 
@@ -17,9 +18,11 @@ export default async function EditArticle({ params }: { params: Promise<{ slug: 
     <>
       <PageHead kicker="Edit article" title={initial.title ?? slug} />
       <ArticleEditor key={slug} isNew={false} initial={{ ...initial, slug }} body={r.data.body} {...articleEditorProps} />
-      <div style={{ marginTop: 40 }}>
-        <DeleteButton collection="articles" slug={slug} title={initial.title ?? slug} after="/admin/articles" />
-      </div>
+      {!isProtected("articles", slug) && (
+        <div style={{ marginTop: 40 }}>
+          <DeleteButton collection="articles" slug={slug} title={initial.title ?? slug} after="/admin/articles" />
+        </div>
+      )}
     </>
   );
 }
