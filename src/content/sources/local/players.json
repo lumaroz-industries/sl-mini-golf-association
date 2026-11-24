@@ -54,6 +54,11 @@
         "alt": "Portrait of Suyash Lahane",
         "width": 800,
         "height": 1000
+      },
+      "medals": {
+        "gold": 3,
+        "silver": 2,
+        "bronze": 5
       }
     }
   ]

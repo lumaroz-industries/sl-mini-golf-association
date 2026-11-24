@@ -184,7 +184,7 @@ without a player show "Reveal soon".
 - Put a portrait photo (about 4:5) in `public/players/`.
 - **Whenever the Top 7 cards change** (a player, photo, medal count or the
   card design), also retake the line-up screenshot used in the first article:
-  `public/articles/beyond-the-green-inside-sl-mini-golf-association/top-7.webp`
+  `public/articles/beyond-the-green-inside-sl-mini-golf-association/top-7-v2.webp` (bump the -vN suffix each time)
   (1600 × 620, the line-up centred, site header hidden). The article's other
   images are homepage renders and don't need updating.
 - The heading, intro and note are in the same file.

@@ -45,7 +45,7 @@ It is one continuous course, built entirely in code: the turf, the stone, the li
 
 The Players page opens with **Maharashtra's Top 7** — seven players taking Indian mini golf to the international stage, presented as collectible cards in black and gold. Each card shows only what matters: the player, and their gold, silver and bronze medals. Hover or tap a card to bring it forward; the arrow opens the player's own page.
 
-![Maharashtra's Top 7 line-up of black-and-gold player cards](/articles/beyond-the-green-inside-sl-mini-golf-association/top-7.webp "Maharashtra's Top 7 — more players will be revealed soon.")
+![Maharashtra's Top 7 line-up of black-and-gold player cards](/articles/beyond-the-green-inside-sl-mini-golf-association/top-7-v2.webp "Maharashtra's Top 7 — more players will be revealed soon.")
 
 The line-up is a selection by SL Mini Golf Association, not a ranking. More players will be revealed as their details are confirmed.
 
