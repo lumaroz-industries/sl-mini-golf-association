@@ -60,6 +60,12 @@
   transform-origin: 50% 18%;
 }
 
+/* A ready-made profile picture: show all of it. */
+.avatarImg[data-whole] {
+  object-position: 50% 50%;
+  transform: none;
+}
+
 .brandMark {
   width: 62%;
   height: auto;
@@ -650,7 +656,7 @@
 }
 
 .profile[data-spotlight="gold"] .avatar {
-  --size: 104px;
+  --size: 124px;
 }
 
 .profile[data-spotlight="gold"] .avatar[data-ring]::before {
@@ -658,7 +664,7 @@
   background: conic-gradient(from 210deg, #fbecc4, #e3c27a, #6b5020, #e3c27a, #fbecc4);
 }
 
-.profile[data-spotlight="gold"] .avatarImg {
+.profile[data-spotlight="gold"] .avatarImg:not([data-whole]) {
   object-position: 50% 18%;
 }
 

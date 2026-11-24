@@ -17,18 +17,20 @@ export interface ProfileCardProps {
   /** Use the SL mark as the avatar (the association's own accounts). */
   brand?: boolean;
   wide?: boolean;
+  /** The portrait is a ready-made profile picture: show it whole. */
+  wholePhoto?: boolean;
   /** Highlighted card: "gold" (the site's designer) or "silver" (a step quieter). */
   spotlight?: "gold" | "silver";
 }
 
 /** A whole-card link styled like a social profile. */
-export function ProfileCard({ platform, url, name, handle, tags, detail, portrait, brand, wide, spotlight }: ProfileCardProps) {
+export function ProfileCard({ platform, url, name, handle, tags, detail, portrait, brand, wide, spotlight, wholePhoto }: ProfileCardProps) {
   const info = PLATFORMS[platform];
   return (
     <a className={styles.profile} data-wide={wide || undefined} data-spotlight={spotlight} href={url} target="_blank" rel="noopener noreferrer">
       <span className={styles.spot} aria-hidden="true" />
       <span className={styles.profileTop}>
-        <Avatar name={name} portrait={portrait} brand={brand} size="lg" />
+        <Avatar name={name} portrait={portrait} brand={brand} size="lg" whole={wholePhoto} />
         <span className={styles.platformBadge} title={info.label}>
           <SocialIcon platform={platform} size={18} />
         </span>

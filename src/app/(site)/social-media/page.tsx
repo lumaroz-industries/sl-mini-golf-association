@@ -82,6 +82,7 @@ export default async function SocialMediaPage() {
         span: a.featured || a.spotlight ? "wide" : "normal",
         spotlight: a.spotlight,
         portrait: a.avatar ?? (a.spotlight ? p?.portrait : undefined),
+        wholePhoto: Boolean(a.avatar),
         platform: a.platform,
         url: a.url,
         name,
