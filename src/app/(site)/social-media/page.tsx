@@ -22,7 +22,7 @@ type Card =
   | {
       kind: "profile";
       id: string;
-      span: "normal" | "wide";
+      span: "normal" | "wide" | "full";
       platform: SocialPlatform;
       url: string;
       name: string;
@@ -79,7 +79,8 @@ export default async function SocialMediaPage() {
       return {
         kind: "profile",
         id: a.id,
-        span: a.featured || a.spotlight ? "wide" : "normal",
+        // The gold spotlight (the site's designer) takes the full width of the grid.
+        span: a.spotlight === "gold" ? "full" : a.featured || a.spotlight ? "wide" : "normal",
         spotlight: a.spotlight,
         portrait: a.avatar ?? (a.spotlight ? p?.portrait : undefined),
         wholePhoto: Boolean(a.avatar),
@@ -127,7 +128,7 @@ export default async function SocialMediaPage() {
                 {c.kind === "channel" ? (
                   <ChannelFeature url={c.url} name={c.name} handle={c.handle} owner={c.owner} description={c.description} />
                 ) : (
-                  <ProfileCard {...c} wide={c.span === "wide"} />
+                  <ProfileCard {...c} wide={c.span !== "normal"} />
                 )}
               </li>
             ))}

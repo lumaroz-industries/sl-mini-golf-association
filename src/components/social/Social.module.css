@@ -704,3 +704,8 @@
 .profile[data-spotlight="silver"] .avatarImg {
   object-position: 50% 18%;
 }
+
+/* Full-width card: the name can use the whole line. */
+.cell[data-span="full"] .profileName {
+  max-width: none;
+}
