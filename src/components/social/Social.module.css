@@ -1049,20 +1049,26 @@
 .fullPhoto {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 2%;
   bottom: 0;
   width: 52%;
+  display: flex;
+  justify-content: center;
   pointer-events: none;
-  -webkit-mask-image: radial-gradient(62% 78% at 56% 50%, #000 42%, rgb(0 0 0 / 0.5) 68%, transparent 92%);
-  mask-image: radial-gradient(62% 78% at 56% 50%, #000 42%, rgb(0 0 0 / 0.5) 68%, transparent 92%);
 }
 
+/* Zoomed out: the whole portrait at the card's height, its own edges fading
+   into the card on all four sides (no box, no ring). */
 .fullPhoto img {
-  width: 100%;
   height: 100%;
+  width: auto;
+  max-width: none;
   object-fit: cover;
-  object-position: 50% 18%;
   filter: saturate(0.95) contrast(1.04);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 26%, #000 74%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 14%, #000 82%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 26%, #000 74%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 14%, #000 82%, transparent 100%);
+  mask-composite: intersect;
 }
 
 .profile[data-photo] .profileTop,
@@ -1073,21 +1079,6 @@
 }
 
 /* A faint tint so the photo sits in each card's finish. */
-.profile[data-spotlight="gold"] .fullPhoto::after,
-.profile[data-spotlight="diamond"] .fullPhoto::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  mix-blend-mode: soft-light;
-}
-
-.profile[data-spotlight="gold"] .fullPhoto::after {
-  background: linear-gradient(160deg, rgb(251 236 196 / 0.35), rgb(140 106 46 / 0.25));
-}
-
-.profile[data-spotlight="diamond"] .fullPhoto::after {
-  background: linear-gradient(160deg, rgb(220 240 255 / 0.35), rgb(200 180 255 / 0.2));
-}
 
 @media (max-width: 760px) {
   .profile[data-photo] {
@@ -1102,11 +1093,10 @@
   }
   .fullPhoto {
     left: 0;
+    right: 0;
     width: 100%;
     bottom: auto;
     height: 340px;
-    -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 98%);
-    mask-image: linear-gradient(to bottom, #000 45%, transparent 98%);
   }
 }
 
@@ -1216,4 +1206,190 @@
   .texture[data-kind="diamond"]::after {
     animation: none;
   }
+}
+
+
+/* ======================================================== YouTube card */
+.channel {
+  border-color: rgb(255 0 51 / 0.45);
+  background:
+    radial-gradient(60% 90% at 100% 0%, rgb(255 0 51 / 0.14), transparent 60%),
+    linear-gradient(160deg, #140b0c, #0a0707 60%, #070505);
+  box-shadow: 0 30px 70px -40px rgb(255 0 51 / 0.45), 0 24px 50px -28px rgb(0 0 0 / 0.9);
+}
+
+.screenCover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.72) saturate(1.05);
+  transition: transform var(--dur-slow) var(--ease-out), filter var(--dur) var(--ease-out);
+}
+
+/* When there's a cover, the drawn scene steps aside. */
+.screenCover ~ .screenFloor,
+.screenCover ~ .screenCup,
+.screenCover ~ .screenBall {
+  display: none;
+}
+
+.screenCover ~ .screenGlow {
+  background: linear-gradient(to top, rgb(0 0 0 / 0.75), transparent 45%);
+  inset: 0;
+  width: auto;
+  aspect-ratio: auto;
+  transform: none;
+  left: 0;
+  bottom: 0;
+  border-radius: 0;
+}
+
+/* The YouTube play button: a red rounded rectangle. */
+.channel .play {
+  width: 88px;
+  height: 62px;
+  border-radius: 18px;
+  background: #ff0033;
+  color: #fff;
+  box-shadow: 0 18px 40px -12px rgb(255 0 51 / 0.75);
+}
+
+.channel .screenBar {
+  background: rgb(255 255 255 / 0.25);
+}
+
+.channel .screenBar span {
+  background: #ff0033;
+  box-shadow: 0 0 10px rgb(255 0 51 / 0.8);
+}
+
+.ytKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ff4d6d;
+}
+
+.channel .profileHandle {
+  color: #ff8095;
+}
+
+.channel .channelCta {
+  background: #ff0033;
+  border-color: #ff0033;
+  color: #fff;
+}
+
+@media (hover: hover) {
+  .channel:hover .screenCover {
+    transform: scale(1.04);
+    filter: brightness(0.85) saturate(1.1);
+  }
+  .channel:hover .channelCta {
+    background: #ff1f4b;
+  }
+}
+
+/* ===================================================== Pune and Nagpur */
+
+/* Pune — royal maroon and copper (the Deccan's old capital). */
+.profile[data-spotlight="maroon"] {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(160deg, #1a0b0e, #0b0607) padding-box,
+    linear-gradient(140deg, #e6a37a, rgb(184 92 60 / 0.4) 35%, rgb(255 255 255 / 0.05) 60%, #c97b56) border-box;
+  box-shadow: 0 24px 50px -28px rgb(0 0 0 / 0.9), 0 30px 70px -48px rgb(201 123 86 / 0.5);
+}
+
+.texture[data-kind="maroon"] {
+  background:
+    radial-gradient(70% 80% at 100% 0%, rgb(201 123 86 / 0.2), transparent 62%),
+    radial-gradient(60% 70% at 0% 100%, rgb(122 22 40 / 0.32), transparent 65%);
+}
+
+/* a fine heritage lattice */
+.texture[data-kind="maroon"]::before {
+  background:
+    repeating-linear-gradient(60deg, rgb(230 163 122 / 0.04) 0 1px, transparent 1px 14px),
+    repeating-linear-gradient(-60deg, rgb(230 163 122 / 0.04) 0 1px, transparent 1px 14px);
+  -webkit-mask: radial-gradient(90% 90% at 100% 0%, #000, transparent 75%);
+  mask: radial-gradient(90% 90% at 100% 0%, #000, transparent 75%);
+}
+
+.profile[data-spotlight="maroon"] .chip {
+  border-color: rgb(230 163 122 / 0.5);
+  color: #f0b994;
+  background: rgb(201 123 86 / 0.08);
+}
+
+.profile[data-spotlight="maroon"] .profileHandle,
+.profile[data-spotlight="maroon"] .profileCta {
+  color: #f0b994;
+}
+
+.profile[data-spotlight="maroon"] .avatar[data-ring]::before {
+  background: conic-gradient(from 210deg, #f3c4a1, #c97b56, #7a1628, #c97b56, #f3c4a1);
+}
+
+.profile[data-spotlight="maroon"] .avatarInner {
+  background: radial-gradient(circle at 30% 25%, rgb(201 123 86 / 0.35), transparent 60%), linear-gradient(160deg, #2a0f15, #0b0607);
+}
+
+/* Nagpur — the Orange City: warm orange with a fresh green. */
+.profile[data-spotlight="orange"] {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(160deg, #1a1108, #0b0806) padding-box,
+    linear-gradient(140deg, #ffb347, rgb(255 140 26 / 0.4) 35%, rgb(255 255 255 / 0.05) 60%, #5fbf4a) border-box;
+  box-shadow: 0 24px 50px -28px rgb(0 0 0 / 0.9), 0 30px 70px -48px rgb(255 140 26 / 0.5);
+}
+
+.texture[data-kind="orange"] {
+  background:
+    radial-gradient(70% 80% at 100% 0%, rgb(255 140 26 / 0.2), transparent 62%),
+    radial-gradient(60% 70% at 0% 100%, rgb(60 150 50 / 0.18), transparent 65%);
+}
+
+/* soft citrus segments radiating from a corner */
+.texture[data-kind="orange"]::before {
+  background: repeating-conic-gradient(from 0deg at 100% 0%, rgb(255 179 71 / 0.05) 0deg 4deg, transparent 4deg 12deg);
+  -webkit-mask: radial-gradient(80% 90% at 100% 0%, #000, transparent 75%);
+  mask: radial-gradient(80% 90% at 100% 0%, #000, transparent 75%);
+}
+
+.profile[data-spotlight="orange"] .chip {
+  border-color: rgb(255 179 71 / 0.5);
+  color: #ffc271;
+  background: rgb(255 140 26 / 0.08);
+}
+
+.profile[data-spotlight="orange"] .chip + .chip {
+  border-color: rgb(95 191 74 / 0.5);
+  color: #8fe07f;
+  background: rgb(60 150 50 / 0.1);
+}
+
+.profile[data-spotlight="orange"] .profileHandle,
+.profile[data-spotlight="orange"] .profileCta {
+  color: #ffc271;
+}
+
+.profile[data-spotlight="orange"] .avatar[data-ring]::before {
+  background: conic-gradient(from 210deg, #ffd08a, #ff8c1a, #5fbf4a, #ff8c1a, #ffd08a);
+}
+
+.profile[data-spotlight="orange"] .avatarInner {
+  background: radial-gradient(circle at 30% 25%, rgb(255 140 26 / 0.35), transparent 60%), linear-gradient(160deg, #2a1a08, #0b0806);
+}
+
+.profile[data-spotlight="maroon"] .platformBadge,
+.profile[data-spotlight="orange"] .platformBadge {
+  position: relative;
+  z-index: 1;
 }

@@ -182,12 +182,12 @@ export const SocialAccount = z
     description: optionalText,
     /** Shown as a wider card. */
     featured: z.boolean().optional().default(false),
-    /** Profile picture for this account's card (e.g. the Instagram photo); otherwise the person's portrait. */
+    /** Profile picture for this account's card; for a YouTube channel, the cover picture of its video panel. */
     avatar: ImageAsset.optional(),
     /** Card width in the grid: a third (default), half, two-thirds ("wide") or the full row. */
     span: z.enum(["normal", "half", "wide", "full"]).optional(),
-    /** Highlighted finish: "diamond" (the site's designer), "gold" (the founder), "silver", or "tricolor" (national body). */
-    spotlight: z.enum(["diamond", "gold", "silver", "tricolor"]).optional(),
+    /** Highlighted finish: "diamond" (the site's designer), "gold" (the founder), "silver", "tricolor" (national body), "maroon", "orange". */
+    spotlight: z.enum(["diamond", "gold", "silver", "tricolor", "maroon", "orange"]).optional(),
   })
   .superRefine((acc, ctx) => {
     if (!urlMatchesPlatform(acc.platform, acc.url)) {

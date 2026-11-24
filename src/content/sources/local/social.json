@@ -20,7 +20,8 @@
       "url": "https://www.instagram.com/pune_minigolf_association/",
       "name": "Pune Minigolf Association",
       "label": "Pune",
-      "span": "half"
+      "span": "half",
+      "spotlight": "maroon"
     },
     {
       "id": "nagpur-minigolf-association",
@@ -29,7 +30,8 @@
       "url": "https://www.instagram.com/nagpur_minigolf_association/",
       "name": "Nagpur Minigolf Association",
       "label": "Nagpur",
-      "span": "half"
+      "span": "half",
+      "spotlight": "orange"
     },
     {
       "id": "suyash-lahane-instagram",
@@ -57,7 +59,13 @@
       "platform": "youtube",
       "url": "https://www.youtube.com/@TheMiniGolfJourney",
       "name": "The Mini Golf Journey",
-      "personId": "suyash-lahane"
+      "personId": "suyash-lahane",
+      "avatar": {
+        "src": "/social/the-mini-golf-journey-cover.webp",
+        "alt": "A golf ball rolling towards the cup on a lit putting green",
+        "width": 1280,
+        "height": 800
+      }
     }
   ],
   "emptyState": "Social media accounts will be listed here soon.",

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { findNavItem } from "@/config/navigation";
 import { PLATFORMS, deriveHandle } from "@/config/social-platforms";
 import { getActiveSocialLinks, getPeople, getSiteSettings, getSocialPageContent } from "@/content/repository";
-import type { SocialPlatform } from "@/content/schema";
+import type { ImageAsset, SocialPlatform } from "@/content/schema";
 import { ChannelFeature } from "@/components/social/ChannelFeature";
 import { Orbit } from "@/components/social/Orbit";
 import { ProfileCard } from "@/components/social/ProfileCard";
@@ -40,6 +40,7 @@ type Card =
       handle?: string;
       owner?: { name: string };
       description?: string;
+      cover?: ImageAsset;
     };
 
 const TYPE_TAG = { organisation: "Organisation", person: "Person", channel: "Channel" } as const;
@@ -74,7 +75,7 @@ export default async function SocialMediaPage() {
       const name = a.name ?? p!.name;
       const handle = a.handle ?? deriveHandle(a.platform, a.url);
       if (a.type === "channel" && a.platform === "youtube") {
-        return { kind: "channel", id: a.id, span: "full", url: a.url, name, handle, owner: p && { name: p.name }, description: a.description };
+        return { kind: "channel", id: a.id, span: "full", url: a.url, name, handle, owner: p && { name: p.name }, description: a.description, cover: a.avatar };
       }
       return {
         kind: "profile",
@@ -125,7 +126,7 @@ export default async function SocialMediaPage() {
             {cards.map((c, i) => (
               <li key={c.id} className={social.cell} data-span={c.span} style={{ "--i": i } as React.CSSProperties}>
                 {c.kind === "channel" ? (
-                  <ChannelFeature url={c.url} name={c.name} handle={c.handle} owner={c.owner} description={c.description} />
+                  <ChannelFeature url={c.url} name={c.name} handle={c.handle} owner={c.owner} description={c.description} cover={c.cover} />
                 ) : (
                   <ProfileCard {...c} wide={c.span !== "normal"} full={c.span === "full"} />
                 )}

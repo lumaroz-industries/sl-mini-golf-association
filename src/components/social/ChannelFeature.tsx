@@ -1,4 +1,6 @@
+import Image from "next/image";
 import type { ImageAsset } from "@/content/schema";
+import { SocialIcon } from "@/components/ui/SocialIcon";
 import { Avatar } from "./Avatar";
 import styles from "./Social.module.css";
 
@@ -8,14 +10,17 @@ interface ChannelFeatureProps {
   handle?: string;
   owner?: { name: string; portrait?: ImageAsset };
   description?: string;
+  /** Cover picture shown in the video panel, like a thumbnail. */
+  cover?: ImageAsset;
 }
 
 /** Cinematic feature panel for a YouTube channel. */
-export function ChannelFeature({ url, name, handle, owner, description }: ChannelFeatureProps) {
+export function ChannelFeature({ url, name, handle, owner, description, cover }: ChannelFeatureProps) {
   return (
     <a className={styles.channel} href={url} target="_blank" rel="noopener noreferrer">
       <span className={styles.spot} aria-hidden="true" />
       <span className={styles.screen} aria-hidden="true">
+        {cover && <Image className={styles.screenCover} src={cover.src} alt="" width={cover.width} height={cover.height} sizes="(max-width: 900px) 100vw, 55vw" />}
         <span className={styles.screenGlow} />
         <span className={styles.screenFloor} />
         <span className={styles.screenCup} />
@@ -30,7 +35,9 @@ export function ChannelFeature({ url, name, handle, owner, description }: Channe
         </span>
       </span>
       <span className={styles.channelInfo}>
-        <span className="kicker">YouTube channel</span>
+        <span className={styles.ytKicker}>
+          <SocialIcon platform="youtube" size={18} /> YouTube channel
+        </span>
         <span className={styles.channelName}>{name}</span>
         {owner && (
           <span className={styles.channelOwner}>
