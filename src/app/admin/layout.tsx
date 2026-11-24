@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { AdminIntro } from "@/components/admin/AdminIntro";
+import { getPeople } from "@/content/repository";
 import s from "@/components/admin/admin.module.css";
 
 export const metadata: Metadata = {
@@ -13,6 +15,12 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: "#050807", viewportFit: "cover" };
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <div className={s.shell}>{children}</div>;
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const people = await getPeople();
+  return (
+    <div className={s.shell}>
+      <AdminIntro people={people.map((p) => ({ name: p.name, role: p.role, portrait: p.portrait?.src }))} />
+      {children}
+    </div>
+  );
 }

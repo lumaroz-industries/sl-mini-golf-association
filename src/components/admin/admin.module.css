@@ -1,10 +1,28 @@
-/* Admin — calm, dark, form-first. */
+/* Admin — black, gold and silver, with deep-green accents. Form-first. */
 
 .shell {
+  /* Admin palette (overrides the site's emerald accents inside the admin). */
+  --gold: #e3c27a;
+  --gold-hi: #fbecc4;
+  --gold-lo: #8c6a2e;
+  --gold-grad: linear-gradient(135deg, #fbecc4 0%, #e3c27a 38%, #b38d45 72%, #e9cf8a 100%);
+  --silver: #c9ced1;
+  --green: #1f8a5f;
+  --green-deep: #0b3d2a;
+  --accent: var(--gold);
+  --line-accent: rgb(227 194 122 / 0.38);
+  --focus: var(--gold-hi);
+  --bg: #050505;
+  --bg-raised: #0b0b0c;
+  --field: #070707;
+  --fg-muted: #a9adb0;
   min-height: 100svh;
+  color: var(--fg);
   background:
-    radial-gradient(80% 50% at 50% -10%, rgb(0 168 107 / 0.08), transparent 60%),
+    radial-gradient(70% 45% at 50% -8%, rgb(227 194 122 / 0.09), transparent 62%),
+    radial-gradient(60% 40% at 100% 100%, rgb(11 61 42 / 0.22), transparent 70%),
     var(--bg);
+  background-attachment: fixed;
 }
 
 .bar {
@@ -16,8 +34,9 @@
   gap: 18px;
   height: 64px;
   padding: 0 var(--gutter);
-  border-bottom: 1px solid var(--line);
-  background: rgb(5 8 7 / 0.85);
+  border-bottom: 1px solid rgb(227 194 122 / 0.16);
+  background: rgb(5 5 5 / 0.88);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.6);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -30,7 +49,7 @@
   font-weight: 800;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--fg-muted);
+  color: var(--gold);
 }
 
 .brand img {
@@ -57,8 +76,9 @@
 
 .nav a:hover,
 .nav a[aria-current="page"] {
-  color: var(--fg);
-  background: rgb(255 255 255 / 0.06);
+  color: var(--gold-hi);
+  background: rgb(227 194 122 / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(227 194 122 / 0.28);
 }
 
 .barEnd {
@@ -106,10 +126,17 @@
   font-weight: 800;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--accent);
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .title {
+  background: linear-gradient(180deg, #ffffff 30%, var(--silver));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   margin-top: 6px;
   font-family: var(--font-display);
   font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
@@ -152,13 +179,15 @@
 }
 
 .primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #02130c;
+  background: var(--gold-grad);
+  border-color: transparent;
+  color: #1a1206;
+  box-shadow: 0 8px 22px -10px rgb(227 194 122 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.45);
 }
 
 .primary:hover {
-  background: var(--c-emerald-bright);
+  background: var(--gold-grad);
+  filter: brightness(1.08);
 }
 
 .danger {
@@ -188,17 +217,24 @@
   gap: 10px;
   padding: 24px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--line);
-  background: var(--bg-raised);
+  border: 1px solid transparent;
+  background:
+    linear-gradient(180deg, #0d0d0e, #080808) padding-box,
+    linear-gradient(150deg, rgb(251 236 196 / 0.35), rgb(227 194 122 / 0.08) 35%, rgb(255 255 255 / 0.05) 65%, rgb(227 194 122 / 0.22)) border-box;
+  box-shadow: 0 24px 50px -30px rgb(0 0 0 / 0.9);
   transition: border-color var(--dur-fast), transform var(--dur) var(--ease-out);
 }
 
 a.tile:hover {
-  border-color: var(--line-accent);
+  box-shadow: 0 24px 50px -30px rgb(0 0 0 / 0.9), 0 0 0 1px rgb(227 194 122 / 0.35);
   transform: translateY(-2px);
 }
 
 .tileTitle {
+  background: linear-gradient(180deg, #ffffff 30%, var(--silver));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 600;
@@ -215,7 +251,7 @@ a.tile:hover {
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--gold);
 }
 
 .notice {
@@ -259,7 +295,7 @@ a.tile:hover {
   height: 48px;
   border-radius: 8px;
   object-fit: cover;
-  background: #0c1411;
+  background: #0d0d0e;
 }
 
 .rowMain {
@@ -319,8 +355,9 @@ a.tile:hover {
 }
 
 .pillLive {
-  color: var(--c-emerald-bright);
-  border-color: var(--line-accent);
+  color: #6fd3a5;
+  border-color: rgb(31 138 95 / 0.55);
+  background: rgb(11 61 42 / 0.45);
 }
 
 .pillWarn {
@@ -347,8 +384,11 @@ a.tile:hover {
   gap: 18px;
   padding: clamp(18px, 3vw, 28px);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--line);
-  background: var(--bg-raised);
+  border: 1px solid transparent;
+  background:
+    linear-gradient(180deg, #0d0d0e, #080808) padding-box,
+    linear-gradient(150deg, rgb(251 236 196 / 0.35), rgb(227 194 122 / 0.08) 35%, rgb(255 255 255 / 0.05) 65%, rgb(227 194 122 / 0.22)) border-box;
+  box-shadow: 0 24px 50px -30px rgb(0 0 0 / 0.9);
 }
 
 .sectionHead {
@@ -406,7 +446,7 @@ a.tile:hover {
   padding: 11px 14px;
   border-radius: 12px;
   border: 1px solid rgb(255 255 255 / 0.12);
-  background: #070c0a;
+  background: var(--field);
   color: var(--fg);
   font: inherit;
   font-size: 1rem;
@@ -418,7 +458,7 @@ a.tile:hover {
 .select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgb(0 168 107 / 0.2);
+  box-shadow: 0 0 0 3px rgb(227 194 122 / 0.18);
 }
 
 .input[readonly] {
@@ -436,13 +476,13 @@ a.tile:hover {
   align-items: center;
   border-radius: 12px;
   border: 1px solid rgb(255 255 255 / 0.12);
-  background: #070c0a;
+  background: var(--field);
   overflow: hidden;
 }
 
 .slugRow:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgb(0 168 107 / 0.2);
+  box-shadow: 0 0 0 3px rgb(227 194 122 / 0.18);
 }
 
 .slugPrefix {
@@ -503,8 +543,8 @@ a.tile:hover {
 }
 
 .choice input:checked + span {
-  border-color: var(--accent);
-  background: rgb(0 168 107 / 0.14);
+  border-color: var(--gold);
+  background: rgb(227 194 122 / 0.12);
   color: var(--fg);
 }
 
@@ -534,7 +574,7 @@ a.tile:hover {
   aspect-ratio: 16 / 10;
   border-radius: 14px;
   border: 1px dashed rgb(255 255 255 / 0.2);
-  background: #070c0a;
+  background: var(--field);
   overflow: hidden;
   cursor: pointer;
   text-align: center;
@@ -572,7 +612,7 @@ a.tile:hover {
   border: 1px solid rgb(255 255 255 / 0.12);
   border-bottom: 0;
   border-radius: 12px 12px 0 0;
-  background: #0b1310;
+  background: #0e0e0f;
 }
 
 .tool {
@@ -591,7 +631,7 @@ a.tile:hover {
 }
 
 .tool[aria-pressed="true"] {
-  background: rgb(0 168 107 / 0.18);
+  background: rgb(227 194 122 / 0.16);
   color: var(--fg);
 }
 
@@ -613,7 +653,7 @@ a.tile:hover {
   padding: 24px;
   border: 1px solid rgb(255 255 255 / 0.12);
   border-radius: 0 0 12px 12px;
-  background: #070c0a;
+  background: var(--field);
   overflow: auto;
 }
 
@@ -645,7 +685,7 @@ a.tile:hover {
 }
 
 .ok {
-  color: var(--c-emerald-bright);
+  color: var(--gold-hi);
 }
 
 .err {
@@ -677,7 +717,7 @@ a.tile:hover {
   padding: 10px;
   border-radius: 16px;
   border: 1px solid var(--line);
-  background: #070c0a;
+  background: var(--field);
 }
 
 .photo[data-cover] {
@@ -689,7 +729,7 @@ a.tile:hover {
   aspect-ratio: 4 / 3;
   border-radius: 10px;
   overflow: hidden;
-  background: #0c1411 center / cover no-repeat;
+  background: #0d0d0e center / cover no-repeat;
 }
 
 .photoImg img {
@@ -757,8 +797,11 @@ a.tile:hover {
   width: min(420px, 100%);
   padding: 36px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--line);
-  background: var(--bg-raised);
+  border: 1px solid transparent;
+  background:
+    linear-gradient(180deg, #0d0d0e, #080808) padding-box,
+    linear-gradient(150deg, rgb(251 236 196 / 0.35), rgb(227 194 122 / 0.08) 35%, rgb(255 255 255 / 0.05) 65%, rgb(227 194 122 / 0.22)) border-box;
+  box-shadow: 0 24px 50px -30px rgb(0 0 0 / 0.9);
 }
 
 .loginCard img {
