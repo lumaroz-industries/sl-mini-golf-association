@@ -292,10 +292,12 @@ export function textTexture(opts: TextOptions): { texture: Texture; aspect: numb
  * designer (gold) · gap · founder (silver) · gap. Tiles seamlessly.
  */
 export function ledRibbonTexture(opts: { font: string; people: Array<{ name: string; line: string; tail?: string }> }): { texture: Texture; aspect: number } {
-  const H = 128;
-  const nameSize = 78;
-  const smallSize = 34;
-  const gap = 46;
+  // Kept small: the whole repeat must stay well under 8192 px (the texture
+  // limit of many laptop GPUs) — about 4 000 px wide at this size.
+  const H = 64;
+  const nameSize = 39;
+  const smallSize = 17;
+  const gap = 23;
   const measureCtx = document.createElement("canvas").getContext("2d")!;
   const measure = (txt: string, size: number, spacing: number) => {
     measureCtx.font = `600 ${size}px ${opts.font}`;
@@ -304,7 +306,7 @@ export function ledRibbonTexture(opts: { font: string; people: Array<{ name: str
     return w - spacing * size;
   };
   type Item = { text: string; size: number; spacing: number; fill: "gold" | "silver" | "white" | "goldSoft" } | { diamond: true } | { blank: number };
-  const widthOf = (it: Item) => ("diamond" in it ? 14 : "blank" in it ? it.blank : measure(it.text, it.size, it.spacing));
+  const widthOf = (it: Item) => ("diamond" in it ? 8 : "blank" in it ? it.blank : measure(it.text, it.size, it.spacing));
   const tag = (p: { name: string; line: string; tail?: string }, metal: "gold" | "silver"): Item[] => {
     const t: Item[] = [{ text: p.name, size: nameSize, spacing: 0.05, fill: metal }, { diamond: true }, { text: p.line, size: smallSize, spacing: 0.2, fill: "white" }];
     if (p.tail) t.push({ diamond: true }, { text: p.tail, size: smallSize, spacing: 0.16, fill: metal === "gold" ? "goldSoft" : "white" });
@@ -326,7 +328,7 @@ export function ledRibbonTexture(opts: { font: string; people: Array<{ name: str
   ctx.fillStyle = "#020403";
   ctx.fillRect(0, 0, W, H);
   ctx.textBaseline = "middle";
-  const y = H / 2 + 3;
+  const y = H / 2 + 2;
   const gold = ctx.createLinearGradient(0, y - nameSize / 2, 0, y + nameSize / 2);
   gold.addColorStop(0, "#fff3d0");
   gold.addColorStop(0.5, "#f0cd7c");
@@ -343,10 +345,10 @@ export function ledRibbonTexture(opts: { font: string; people: Array<{ name: str
       // empty stretch of LED panel
     } else if ("diamond" in it) {
       ctx.save();
-      ctx.translate(x + 7, y);
+      ctx.translate(x + 4, y);
       ctx.rotate(Math.PI / 4);
       ctx.fillStyle = "#19d18c";
-      ctx.fillRect(-6, -6, 12, 12);
+      ctx.fillRect(-3, -3, 6, 6);
       ctx.restore();
     } else {
       ctx.font = `600 ${it.size}px ${opts.font}`;
@@ -362,12 +364,12 @@ export function ledRibbonTexture(opts: { font: string; people: Array<{ name: str
 
   // LED pixel grid.
   ctx.fillStyle = "rgba(0,0,0,0.45)";
-  for (let gx = 0; gx < W; gx += 4) ctx.fillRect(gx, 0, 1.3, H);
-  for (let gy = 0; gy < H; gy += 4) ctx.fillRect(0, gy, W, 1.3);
+  for (let gx = 0; gx < W; gx += 2) ctx.fillRect(gx, 0, 0.65, H);
+  for (let gy = 0; gy < H; gy += 2) ctx.fillRect(0, gy, W, 0.65);
 
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
   texture.wrapS = RepeatWrapping;
-  texture.anisotropy = 16;
+  texture.anisotropy = 8;
   return { texture, aspect: W / H };
 }
