@@ -8,11 +8,10 @@ author:
   bio: The team behind the platform.
 publishedAt: "2026-11-24"
 cover:
-  src: /articles/beyond-the-green-inside-sl-mini-golf-association/cover.webp
-  alt: A white golf ball rolling across an emerald putting green towards the cup, with a stone arch glowing in the dark behind it
+  src: /articles/beyond-the-green-inside-sl-mini-golf-association/cover-sl-v2.webp
+  alt: "The SL Mini Golf Association logo and the tagline \"Beyond the green. Beyond boundaries.\" over the homepage's 3D course at night"
   width: 1600
   height: 1000
-  credit: Render from the SL Mini Golf Association homepage
 tags: [platform, website, behind the scenes]
 featured: true
 draft: false
