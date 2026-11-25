@@ -1,6 +1,6 @@
 import { SiteHeader } from "@/components/nav/SiteHeader";
 import { SiteFooter } from "@/components/footer/SiteFooter";
-import { getActiveSocialLinks, getPeopleByIds, getPeopleInstagram, getSiteSettings } from "@/content/repository";
+import { getActiveSocialLinks, getPeopleByIds, getPeopleInstagram, getPeopleStyle, getSiteSettings } from "@/content/repository";
 import { getBaseUrl } from "@/lib/site-url";
 import { SiteIntro, type IntroPerson } from "@/sections/home/SiteIntro";
 
@@ -10,10 +10,10 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const social = await getActiveSocialLinks();
   const base = await getBaseUrl();
   // The founder and the website's designer, introduced in the homepage opening.
-  const [[owner, dev], instagram] = await Promise.all([getPeopleByIds([site.credits.ownerId, site.credits.developerId]), getPeopleInstagram()]);
+  const [[owner, dev], instagram, style] = await Promise.all([getPeopleByIds([site.credits.ownerId, site.credits.developerId]), getPeopleInstagram(), getPeopleStyle()]);
   const introPeople: IntroPerson[] = [
-    { name: owner.name, role: owner.role, photo: "/social/suyash-lahane-cutout.webp", handle: instagram[owner.id]?.handle, finish: "gold" },
-    { name: dev.name, role: dev.role, photo: "/social/chaitanya-payghan-cutout-v3.webp", handle: instagram[dev.id]?.handle, finish: "diamond" },
+    { name: owner.name, role: owner.role, photo: style[owner.id]?.cutout?.src ?? owner.portrait?.src, handle: instagram[owner.id]?.handle, finish: "gold" },
+    { name: dev.name, role: dev.role, photo: style[dev.id]?.cutout?.src ?? dev.portrait?.src, handle: instagram[dev.id]?.handle, finish: "diamond" },
   ];
   // Structured data: lets search engines connect the site to its official profiles.
   const organization = {

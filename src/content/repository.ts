@@ -101,6 +101,18 @@ export const getPeopleInstagram = cache(async (): Promise<Record<string, { url: 
   return out;
 });
 
+/** Finish used for a person across the site (gold, diamond …) and their cut-out photo, from their Social Media card. */
+export type PersonFinish = "diamond" | "gold" | "silver" | "tricolor" | "maroon" | "orange";
+export const getPeopleStyle = cache(async (): Promise<Record<string, { finish?: PersonFinish; cutout?: ImageAsset }>> => {
+  const { accounts } = await getSocialPageContent();
+  const out: Record<string, { finish?: PersonFinish; cutout?: ImageAsset }> = {};
+  for (const a of accounts) {
+    if (!a.personId || out[a.personId]) continue;
+    if (a.spotlight || a.cutout) out[a.personId] = { finish: a.spotlight, cutout: a.cutout };
+  }
+  return out;
+});
+
 export async function getPeopleByIds(ids: string[]): Promise<Person[]> {
   const people = await getPeople();
   return ids.map((id) => {

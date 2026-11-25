@@ -1,4 +1,4 @@
-import { getHomeContent, getPeopleByIds, getPeopleInstagram, getSiteSettings } from "@/content/repository";
+import { getHomeContent, getPeopleByIds, getPeopleInstagram, getPeopleStyle, getSiteSettings } from "@/content/repository";
 import { Journey } from "@/sections/home/journey/Journey";
 import { PeopleSection } from "@/sections/home/PeopleSection";
 
@@ -11,7 +11,7 @@ const JOURNEY_MODE = `try{if(document.createElement('canvas').getContext('webgl2
 
 export default async function HomePage() {
   const home = await getHomeContent();
-  const [people, instagram, site] = await Promise.all([getPeopleByIds(home.people.memberIds), getPeopleInstagram(), getSiteSettings()]);
+  const [people, instagram, site, style] = await Promise.all([getPeopleByIds(home.people.memberIds), getPeopleInstagram(), getSiteSettings(), getPeopleStyle()]);
   const [owner, dev] = await getPeopleByIds([site.credits.ownerId, site.credits.developerId]);
   // Trackside LED boards on the 3D course: mostly the website's designer, a couple for the founder.
   const trackside = [
@@ -23,7 +23,7 @@ export default async function HomePage() {
     <>
       <script dangerouslySetInnerHTML={{ __html: JOURNEY_MODE }} />
       <Journey hero={home.hero} intro={home.intro} visionMission={home.visionMission} community={home.community} trackside={trackside} />
-      <PeopleSection content={home.people} people={people} instagram={instagram} />
+      <PeopleSection content={home.people} people={people} instagram={instagram} style={style} />
     </>
   );
 }
