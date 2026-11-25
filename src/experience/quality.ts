@@ -46,6 +46,14 @@ export function detectQuality(): QualitySettings {
   return SETTINGS.high;
 }
 
+/**
+ * One step lighter (high → medium → low). Used after the browser's graphics
+ * dropped the 3D view, so the rebuilt scene asks less of the device.
+ */
+export function lowerQuality(q: QualitySettings): QualitySettings {
+  return q.tier === "high" ? SETTINGS.medium : SETTINGS.low;
+}
+
 export function supportsWebGL2(): boolean {
   try {
     const canvas = document.createElement("canvas");

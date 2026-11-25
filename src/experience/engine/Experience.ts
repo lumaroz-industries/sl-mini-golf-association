@@ -34,6 +34,8 @@ export interface ExperienceOptions {
   canvas: HTMLCanvasElement;
   quality: QualitySettings;
   text: WorldText;
+  /** Called right after a frame is drawn, at most every few hundred ms (for a still copy). */
+  onFrame?: (canvas: HTMLCanvasElement) => void;
 }
 
 const DIM = new Color("#05130d");
@@ -63,6 +65,12 @@ export class Experience {
   private raf = 0;
   private envTexture?: Texture;
   private disposed = false;
+  /* Adaptive resolution: average time between frames while the scene is moving. */
+  private lastFrame = 0;
+  private frameAvg = 16;
+  private slowFrames = 0;
+  private pixelRatio = 1;
+  private lastStill = 0;
 
   constructor(private readonly opts: ExperienceOptions) {
     const { canvas, quality } = opts;
@@ -73,7 +81,8 @@ export class Experience {
       alpha: false,
       stencil: false,
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality.maxPixelRatio));
+    this.pixelRatio = Math.min(window.devicePixelRatio, quality.maxPixelRatio);
+    this.renderer.setPixelRatio(this.pixelRatio);
     this.renderer.outputColorSpace = SRGBColorSpace;
     this.renderer.toneMapping = ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1;
@@ -160,10 +169,38 @@ export class Experience {
     this.dirty = false;
   }
 
-  private loop() {
+  private loop(time: number) {
     if (this.disposed) return;
-    if (this.dirty) this.renderNow();
+    if (this.dirty) {
+      this.renderNow();
+      this.adapt(time);
+      if (this.opts.onFrame && time - this.lastStill > 350) {
+        this.lastStill = time;
+        this.opts.onFrame(this.opts.canvas);
+      }
+    } else this.lastFrame = 0;
     this.raf = requestAnimationFrame(this.loop);
+  }
+
+  /**
+   * If frames keep taking too long while scrolling, render at a lower
+   * resolution. Very heavy frames can make the browser's graphics give up
+   * (the 3D view drops out), so this keeps the device within its limits.
+   */
+  private adapt(time: number) {
+    if (this.lastFrame) {
+      const dt = Math.min(250, time - this.lastFrame);
+      this.frameAvg += (dt - this.frameAvg) * 0.1;
+      this.slowFrames = this.frameAvg > 42 ? this.slowFrames + 1 : 0;
+      if (this.slowFrames > 20 && this.pixelRatio > 0.75) {
+        this.pixelRatio = Math.max(0.75, this.pixelRatio - 0.25);
+        this.renderer.setPixelRatio(this.pixelRatio);
+        this.resize();
+        this.slowFrames = 0;
+        this.frameAvg = 30;
+      }
+    }
+    this.lastFrame = time;
   }
 
   private render() {

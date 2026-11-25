@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { HomeContent } from "@/content/schema";
 import { SCENES, SKIP_TO, SKIP_UNTIL, quantizeToStill, sceneOpacity, type SceneId } from "@/experience/timeline/chapters";
-import { detectQuality } from "@/experience/quality";
+import { detectQuality, lowerQuality } from "@/experience/quality";
 import { prefetchSurfaces } from "@/experience/materials/surfaceCache";
 import styles from "./Journey.module.css";
 
@@ -46,6 +46,7 @@ interface JourneyProps {
 export function Journey({ hero, intro, visionMission, community, trackside }: JourneyProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const stillRef = useRef<HTMLCanvasElement>(null);
   const lenisRef = useRef<import("lenis").default | undefined>(undefined);
 
   useEffect(() => {
@@ -105,9 +106,13 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
     let rebuild: (() => void) | undefined;
     // If the browser's graphics drop the 3D view (low memory, driver reset),
     // show the static backdrop instead of a half-black frame, then rebuild it.
+    let quality = early?.quality ?? detectQuality();
     const onLost = (e: Event) => {
       e.preventDefault();
       root.removeAttribute("data-ready");
+      root.setAttribute("data-rebuilding", "");
+      // Rebuild lighter, so the same heavy view doesn't drop it again.
+      quality = lowerQuality(quality);
     };
     const onRestored = () => rebuild?.();
     canvas.addEventListener("webglcontextlost", onLost);
@@ -115,7 +120,6 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
 
     (async () => {
       try {
-        const quality = early?.quality ?? detectQuality();
         const [{ Experience }, LenisModule] = await Promise.all([
           early?.engine ?? import("@/experience/engine/Experience"),
           reduced ? Promise.resolve(undefined) : import("lenis"),
@@ -126,10 +130,28 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
         const font = getComputedStyle(document.documentElement).getPropertyValue("--font-clash").trim() || "sans-serif";
         await document.fonts.load(`600 100px ${font}`).catch(() => undefined);
         if (cancelled) return;
+        // A small copy of the latest frame. If the browser's graphics drop the
+        // 3D view, this is shown while it is rebuilt — instead of a black screen.
+        const still = stillRef.current;
+        const keepStill = (src: HTMLCanvasElement) => {
+          if (!still || !src.width) return;
+          const w = Math.min(640, src.width);
+          const h = Math.round((w * src.height) / src.width);
+          if (still.width !== w || still.height !== h) {
+            still.width = w;
+            still.height = h;
+          }
+          try {
+            still.getContext("2d")?.drawImage(src, 0, 0, w, h);
+          } catch {
+            /* not available on this browser */
+          }
+        };
         const create = async () => {
           const e = new Experience({
             canvas,
             quality,
+            onFrame: keepStill,
             text: { title: hero.title, taglineTop: hero.taglineLines[0], taglineBottom: hero.taglineLines[1], font, trackside },
           });
           engine = e;
@@ -138,6 +160,7 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
           e.setProgress(reduced ? quantizeToStill(progress()) : progress());
           e.renderNow();
           root.setAttribute("data-ready", "");
+          root.removeAttribute("data-rebuilding");
         };
         rebuild = () => {
           if (cancelled) return;
@@ -219,6 +242,7 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
           <div className={styles.glow} />
           <div className={styles.floor} />
         </div>
+        <canvas ref={stillRef} className={styles.still} aria-hidden="true" />
         <canvas ref={canvasRef} className={styles.canvas} aria-hidden="true" />
         <div className={styles.vignette} aria-hidden="true" />
 

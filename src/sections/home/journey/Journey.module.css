@@ -21,6 +21,7 @@
 }
 
 .canvas,
+.still,
 .vignette,
 .cue,
 .skip {
@@ -245,6 +246,20 @@
 
 :global(:root[data-journey="cinematic"]) .journey[data-ready] .canvas {
   opacity: 1;
+}
+
+/* Last frame, held on screen while a dropped 3D view is rebuilt (no black flash). */
+:global(:root[data-journey="cinematic"]) .journey[data-rebuilding] .still {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(1.5px) saturate(1.05);
+}
+
+:global(:root[data-journey="cinematic"]) .journey[data-rebuilding] .backdrop {
+  opacity: 0;
 }
 
 :global(:root[data-journey="cinematic"]) .vignette {
