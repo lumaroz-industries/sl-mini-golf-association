@@ -254,7 +254,7 @@ export function buildWorld(scene: Scene, path: CoursePath, q: QualitySettings, t
   const trunkMat = new MeshStandardMaterial({ color: "#1d1712", roughness: 0.9 });
 
   /* ----- sky, fog, ground */
-  scene.fog = new FogExp2("#030806", 0.022);
+  scene.fog = new FogExp2("#05271c", 0.022);
   const skyMat = new ShaderMaterial({
     side: BackSide,
     depthWrite: false,
@@ -306,7 +306,7 @@ export function buildWorld(scene: Scene, path: CoursePath, q: QualitySettings, t
   group.add(ground);
 
   /* ----- lights */
-  const hemi = new HemisphereLight("#1c4636", "#020403", 0.5);
+  const hemi = new HemisphereLight("#1c4636", "#06231a", 0.5);
   group.add(hemi);
 
   const key = new DirectionalLight("#d8ecff", 1.4);

@@ -212,27 +212,14 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
     };
   }, [hero]);
 
-  /**
-   * Skip to the finale (SL logo over the lit course): a quick fade to black,
-   * an instant jump, then fade back in — rather than racing through the whole
-   * animation.
-   */
+  /** Skip to the finale (SL logo over the lit course): an instant cut, no fade to black. */
   const skipIntro = () => {
     const root = rootRef.current;
-    if (!root || root.hasAttribute("data-skipping")) return;
+    if (!root) return;
     const top = root.getBoundingClientRect().top + window.scrollY;
     const y = top + SKIP_TO * (root.offsetHeight - window.innerHeight);
-    const jump = () => {
-      if (lenisRef.current) lenisRef.current.scrollTo(y, { immediate: true, force: true });
-      else window.scrollTo({ top: y, behavior: "instant" });
-    };
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return jump();
-    root.setAttribute("data-skipping", "");
-    window.setTimeout(() => {
-      jump();
-      // Let the new frame render before fading back in.
-      requestAnimationFrame(() => requestAnimationFrame(() => root.removeAttribute("data-skipping")));
-    }, 320);
+    if (lenisRef.current) lenisRef.current.scrollTo(y, { immediate: true, force: true });
+    else window.scrollTo({ top: y, behavior: "instant" });
   };
 
   return (

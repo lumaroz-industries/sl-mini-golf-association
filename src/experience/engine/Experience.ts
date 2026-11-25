@@ -88,7 +88,7 @@ export class Experience {
     this.renderer.toneMappingExposure = 1;
     this.renderer.shadowMap.enabled = quality.shadows;
     this.renderer.shadowMap.type = PCFShadowMap;
-    this.scene.background = new Color("#020403");
+    this.scene.background = new Color("#052b20");
 
     // The soft environment light is added just after the first frame (see
     // prepare), so it doesn't delay the course appearing.
@@ -233,21 +233,21 @@ export class Experience {
     this.camera.lookAt(this.pose.look);
     this.camera.updateProjectionMatrix();
 
-    /* lighting: darkness → emerald → environment → finale */
-    const emeraldIn = smoothstep(0, 0.025, p) * 0.75 + 0.25;
-    const envIn = smoothstep(0.012, 0.06, p);
+    /* lighting: lit from the first frame (no dark start), brightening into the finale */
+    const emeraldIn = smoothstep(0, 0.025, p) * 0.2 + 0.8;
+    const envIn = smoothstep(0.012, 0.06, p) * 0.25 + 0.75;
     const finale = smoothstep(P.dropEnd, P.dropEnd + 0.05, p);
     world.hemi.intensity = 0.06 + 0.5 * envIn + 0.5 * finale;
     world.key.intensity = 1.4 * envIn + 0.6 * finale;
-    world.hallSpot.intensity = 14 * smoothstep(0.02, 0.07, p);
+    world.hallSpot.intensity = 14 * (0.75 + 0.25 * smoothstep(0.02, 0.07, p));
     world.wallGlow.intensity = 45 * emeraldIn;
     world.greenSpot.intensity = 30 * smoothstep(P.obstaclesEnd - 0.04, P.obstaclesEnd + 0.04, p);
     world.hallEmissive[0].color.copy(EMERALD).multiplyScalar(2.6 * emeraldIn);
     world.hallEmissive[1].color.set("#dff5ec").multiplyScalar(1.4 * envIn);
     // Wall typography leads the reveal, then steps back as the hero overlay arrives.
     const handoff = 1 - 0.9 * smoothstep(P.revealEnd - 0.008, P.revealEnd + 0.012, p);
-    world.hallText[0].opacity = smoothstep(0.01, 0.05, p) * handoff;
-    world.hallText[1].opacity = 0.9 * smoothstep(0.02, 0.07, p) * handoff;
+    world.hallText[0].opacity = (0.7 + 0.3 * smoothstep(0.01, 0.05, p)) * handoff;
+    world.hallText[1].opacity = 0.9 * (0.7 + 0.3 * smoothstep(0.02, 0.07, p)) * handoff;
     world.stars.opacity = 0.7 * envIn;
 
     // Keep the shadow camera on the action.
