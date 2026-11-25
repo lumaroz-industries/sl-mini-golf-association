@@ -16,6 +16,7 @@ import {
   PerspectiveCamera,
   PlaneGeometry,
   Points,
+  Quaternion,
   Scene,
   ShaderMaterial,
   SphereGeometry,
@@ -116,6 +117,90 @@ async function sampleLogo(count: number): Promise<{ pos: Float32Array; col: Floa
   return { pos, col };
 }
 
+/**
+ * Carves the SL mark into the ball: pressed into the dimple bump map (a
+ * flat-bottomed engraving) and filled with dark ink in a colour map, the
+ * slash kept in emerald. `face` is the ball-local direction that looks at
+ * the camera once the ball stops spinning, and `up` the ball-local
+ * direction of "up" on screen there, so the mark sits upright facing you.
+ */
+async function carveBrand(bump: Texture, face: Vector3, up: Vector3): Promise<Texture | undefined> {
+  const canvas = bump.image as HTMLCanvasElement | undefined;
+  if (!canvas?.getContext) return undefined;
+  const img = new Image();
+  img.src = "/brand/slmga-icon-dark.svg";
+  await img.decode();
+  const W = canvas.width;
+  const H = canvas.height;
+
+  // Where `face` lands on the sphere's texture (three.js SphereGeometry mapping).
+  const f = face.clone().normalize();
+  const theta = Math.acos(Math.min(1, Math.max(-1, f.y)));
+  let phi = Math.atan2(f.z, -f.x);
+  if (phi < 0) phi += Math.PI * 2;
+  const cx = (phi / (Math.PI * 2)) * W;
+  const cy = (theta / Math.PI) * H;
+
+  // Turn so the mark's top points along `up` (in the surface's east/north frame).
+  const north = new Vector3(Math.cos(theta) * -Math.cos(phi), -Math.sin(theta), Math.cos(theta) * Math.sin(phi)).multiplyScalar(-1);
+  const east = new Vector3(Math.sin(phi), 0, Math.cos(phi));
+  const angle = Math.atan2(up.dot(east), up.dot(north));
+
+  // Size on the ball: ~1.1 rad wide; equirectangular stretch corrected by 1/sin(theta).
+  const markW = (1.08 / (Math.PI * 2)) * W;
+  const markH = markW * (251 / 760); // same scale both ways at the equator (texture is 2:1)
+  const stretch = 1 / Math.max(0.3, Math.sin(theta));
+
+  // The mark as a silhouette, and in its colours (white → dark ink, slash stays green).
+  const off = document.createElement("canvas");
+  off.width = Math.ceil(markW);
+  off.height = Math.ceil(markH);
+  const o = off.getContext("2d", { willReadFrequently: true })!;
+  o.drawImage(img, 0, 0, off.width, off.height);
+  const px = o.getImageData(0, 0, off.width, off.height);
+  const ink = o.createImageData(px);
+  const cut = o.createImageData(px);
+  for (let i = 0; i < px.data.length; i += 4) {
+    const a = px.data[i + 3];
+    const green = px.data[i + 1] > 120 && px.data[i] < 80;
+    ink.data.set(green ? [0, 168, 107, a] : [24, 30, 28, a * 0.92], i);
+    cut.data.set([40, 40, 40, a], i); // depth: darker = pressed in
+  }
+  const draw = (target: CanvasRenderingContext2D, data: ImageData, blur: string) => {
+    const tmp = document.createElement("canvas");
+    tmp.width = off.width;
+    tmp.height = off.height;
+    tmp.getContext("2d")!.putImageData(data, 0, 0);
+    for (const dx of [0, -W, W]) {
+      target.save();
+      target.translate(cx + dx, cy);
+      target.scale(stretch, 1);
+      target.rotate(angle);
+      target.filter = blur;
+      target.drawImage(tmp, -off.width / 2, -off.height / 2);
+      target.restore();
+    }
+  };
+
+  // Engrave into the bump map (soft edge = a slight bevel).
+  const b = canvas.getContext("2d")!;
+  draw(b, cut, "blur(1.2px)");
+  bump.needsUpdate = true;
+
+  // Colour map: white ball, inked engraving.
+  const colour = document.createElement("canvas");
+  colour.width = W;
+  colour.height = H;
+  const c = colour.getContext("2d")!;
+  c.fillStyle = "#ffffff";
+  c.fillRect(0, 0, W, H);
+  draw(c, ink, "none");
+  const map = new CanvasTexture(colour);
+  map.colorSpace = SRGBColorSpace;
+  map.anisotropy = 8;
+  return map;
+}
+
 /** Soft cloud texture (drawn once): overlapping blurred puffs. */
 function cloudTexture(): Texture {
   const c = document.createElement("canvas");
@@ -213,7 +298,18 @@ export class BallScene {
     this.scene.add(key, rim, fill);
 
     /* ----- the ball: re-entry heat on its leading side, then a burning dissolve */
-    const ballMat = new MeshStandardMaterial({ color: "#f2f4f3", roughness: 0.32, bumpMap: dimpleTexture(light ? 512 : 1024), bumpScale: 1.2 });
+    const bump = dimpleTexture(light ? 1024 : 2048);
+    const ballMat = new MeshStandardMaterial({ color: "#f2f4f3", roughness: 0.32, bumpMap: bump, bumpScale: 1.2 });
+    // The SL mark, carved where the ball faces the camera once it stops spinning.
+    {
+      const r0 = spin(T.dissolveStart);
+      const toLocal = new Quaternion().setFromEuler(new Euler(r0.x, r0.y, 0)).invert();
+      const face = new Vector3(0, 6, 12.5).normalize().applyQuaternion(toLocal);
+      const camUp = new Vector3(0, 12.5, -4.2).normalize(); // "up" on screen for the downward-looking camera
+      const up = camUp.applyQuaternion(toLocal);
+      const map = await carveBrand(bump, face, up).catch(() => undefined);
+      if (map) ballMat.map = map;
+    }
     ballMat.onBeforeCompile = (shader) => {
       shader.uniforms.uProg = this.ballU.uProg;
       shader.uniforms.uHeat = this.ballU.uHeat;
