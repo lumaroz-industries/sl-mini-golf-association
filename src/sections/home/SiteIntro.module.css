@@ -1,22 +1,28 @@
 /*
- * Homepage opening animation — emerald, ≈2.3 s:
- * logo + light sweep → rule + tagline → opens up into the 3D course.
- * Only transform, opacity and filter animate, so it stays smooth on phones.
+ * Homepage opening — three acts cut together by the slash from the SL logo.
+ *
+ *   0.00 s  Act 1: SL logo, light sweep, rule, tagline (emerald)
+ *   1.55 s  slash wipe (emerald → gold), covers the screen at 1.95 s
+ *   1.95 s  Act 2: the founder, gold
+ *   3.45 s  slash wipe (gold → diamond), covers the screen at 3.85 s
+ *   3.85 s  Act 3: the designer, diamond — holds until the 3D course is ready
+ *   then    opens up into the course (data-leave)
+ *
+ * Only transform, opacity, clip-path and filter animate, so it stays smooth
+ * on phones while the 3D course loads underneath.
  */
 
 .intro {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  display: grid;
-  place-items: center;
   overflow: hidden;
-  background: #050807;
+  background: #000;
   cursor: pointer;
   user-select: none;
-  /* Leaves when the 3D course is ready (data-leave, set by script). The long
+  /* Leaves when the course is ready (data-leave, set by script). The long
      delay is only a safety net if scripts never run. */
-  animation: out 0.5s cubic-bezier(0.65, 0, 0.35, 1) 9s forwards;
+  animation: out 0.7s cubic-bezier(0.65, 0, 0.35, 1) 12.5s forwards;
 }
 
 :global(html[data-site-intro="skip"]) .intro {
@@ -24,24 +30,82 @@
 }
 
 .intro[data-leave] {
-  animation: out 0.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation: out 0.7s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
 /* Opens up towards the viewer, like stepping into the course. */
 @keyframes out {
-  to {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  100% {
     opacity: 0;
     visibility: hidden;
-    transform: scale(1.06);
+    transform: scale(1.08);
+    filter: blur(6px);
   }
 }
 
+.act {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* Instant cuts, hidden under the slash. */
+@keyframes on {
+  from {
+    opacity: 0;
+    visibility: hidden;
+  }
+  to {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@keyframes off {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Film grain over everything, for a printed, rich finish. */
+.grain {
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 0.6s steps(4) infinite;
+}
+
+@keyframes grain {
+  25% {
+    transform: translate(-3%, 2%);
+  }
+  50% {
+    transform: translate(2%, -3%);
+  }
+  75% {
+    transform: translate(-2%, -1%);
+  }
+}
+
+/* ================================================================ act 1 */
+.brandAct {
+  animation: off 0s linear 1.95s forwards;
+}
+
+/* Pure black behind the logo, with only a faint warm light. */
 .glow {
   position: absolute;
   inset: -20%;
-  background:
-    radial-gradient(38% 30% at 50% 46%, rgb(0 168 107 / 0.2), transparent 70%),
-    radial-gradient(60% 45% at 50% 110%, rgb(5 43 32 / 0.9), transparent 70%);
+  background: radial-gradient(34% 26% at 50% 46%, rgb(255 255 255 / 0.05), transparent 70%);
   animation: fadeIn 0.7s ease-out both;
 }
 
@@ -62,16 +126,16 @@
 
 .logoWrap {
   position: relative;
-  width: min(440px, 76vw);
+  width: min(460px, 78vw);
   aspect-ratio: 520 / 120;
-  animation: logoIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+  animation: logoIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
 }
 
 @keyframes logoIn {
   from {
     opacity: 0;
-    transform: scale(0.94);
-    filter: blur(10px);
+    transform: scale(0.92);
+    filter: blur(12px);
   }
 }
 
@@ -81,15 +145,14 @@
   object-fit: contain;
 }
 
-/* A band of emerald-white light passing across the letters. */
 .shine {
   position: absolute;
   inset: 0;
   -webkit-mask: url(/brand/slmga-logo-dark.svg) center / contain no-repeat;
   mask: url(/brand/slmga-logo-dark.svg) center / contain no-repeat;
-  background: linear-gradient(105deg, transparent 35%, #00a86b 45%, #eafff5 50%, #00a86b 55%, transparent 65%) 0 0 / 300% 100%;
+  background: linear-gradient(105deg, transparent 35%, #e3c27a 45%, #fff 50%, #e3c27a 55%, transparent 65%) 0 0 / 300% 100%;
   background-position: 100% 0;
-  animation: sweep 0.9s cubic-bezier(0.45, 0, 0.25, 1) 0.5s both;
+  animation: sweep 0.9s cubic-bezier(0.45, 0, 0.25, 1) 0.45s both;
 }
 
 @keyframes sweep {
@@ -104,29 +167,8 @@
 .rule {
   width: min(300px, 58vw);
   height: 1px;
-  background: linear-gradient(90deg, transparent, #00a86b 20%, #b9f5dc 50%, #00a86b 80%, transparent);
+  background: linear-gradient(90deg, transparent, #8c6a2e 20%, #fbecc4 50%, #8c6a2e 80%, transparent);
   animation: grow 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
-}
-
-/* While the course is still loading, a soft light keeps running along the rule. */
-.rule {
-  position: relative;
-  overflow: hidden;
-}
-
-.rule::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, #eafff5, transparent);
-  transform: translateX(-100%);
-  animation: run 1.4s ease-in-out 1.3s infinite;
-}
-
-@keyframes run {
-  to {
-    transform: translateX(100%);
-  }
 }
 
 @keyframes grow {
@@ -150,7 +192,7 @@
 }
 
 .tagline span {
-  animation: rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) calc(0.7s + var(--i) * 0.18s) both;
+  animation: rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) calc(0.65s + var(--i) * 0.16s) both;
 }
 
 .tagline span + span {
@@ -160,31 +202,343 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
+}
+
+/* ================================================================ slash */
+/* A giant version of the "/" in the SL logo, sweeping across the screen. */
+.slash {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 50%;
+  z-index: 5;
+  width: 190vmax;
+  margin-left: -95vmax;
+  transform: translateX(-160vmax) skewX(-22deg);
+  pointer-events: none;
+}
+
+.slash::before,
+.slash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+/* Leading edge: a thin blade of light. */
+.slash::after {
+  left: auto;
+  width: 6px;
+  right: -3px;
+  background: #fff;
+  box-shadow: 0 0 40px 12px rgb(255 255 255 / 0.55);
+}
+
+.slash[data-n="1"]::before {
+  background: linear-gradient(90deg, #000, #111 45%, #2a2112 70%, #b38d45 92%, #fbecc4);
+}
+
+.slash[data-n="2"]::before {
+  background: linear-gradient(90deg, #2a2112, #b38d45 40%, #1a2a33 70%, #b9d8ea 92%, #eaf6ff);
+}
+
+.slash[data-n="1"] {
+  animation: slash 0.8s cubic-bezier(0.7, 0, 0.3, 1) 1.55s both;
+}
+
+.slash[data-n="2"] {
+  animation: slash 0.8s cubic-bezier(0.7, 0, 0.3, 1) 3.45s both;
+}
+
+@keyframes slash {
+  from {
+    transform: translateX(-160vmax) skewX(-22deg);
+  }
+  to {
+    transform: translateX(160vmax) skewX(-22deg);
+  }
+}
+
+/* ============================================================== people */
+.person {
+  --t: 1.95s;
+  --hi: #fbecc4;
+  --mid: #e3c27a;
+  --lo: #8c6a2e;
+  --glow: 227 194 122;
+  opacity: 0;
+  visibility: hidden;
+  place-items: stretch;
+  animation: on 0s linear var(--t) forwards;
+}
+
+.person[data-act="2"] {
+  animation:
+    on 0s linear var(--t) forwards,
+    off 0s linear 3.85s forwards;
+}
+
+.person[data-act="3"] {
+  --t: 3.85s;
+}
+
+.person[data-finish="diamond"] {
+  --hi: #ffffff;
+  --mid: #cfe6f5;
+  --lo: #7f9fb3;
+  --glow: 185 225 255;
+}
+
+.personGlow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(55% 60% at 68% 55%, rgb(var(--glow) / 0.22), transparent 70%),
+    #000;
+  animation: glowPulse 2.4s ease-out var(--t) both;
+}
+
+@keyframes glowPulse {
+  from {
+    opacity: 0.2;
+    transform: scale(1.2);
+  }
+}
+
+/* Huge outlined name drifting behind everything. */
+.ghost {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 17vw, 17rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(var(--glow) / 0.22);
+  translate: 0 -50%;
+  animation: drift 3.2s cubic-bezier(0.2, 0.6, 0.3, 1) var(--t) both;
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(8vw);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-22vw);
+  }
+}
+
+/* Cut-out portrait rising into the light. */
+.portrait {
+  position: absolute;
+  bottom: 0;
+  right: max(4vw, calc(50% - 600px));
+  height: min(92svh, 860px);
+  aspect-ratio: 0.82;
+  animation: portraitIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--t) + 0.05s) both;
+}
+
+.portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 0 30px rgb(var(--glow) / 0.28)) drop-shadow(-12px 0 2px rgb(var(--glow) / 0.08));
+  -webkit-mask-image: linear-gradient(to top, transparent, #000 14%);
+  mask-image: linear-gradient(to top, transparent, #000 14%);
+}
+
+@keyframes portraitIn {
+  from {
+    opacity: 0;
+    transform: translateY(9%) scale(1.06);
+    clip-path: inset(100% 0 0 0);
+    filter: brightness(2.2) saturate(0.4);
+  }
+  60% {
+    filter: brightness(1.15);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.card {
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  justify-self: start;
+  display: grid;
+  gap: 14px;
+  margin-left: max(6vw, calc(50% - 560px));
+  max-width: 560px;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--mid);
+  animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--t) + 0.3s) both;
+}
+
+.kicker i {
+  width: 44px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mid));
+  transform-origin: left;
+  animation: grow 0.6s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--t) + 0.3s) both;
+}
+
+.name {
+  display: grid;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 1.6rem + 5vw, 6.25rem);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+/* Each line slides up out of a mask, in a metallic finish with a moving glint. */
+.name span {
+  display: block;
+  padding-bottom: 0.06em;
+  background: linear-gradient(100deg, var(--lo) 0%, var(--mid) 25%, var(--hi) 42%, #fff 50%, var(--hi) 58%, var(--mid) 75%, var(--lo) 100%) 0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation:
+    lineIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--t) + 0.38s) both,
+    glint 2.2s ease-in-out calc(var(--t) + 0.6s) both;
+}
+
+.name span + span {
+  animation:
+    lineIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--t) + 0.5s) both,
+    glint 2.2s ease-in-out calc(var(--t) + 0.75s) both;
+}
+
+@keyframes lineIn {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(0.45em) skewY(4deg);
+    opacity: 0;
+  }
+  to {
+    clip-path: inset(-10% 0 -10% 0);
+  }
+}
+
+@keyframes glint {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+.role {
+  font-size: clamp(0.95rem, 0.85rem + 0.4vw, 1.2rem);
+  font-weight: 500;
+  color: #e8ece9;
+  animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--t) + 0.7s) both;
+}
+
+.handle {
+  justify-self: start;
+  padding: 6px 14px;
+  border: 1px solid rgb(var(--glow) / 0.4);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--hi);
+  background: rgb(var(--glow) / 0.06);
+  animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--t) + 0.85s) both;
 }
 
 .skip {
   position: absolute;
-  bottom: max(28px, env(safe-area-inset-bottom));
+  z-index: 6;
+  bottom: max(26px, env(safe-area-inset-bottom));
   left: 50%;
   translate: -50% 0;
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgb(167 176 172 / 0.6);
+  color: rgb(255 255 255 / 0.5);
   animation: fadeIn 0.4s ease 0.6s both;
 }
 
+/* ============================================================== phones */
+@media (max-width: 760px) {
+  .portrait {
+    right: 50%;
+    translate: 50% 0;
+    height: min(64svh, 560px);
+  }
+  .card {
+    align-self: start;
+    justify-self: center;
+    justify-items: center;
+    margin: calc(var(--nav-h, 64px) + 6svh) 20px 0;
+    text-align: center;
+    gap: 10px;
+  }
+  .kicker {
+    font-size: 0.6875rem;
+    letter-spacing: 0.28em;
+  }
+  .kicker i {
+    display: none;
+  }
+  .handle {
+    justify-self: center;
+  }
+  .ghost {
+    top: 58%;
+    font-size: 30vw;
+  }
+  .personGlow {
+    background:
+      radial-gradient(80% 50% at 50% 75%, rgb(var(--glow) / 0.24), transparent 70%),
+      #000;
+  }
+}
+
+/* ======================================================= reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .intro *,
-  .intro *::before {
+  .intro *::before,
+  .intro *::after {
     animation-duration: 0.01s !important;
     animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
   }
-  .shine,
-  .rule::after {
+  .person,
+  .slash,
+  .shine {
     display: none;
+  }
+  .brandAct {
+    animation: none;
   }
 }

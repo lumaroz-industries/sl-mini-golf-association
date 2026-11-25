@@ -88,7 +88,7 @@ export class Experience {
     this.renderer.toneMappingExposure = 1;
     this.renderer.shadowMap.enabled = quality.shadows;
     this.renderer.shadowMap.type = PCFShadowMap;
-    this.scene.background = new Color("#052b20");
+    this.scene.background = new Color("#020403");
 
     // The soft environment light is added just after the first frame (see
     // prepare), so it doesn't delay the course appearing.

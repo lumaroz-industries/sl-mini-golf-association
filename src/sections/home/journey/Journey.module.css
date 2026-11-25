@@ -217,8 +217,7 @@
   top: 0;
   height: 100svh;
   overflow: hidden;
-  /* Deep forest green, never plain black, behind the 3D view. */
-  background: radial-gradient(90% 70% at 50% 40%, #0a3a2a, #052b20 55%, #03140f);
+  background: var(--c-black);
 }
 
 :global(:root[data-journey="cinematic"]) .backdrop {
