@@ -1,0 +1,127 @@
+/* Homepage hero: the falling ball that becomes the logo. */
+
+.hero {
+  position: relative;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  background: #000;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.logo {
+  position: absolute;
+  left: 50%;
+  top: var(--logo-cy, 46%);
+  width: var(--logo-w, min(78vw, 720px));
+  height: auto;
+  translate: -50% -50%;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease-out);
+  pointer-events: none;
+}
+
+.hero[data-phase="formed"] .logo,
+.hero[data-phase="static"] .logo {
+  opacity: 1;
+}
+
+.hero[data-phase="static"] .canvas {
+  display: none;
+}
+
+/* Tagline under the logo, once the particles have formed it. */
+.copy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--logo-cy, 46%) + var(--logo-w, min(78vw, 720px)) * 0.0692 + 26px);
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 0 var(--gutter);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 1.2s var(--ease-out),
+    transform 1.2s var(--ease-out);
+}
+
+.hero[data-phase="formed"] .copy,
+.hero[data-phase="static"] .copy {
+  opacity: 1;
+  transform: none;
+}
+
+.tagline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 0.9rem + 0.8vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.tagline span + span {
+  color: #a7b0ac;
+}
+
+.supporting {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+
+.cue {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  translate: -50% 0;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  opacity: 0;
+  transition: opacity 1s var(--ease-out) 0.6s;
+}
+
+.cue i {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(#e3c27a, transparent);
+  animation: cue 2.2s var(--ease-in-out) infinite;
+  transform-origin: top;
+}
+
+@keyframes cue {
+  0% {
+    transform: scaleY(0);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+
+.hero[data-phase="formed"] .cue,
+.hero[data-phase="static"] .cue {
+  opacity: 1;
+}
+

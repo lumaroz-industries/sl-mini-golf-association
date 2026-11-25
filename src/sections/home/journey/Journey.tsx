@@ -14,6 +14,8 @@ import styles from "./Journey.module.css";
 const early =
   typeof window !== "undefined"
     ? (() => {
+        // Only on a page that uses the 3D course (its pre-paint script set this).
+        if (document.documentElement.dataset.journey !== "cinematic") return undefined;
         try {
           if (!document.createElement("canvas").getContext("webgl2")) return undefined;
         } catch {
@@ -41,9 +43,16 @@ interface JourneyProps {
   community: HomeContent["community"];
   /** Trackside LED boards on the 3D course: [0] the website's designer, [1] the founder. */
   trackside?: Array<{ name: string; line: string; tail?: string }>;
+  /**
+   * "cinematic" (default): the 3D golf-course journey.
+   * "story": the same content as plain stacked sections, with no 3D and no
+   * hero (used under the falling-ball hero).
+   */
+  variant?: "cinematic" | "story";
 }
 
-export function Journey({ hero, intro, visionMission, community, trackside }: JourneyProps) {
+export function Journey({ hero, intro, visionMission, community, trackside, variant = "cinematic" }: JourneyProps) {
+  const story = variant === "story";
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stillRef = useRef<HTMLCanvasElement>(null);
@@ -52,7 +61,7 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
   useEffect(() => {
     const root = rootRef.current;
     const canvas = canvasRef.current;
-    if (!root || !canvas) return;
+    if (!root || !canvas || story) return;
     // On client-side navigation the pre-paint script in page.tsx has not run.
     if (!document.documentElement.hasAttribute("data-journey")) {
       try {
@@ -210,7 +219,7 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
       lenisRef.current = undefined;
       engine?.dispose();
     };
-  }, [hero]);
+  }, [hero, story]);
 
   /** Skip to the finale (SL logo over the lit course): an instant cut, no fade to black. */
   const skipIntro = () => {
@@ -223,32 +232,38 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
   };
 
   return (
-    <div ref={rootRef} className={styles.journey} data-journey-root="">
+    <div ref={rootRef} className={styles.journey} data-journey-root={story ? undefined : ""} data-variant={variant}>
       <div className={styles.stage}>
-        <div className={styles.backdrop} aria-hidden="true">
-          <div className={styles.glow} />
-          <div className={styles.floor} />
-        </div>
+        {!story && (
+          <div className={styles.backdrop} aria-hidden="true">
+            <div className={styles.glow} />
+            <div className={styles.floor} />
+          </div>
+        )}
         <canvas ref={stillRef} className={styles.still} aria-hidden="true" />
         <canvas ref={canvasRef} className={styles.canvas} aria-hidden="true" />
         <div className={styles.vignette} aria-hidden="true" />
 
         <div className={styles.scenes}>
-          <div data-scene="cue" className={`${styles.scene} ${styles.cue}`} aria-hidden="true">
-            <span>Scroll to begin</span>
-            <i />
-          </div>
+          {!story && (
+            <>
+              <div data-scene="cue" className={`${styles.scene} ${styles.cue}`} aria-hidden="true">
+                <span>Scroll to begin</span>
+                <i />
+              </div>
 
-          <section data-scene="hero" className={`${styles.scene} ${styles.hero}`} aria-labelledby="hero-title">
-            <h1 id="hero-title" className={styles.heroTitle}>
-              {hero.title}
-            </h1>
-            <p className={styles.tagline}>
-              <span>{hero.taglineLines[0]}</span>
-              <span>{hero.taglineLines[1]}</span>
-            </p>
-            <p className={styles.supporting}>{hero.supporting}</p>
-          </section>
+              <section data-scene="hero" className={`${styles.scene} ${styles.hero}`} aria-labelledby="hero-title">
+                <h1 id="hero-title" className={styles.heroTitle}>
+                  {hero.title}
+                </h1>
+                <p className={styles.tagline}>
+                  <span>{hero.taglineLines[0]}</span>
+                  <span>{hero.taglineLines[1]}</span>
+                </p>
+                <p className={styles.supporting}>{hero.supporting}</p>
+              </section>
+            </>
+          )}
 
           <div data-scene="short" className={`${styles.scene} ${styles.short}`}>
             <span className="kicker">Beyond the game</span>
@@ -304,16 +319,20 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
             </section>
           ))}
 
-          <div data-scene="finale" className={`${styles.scene} ${styles.finale}`}>
-            {/* Drawn inline (not a separate image file), so it can never show as a broken image. */}
-            <svg className={styles.finaleLogo} viewBox="0 0 1806 250" width={420} height={58} aria-hidden="true" dangerouslySetInnerHTML={{ __html: FINALE_LOGO }} />
-            <p>{hero.supporting}</p>
-          </div>
+          {!story && (
+            <div data-scene="finale" className={`${styles.scene} ${styles.finale}`}>
+              {/* Drawn inline (not a separate image file), so it can never show as a broken image. */}
+              <svg className={styles.finaleLogo} viewBox="0 0 1806 250" width={420} height={58} aria-hidden="true" dangerouslySetInnerHTML={{ __html: FINALE_LOGO }} />
+              <p>{hero.supporting}</p>
+            </div>
+          )}
         </div>
 
-        <button type="button" className={styles.skip} onClick={skipIntro}>
-          Skip intro <span aria-hidden="true">↓</span>
-        </button>
+        {!story && (
+          <button type="button" className={styles.skip} onClick={skipIntro}>
+            Skip intro <span aria-hidden="true">↓</span>
+          </button>
+        )}
       </div>
     </div>
   );

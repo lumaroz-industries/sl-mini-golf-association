@@ -83,10 +83,13 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
     let a: IntroAudio | null = null;
     const elapsed = () => (performance.now() - started.current) / 1000;
     const begin = () => {
-      if (!a) return;
-      void a.ctx.resume().then(() => {
-        if (a && a.running && elapsed() < min / 1000) a.schedule(elapsed());
-      });
+      if (!a || a.ctx.state === "closed") return;
+      a.ctx
+        .resume()
+        .then(() => {
+          if (a && a.running && elapsed() < min / 1000) a.schedule(elapsed());
+        })
+        .catch(() => undefined); // closed meanwhile (skipped)
     };
     const onGesture = () => {
       begin();
@@ -109,8 +112,11 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
       }
     }
 
-    const cinematic = () => document.documentElement.dataset.journey === "cinematic";
-    const ready = () => !!document.querySelector("[data-journey-root][data-ready]") || !cinematic();
+    // The homepage's animated hero (3D) marks itself data-journey-root and sets data-ready.
+    const ready = () => {
+      const root = document.querySelector("[data-journey-root]");
+      return !root || root.hasAttribute("data-ready");
+    };
     const timer = window.setInterval(() => {
       const t = performance.now() - started.current;
       if ((t >= min && ready()) || t >= min + GRACE_MS) {

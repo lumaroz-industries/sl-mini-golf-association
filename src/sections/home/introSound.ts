@@ -74,7 +74,7 @@ export class IntroAudio {
 
   /** Plays every cue still ahead, given how far into the intro we are (seconds). Once only. */
   schedule(elapsed: number) {
-    if (this.scheduled) return;
+    if (this.scheduled || this.ctx.state !== "running") return;
     this.scheduled = true;
     const now = this.ctx.currentTime + 0.03;
     for (const c of CUES) if (c.at >= elapsed - 0.1) c.play(this, now + Math.max(0, c.at - elapsed));
@@ -82,6 +82,7 @@ export class IntroAudio {
 
   /** Lets everything ring out softly with the picture. */
   fadeOut(seconds = 1.2) {
+    if (this.ctx.state === "closed") return;
     const g = this.master.gain;
     const now = this.ctx.currentTime;
     g.cancelScheduledValues(now);
