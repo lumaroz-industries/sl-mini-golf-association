@@ -16,12 +16,11 @@ export interface IntroPerson {
 }
 
 /** Full sequence: logo → founder → designer (see the CSS timeline). */
-const SEQUENCE_MS = 6300;
+const SEQUENCE_MS = 6600;
 /** With reduced motion only the logo shows, briefly. */
 const REDUCED_MS = 1300;
 /** After the sequence, wait at most this long for the 3D course, then open anyway. */
 const GRACE_MS = 1500;
-const SOUND_KEY = "sl-intro-sound";
 
 /** Sparkle positions for the diamond act (x %, y %, size px, delay s). */
 const SPARKLES: Array<[number, number, number, number]> = [
@@ -45,9 +44,10 @@ const letters = (word: string, from: number) =>
  * then it opens up straight into the 3D course — on its own, no tap needed.
  *
  * Plays every time the homepage is opened (also coming back from another
- * page). Tap to skip. Optional sound (the browser only allows it after a
- * tap, so there is a Sound button). Server-rendered, pure CSS animation, so
- * it is on screen from the very first frame.
+ * page). Tap to skip. Sound starts by itself where the browser allows it,
+ * otherwise on the first tap or key press (browsers block sound until then).
+ * Server-rendered and animated with transform and opacity only, so it stays
+ * smooth while the 3D course is being built underneath.
  */
 export function SiteIntro({ tagline, people }: { tagline: string[]; people: IntroPerson[] }) {
   const path = usePathname();
@@ -55,7 +55,6 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
   const [run, setRun] = useState(0);
   const [gone, setGone] = useState(!home);
   const [leaving, setLeaving] = useState(false);
-  const [sound, setSound] = useState(false);
   const audio = useRef<IntroAudio | null>(null);
   const started = useRef(0);
 
@@ -77,20 +76,34 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
     const min = reduced ? REDUCED_MS : SEQUENCE_MS;
     started.current = performance.now();
 
-    // Sound, if the visitor turned it on before and the browser allows it.
-    let wanted = false;
-    try {
-      wanted = localStorage.getItem(SOUND_KEY) === "on";
-    } catch {}
-    if (wanted && !reduced) {
+    // Sound: right away if the browser allows it, otherwise on the first tap or key press.
+    let a: IntroAudio | null = null;
+    const elapsed = () => (performance.now() - started.current) / 1000;
+    const begin = () => {
+      if (!a) return;
+      void a.ctx.resume().then(() => {
+        if (a && a.running && elapsed() < min / 1000) a.schedule(elapsed());
+      });
+    };
+    const onGesture = () => {
+      begin();
+      removeGesture();
+    };
+    const removeGesture = () => {
+      for (const ev of ["pointerdown", "keydown", "touchend"]) window.removeEventListener(ev, onGesture, true);
+    };
+    if (!reduced) {
       try {
-        const a = new IntroAudio();
-        if (a.running) {
-          audio.current = a;
-          a.schedule(0);
-          setSound(true);
-        } else void a.ctx.close();
-      } catch {}
+        a = new IntroAudio();
+        audio.current = a;
+        if (a.running) a.schedule(0);
+        else {
+          begin(); // some browsers allow it after resume()
+          for (const ev of ["pointerdown", "keydown", "touchend"]) window.addEventListener(ev, onGesture, true);
+        }
+      } catch {
+        a = null;
+      }
     }
 
     const cinematic = () => document.documentElement.dataset.journey === "cinematic";
@@ -102,35 +115,18 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
         setLeaving(true);
       }
     }, 100);
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+      removeGesture();
+    };
   }, [home, gone, run]);
 
   // Let the sound fade with the picture.
   useEffect(() => {
     if (!leaving) return;
-    audio.current?.fadeOut(0.7);
+    audio.current?.fadeOut(1.4);
     audio.current = null;
   }, [leaving]);
-
-  function toggleSound(e: React.MouseEvent) {
-    e.stopPropagation(); // not a "skip"
-    if (sound) {
-      audio.current?.fadeOut(0.2);
-      audio.current = null;
-      setSound(false);
-      try {
-        localStorage.setItem(SOUND_KEY, "off");
-      } catch {}
-      return;
-    }
-    try {
-      const a = new IntroAudio();
-      void a.ctx.resume().then(() => a.schedule((performance.now() - started.current) / 1000));
-      audio.current = a;
-      setSound(true);
-      localStorage.setItem(SOUND_KEY, "on");
-    } catch {}
-  }
 
   if (gone) return null;
   return (
@@ -188,7 +184,8 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
                 <div className={s.portrait} style={{ "--photo": `url(${p.photo})` } as React.CSSProperties}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={p.photo} alt="" fetchPriority="high" />
-                  <span className={s.portraitSheen} />
+                  {diamond && <span className={s.portraitSheen} />}
+                  <span className={s.flash} />
                 </div>
               )}
               <div className={s.card}>
@@ -198,8 +195,8 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
                   {i === 0 ? "Founded by" : "Designed & built by"}
                 </span>
                 <h2 className={s.name}>
-                  <span className={s.line}>{letters(first, 0)}</span>
-                  <span className={s.line}>{letters(rest, first.length)}</span>
+                  <span className={s.line}>{diamond ? letters(first, 0) : first}</span>
+                  <span className={s.line}>{diamond ? letters(rest, first.length) : rest}</span>
                 </h2>
                 {diamond ? (
                   <span className={s.chips}>
@@ -224,15 +221,6 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
         <span className={s.slash} data-n="1" />
         <span className={s.slash} data-n="2" />
         <span className={s.grain} />
-        <button type="button" className={s.sound} data-on={sound || undefined} onClick={toggleSound} aria-label={sound ? "Sound off" : "Sound on"}>
-          <span className={s.bars} aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <i />
-          </span>
-          {sound ? "Sound on" : "Sound"}
-        </button>
         <span className={s.skip}>Tap to skip</span>
       </div>
     </>

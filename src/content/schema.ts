@@ -69,6 +69,8 @@ export const Person = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   role: z.string().min(1),
+  /** Short name shown large behind them on their homepage card (defaults to the first name). */
+  nickname: z.string().min(1).optional(),
   /** Real photograph only. When absent, a reserved branded frame is shown. */
   portrait: ImageAsset.optional(),
 });

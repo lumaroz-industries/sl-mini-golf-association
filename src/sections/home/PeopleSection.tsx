@@ -42,7 +42,7 @@ export function PeopleSection({ content, people, instagram = {}, style = {} }: P
                 <figure className={styles.figure}>
                   <div className={styles.stage}>
                     <span className={styles.ghost} aria-hidden="true">
-                      {first}
+                      {person.nickname ?? first}
                     </span>
                     <span className={styles.number} aria-hidden="true">
                       {String(i + 1).padStart(2, "0")}
