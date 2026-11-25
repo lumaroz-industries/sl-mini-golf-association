@@ -14,15 +14,17 @@
   background: #050807;
   cursor: pointer;
   user-select: none;
-  animation: out 0.5s cubic-bezier(0.65, 0, 0.35, 1) 1.85s forwards;
+  /* Leaves when the 3D course is ready (data-leave, set by script). The long
+     delay is only a safety net if scripts never run. */
+  animation: out 0.5s cubic-bezier(0.65, 0, 0.35, 1) 9s forwards;
 }
 
 :global(html[data-site-intro="skip"]) .intro {
   display: none;
 }
 
-.intro[data-skip] {
-  animation: out 0.3s ease forwards;
+.intro[data-leave] {
+  animation: out 0.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
 /* Opens up towards the viewer, like stepping into the course. */
@@ -106,6 +108,27 @@
   animation: grow 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
 }
 
+/* While the course is still loading, a soft light keeps running along the rule. */
+.rule {
+  position: relative;
+  overflow: hidden;
+}
+
+.rule::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #eafff5, transparent);
+  transform: translateX(-100%);
+  animation: run 1.4s ease-in-out 1.3s infinite;
+}
+
+@keyframes run {
+  to {
+    transform: translateX(100%);
+  }
+}
+
 @keyframes grow {
   from {
     transform: scaleX(0);
@@ -155,15 +178,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro {
-    animation: out 0.4s ease 1.2s forwards;
-  }
   .intro *,
   .intro *::before {
     animation-duration: 0.01s !important;
     animation-delay: 0s !important;
   }
-  .shine {
+  .shine,
+  .rule::after {
     display: none;
   }
 }

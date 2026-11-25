@@ -213,7 +213,7 @@ export function Journey({ hero, intro, visionMission, community, trackside }: Jo
   };
 
   return (
-    <div ref={rootRef} className={styles.journey}>
+    <div ref={rootRef} className={styles.journey} data-journey-root="">
       <div className={styles.stage}>
         <div className={styles.backdrop} aria-hidden="true">
           <div className={styles.glow} />

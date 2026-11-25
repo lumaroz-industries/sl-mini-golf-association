@@ -1,45 +1,71 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import s from "./SiteIntro.module.css";
 
-/** Set once the intro has played in this browser tab. */
-const KEY = "sl-intro";
+/** Shortest time the intro stays up, so it always plays in full. */
+const MIN_MS = 1900;
+/** Longest wait for the 3D course; after this the intro leaves anyway. */
+const MAX_MS = 9000;
 
 /**
  * Opening animation for the homepage — the website's version of the admin
  * intro, in emerald: the SL logo with a light sweep and the tagline, then it
- * opens up into the 3D course (≈2.3 s). It hides the course loading behind it.
+ * opens up straight into the 3D course.
  *
- * Server-rendered and pure CSS, so it is on screen from the first frame. It
- * is mounted by the site layout and plays only when the homepage itself is
- * opened, once per browser tab (coming back to the homepage later in the same
- * tab skips it). Tap anywhere to skip.
+ * It plays every time the homepage is opened (also when coming back to it
+ * from another page), and it stays up until the 3D course has finished
+ * loading — so visitors never see a black screen in between. Tap to skip.
+ * Server-rendered and pure CSS, so it is on screen from the first frame.
  */
 export function SiteIntro({ tagline }: { tagline: string[] }) {
-  const [gone, setGone] = useState(false);
-  const [skip, setSkip] = useState(false);
+  const path = usePathname();
+  const home = path === "/";
+  const [run, setRun] = useState(0);
+  const [gone, setGone] = useState(!home);
+  const [leaving, setLeaving] = useState(false);
+
+  // Coming back to the homepage from another page plays it again.
+  const [lastPath, setLastPath] = useState(path);
+  if (path !== lastPath) {
+    setLastPath(path);
+    if (home) {
+      setRun((n) => n + 1);
+      setGone(false);
+      setLeaving(false);
+    } else setGone(true);
+  }
+
   useEffect(() => {
-    // Not playing (another page, or already seen): drop it from the page.
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-off check after hydration
-    if (document.documentElement.dataset.siteIntro === "skip") setGone(true);
-  }, []);
+    if (!home || gone) return;
+    document.documentElement.dataset.siteIntro = "play";
+    const start = performance.now();
+    const cinematic = () => document.documentElement.dataset.journey === "cinematic";
+    const ready = () => !!document.querySelector("[data-journey-root][data-ready]") || !cinematic();
+    const timer = window.setInterval(() => {
+      const t = performance.now() - start;
+      if ((t >= MIN_MS && ready()) || t >= MAX_MS) {
+        window.clearInterval(timer);
+        setLeaving(true);
+      }
+    }, 100);
+    return () => window.clearInterval(timer);
+  }, [home, gone, run]);
+
   if (gone) return null;
   return (
     <>
-      {/* Runs before the overlay is painted, so repeat visits never flash it. Decides once per page load (safe if run again). */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `try{var d=document.documentElement.dataset;if(!d.siteIntro){if(location.pathname!=="/"||sessionStorage.getItem("${KEY}"))d.siteIntro="skip";else{d.siteIntro="play";sessionStorage.setItem("${KEY}","1")}}}catch(e){}`,
-        }}
-      />
+      {/* Hides the overlay before first paint on every page except the homepage. */}
+      <script dangerouslySetInnerHTML={{ __html: `if(location.pathname!=="/")document.documentElement.dataset.siteIntro="skip"` }} />
       <div
+        key={run}
         className={s.intro}
-        data-skip={skip || undefined}
+        data-leave={leaving || undefined}
         aria-hidden="true"
-        onClick={() => setSkip(true)}
+        onClick={() => setLeaving(true)}
         onAnimationEnd={(e) => {
-          if (e.target === e.currentTarget) setGone(true);
+          if (e.target === e.currentTarget && e.animationName.includes("out")) setGone(true);
         }}
       >
         <div className={s.glow} />
