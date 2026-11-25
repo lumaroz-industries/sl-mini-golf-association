@@ -3,10 +3,10 @@
  *
  *   0.00 s  Act 1: SL logo on black, light sweep, rule, tagline
  *   1.00 s  slash wipe (black → gold), covers the screen at 1.40 s
- *   1.40 s  Act 2: the founder, gold (≈1.2 s)
- *   2.20 s  slash wipe (gold → diamond), covers the screen at 2.60 s
- *   2.60 s  Act 3: the designer, diamond — the longest act (≈4 s)
- *   6.60 s  fades gently into the website on its own (data-leave)
+ *   1.40 s  Act 2: the founder, gold (≈2 s)
+ *   3.00 s  slash wipe (gold → diamond), covers the screen at 3.40 s
+ *   3.40 s  Act 3: the designer, diamond — the longest act (≈4 s)
+ *   7.40 s  fades gently into the website on its own (data-leave)
  *
  * The sound cues in introSound.ts follow the same timeline.
  * Everything animates with transform and opacity only — the graphics card
@@ -273,7 +273,7 @@
 }
 
 .slash[data-n="2"] {
-  animation: slash 0.8s cubic-bezier(0.65, 0, 0.35, 1) 2.2s both;
+  animation: slash 0.8s cubic-bezier(0.65, 0, 0.35, 1) 3s both;
 }
 
 @keyframes slash {
@@ -301,11 +301,11 @@
 .person[data-act="2"] {
   animation:
     on 0s linear var(--t) forwards,
-    off 0s linear 2.6s forwards;
+    off 0s linear 3.4s forwards;
 }
 
 .person[data-act="3"] {
-  --t: 2.6s;
+  --t: 3.4s;
 }
 
 .person[data-finish="diamond"] {

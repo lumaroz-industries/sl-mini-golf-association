@@ -153,6 +153,8 @@ export interface BallSceneOptions {
   canvas: HTMLCanvasElement;
   /** Fewer particles and a lower resolution on phones / modest devices. */
   light: boolean;
+  /** Moments for the sound to land on: smashing through a ring, starting to burn, the logo forming. */
+  onEvent?: (e: "ring" | "burn" | "formed") => void;
 }
 
 export class BallScene {
@@ -180,6 +182,8 @@ export class BallScene {
   private disposed = false;
   private visible = true;
   private bg = new Color(0, 0, 0);
+  private lastP = 0;
+  private ringY: number[] = [];
 
   constructor(private readonly opts: BallSceneOptions) {
     this.renderer = new WebGLRenderer({ canvas: opts.canvas, antialias: !opts.light, alpha: false, powerPreference: "high-performance" });
@@ -584,11 +588,15 @@ export class BallScene {
     const falling = 1 - smooth(P.dissolveStart, P.dissolveEnd + 0.08, p);
     const heat = smooth(0.08, 0.38, p) * (1 - smooth(P.dissolveStart + 0.1, P.dissolveEnd, p));
 
-    /* camera: shake and a wider view the faster it falls */
+    /* camera: above the ball looking DOWN the fall (the air streaks converge on a
+       point far below, like diving), shaking and widening the faster it goes;
+       it levels out to face the logo as the fall ends. */
     const shake = speed * falling * 0.09;
     const c = this.clock;
-    this.camera.position.set(Math.sin(c * 23.0) * shake + Math.sin(c * 7.3) * shake * 0.6, Math.cos(c * 19.0) * shake, 14);
-    this.camera.rotation.z = Math.sin(c * 11.0) * shake * 0.05;
+    const tilt = falling;
+    this.camera.position.set(Math.sin(c * 23.0) * shake + Math.sin(c * 7.3) * shake * 0.6, 4.2 * tilt + Math.cos(c * 19.0) * shake, 14 - 1.5 * tilt);
+    this.camera.lookAt(0, -2.2 * tilt, 0);
+    this.camera.rotateZ(Math.sin(c * 11.0) * shake * 0.05);
     this.camera.fov = 34 + 12 * speed * falling;
     this.camera.updateProjectionMatrix();
 
@@ -597,7 +605,9 @@ export class BallScene {
     const settle = smooth(0.3, P.dissolveStart, p);
     this.ball.rotation.set(r.x + (1 - settle) * c * 2.2, r.y + (1 - settle) * c * 0.9, 0);
     const wobble = (1 - settle) * 0.08;
-    this.ball.position.set(Math.sin(c * 5.1) * wobble, Math.cos(c * 4.3) * wobble, 0);
+    // It drops into the frame from above at the very start of the scroll.
+    const entry = 3.4 * (1 - smooth(0, 0.16, p)) * this.ball.scale.x;
+    this.ball.position.set(Math.sin(c * 5.1) * wobble, entry + Math.cos(c * 4.3) * wobble, 0);
     this.ballU.uProg.value = Math.min(1.02, Math.max(0, (t - T.dissolveStart) / (T.dissolveEnd - T.dissolveStart)) * 1.02);
     this.ballU.uHeat.value = heat;
     this.ball.visible = this.ballU.uProg.value < 1;
@@ -623,7 +633,11 @@ export class BallScene {
       ring.position.set(0, y, 0);
       ring.scale.setScalar(this.ball.scale.x);
       ring.visible = falling > 0.05;
-      flash = Math.max(flash, 1 - Math.min(1, Math.abs(y) / 1.4));
+      flash = Math.max(flash, 1 - Math.min(1, Math.abs(y - this.ball.position.y) / 1.4));
+      // The ball goes through it (the ring rises past the ball).
+      const prev = this.ringY[i];
+      if (this.running && prev !== undefined && prev < this.ball.position.y && y >= this.ball.position.y && y - prev < 5 && falling > 0.3) this.opts.onEvent?.("ring");
+      this.ringY[i] = y;
     });
     this.ringMat.opacity = 0.85 * falling;
 
@@ -635,6 +649,13 @@ export class BallScene {
     this.emberMat.uniforms.uHeat.value = heat * (1 - smooth(P.dissolveStart, P.dissolveStart + 0.08, p));
     this.emberMat.uniforms.uSpeed.value = speed;
 
+    // Story moments, going forward.
+    if (this.running) {
+      if (this.lastP < P.dissolveStart && p >= P.dissolveStart) this.opts.onEvent?.("burn");
+      if (this.lastP < P.formEnd - 0.02 && p >= P.formEnd - 0.02) this.opts.onEvent?.("formed");
+    }
+    this.lastP = p;
+
     // A warm flash lights the whole sky as the ball punches through a ring.
     this.bg.setRGB(0.05 * flash * falling, 0.035 * flash * falling, 0.015 * flash * falling);
     this.scene.background = this.bg;
@@ -644,6 +665,18 @@ export class BallScene {
   /** 0 → 1 how fast the scene is falling right now (for the page's vignette). */
   get intensity() {
     return fallSpeed(this.p) * (1 - smooth(P.dissolveStart, P.dissolveEnd + 0.08, this.p));
+  }
+
+  /** What the sound follows each frame. */
+  get audio() {
+    const p = this.p;
+    const falling = 1 - smooth(P.dissolveStart, P.dissolveEnd + 0.08, p);
+    return {
+      speed: fallSpeed(p) * (1 + this.boost) * falling,
+      heat: smooth(0.08, 0.38, p) * (1 - smooth(P.dissolveStart + 0.1, P.dissolveEnd, p)),
+      burn: smooth(P.dissolveStart - 0.01, P.dissolveStart + 0.04, p) * (1 - smooth(P.dissolveEnd - 0.05, P.dissolveEnd + 0.04, p)),
+      gather: smooth(P.dissolveEnd, P.dissolveEnd + 0.06, p) * (1 - smooth(P.formEnd - 0.04, P.formEnd + 0.02, p)),
+    };
   }
 
   get progress() {

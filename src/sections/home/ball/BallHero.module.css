@@ -3,7 +3,7 @@
 .hero {
   position: relative;
   /* Scroll length of the fall; the stage stays pinned while you scroll through it. */
-  height: 420svh;
+  height: 500svh;
   background: #000;
 }
 

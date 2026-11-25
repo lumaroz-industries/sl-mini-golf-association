@@ -13,7 +13,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const [[owner, dev], instagram, style] = await Promise.all([getPeopleByIds([site.credits.ownerId, site.credits.developerId]), getPeopleInstagram(), getPeopleStyle()]);
   const introPeople: IntroPerson[] = [
     { name: owner.name, role: owner.role, photo: style[owner.id]?.cutout?.src ?? owner.portrait?.src, handle: instagram[owner.id]?.handle, finish: "gold" },
-    { name: dev.name, role: dev.role, photo: style[dev.id]?.cutout?.src ?? dev.portrait?.src, handle: instagram[dev.id]?.handle, finish: "diamond" },
+    { name: dev.name, role: dev.role, photo: style[dev.id]?.cutout?.src ?? dev.portrait?.src, handle: instagram[dev.id]?.handle, finish: "diamond", ghost: dev.nickname },
   ];
   // Structured data: lets search engines connect the site to its official profiles.
   const organization = {

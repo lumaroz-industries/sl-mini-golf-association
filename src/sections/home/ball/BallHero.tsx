@@ -40,6 +40,8 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
     }
 
     let scene: import("./ballScene").BallScene | undefined;
+    let audio: import("./fallSound").FallAudio | undefined;
+    let onScreen = true;
     let cancelled = false;
     let raf = 0;
     const light = Math.min(window.innerWidth, window.innerHeight) < 600 || (navigator.hardwareConcurrency ?? 8) <= 4;
@@ -64,15 +66,16 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
         st.style.setProperty("--speed", scene.intensity.toFixed(3));
         st.toggleAttribute("data-formed", scene.progress > P.formEnd - 0.02);
         st.toggleAttribute("data-started", scene.progress > 0.015);
+        audio?.update(scene.audio, onScreen);
       }
       raf = requestAnimationFrame(sync);
     };
 
     (async () => {
       try {
-        const { BallScene } = await import("./ballScene");
+        const [{ BallScene }, { FallAudio }] = await Promise.all([import("./ballScene"), import("./fallSound")]);
         if (cancelled) return;
-        scene = new BallScene({ canvas: cv, light });
+        scene = new BallScene({ canvas: cv, light, onEvent: (e) => audio?.event(e) });
         if (location.search.includes("debug-ball")) (window as unknown as { __slBall: unknown }).__slBall = scene;
         await scene.prepare();
         if (cancelled) return;
@@ -82,6 +85,23 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
           if (cancelled || !scene) return;
           scene.start();
           raf = requestAnimationFrame(sync);
+          // Sound: plays by itself if the browser allows; otherwise from the first tap, click or key.
+          try {
+            audio = new FallAudio();
+            void audio.unlock().then((on) => {
+              if (on || cancelled) return;
+              const unlock = () => {
+                void audio?.unlock();
+                for (const ev of ["pointerdown", "keydown", "touchend"]) window.removeEventListener(ev, unlock, true);
+              };
+              for (const ev of ["pointerdown", "keydown", "touchend"]) window.addEventListener(ev, unlock, true);
+              removeUnlock = () => {
+                for (const ev of ["pointerdown", "keydown", "touchend"]) window.removeEventListener(ev, unlock, true);
+              };
+            });
+          } catch {
+            audio = undefined;
+          }
         };
         // Let the opening intro have the graphics card to itself first.
         if (document.documentElement.dataset.siteIntro === "play") window.addEventListener("sl-intro-done", go, { once: true });
@@ -98,13 +118,19 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
       place();
     };
     window.addEventListener("resize", onResize);
-    const io = new IntersectionObserver(([e]) => scene?.setVisible(e.isIntersecting));
+    let removeUnlock = () => {};
+    const io = new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting;
+      scene?.setVisible(e.isIntersecting);
+    });
     io.observe(el);
     return () => {
       cancelled = true;
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
       io.disconnect();
+      removeUnlock();
+      audio?.dispose();
       scene?.dispose();
     };
   }, []);

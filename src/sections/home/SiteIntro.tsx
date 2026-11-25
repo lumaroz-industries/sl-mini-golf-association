@@ -14,10 +14,12 @@ export interface IntroPerson {
   handle?: string;
   /** Finish, matching their Social Media card. */
   finish: "gold" | "diamond";
+  /** Word drifting large behind them (defaults to their full name). */
+  ghost?: string;
 }
 
 /** Full sequence: logo → founder → designer (see the CSS timeline). */
-const SEQUENCE_MS = 6600;
+const SEQUENCE_MS = 7400;
 /** With reduced motion only the logo shows, briefly. */
 const REDUCED_MS = 1300;
 /** After the sequence, wait at most this long for the 3D course, then open anyway. */
@@ -58,6 +60,9 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
   const [leaving, setLeaving] = useState(false);
   const audio = useRef<IntroAudio | null>(null);
   const started = useRef(0);
+  // True while the browser is still blocking sound: the first tap turns it on instead of skipping.
+  const soundLocked = useRef(false);
+  const [needsTap, setNeedsTap] = useState(false);
 
   // Coming back to the homepage from another page plays it again.
   const [lastPath, setLastPath] = useState(path);
@@ -87,7 +92,10 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
       a.ctx
         .resume()
         .then(() => {
-          if (a && a.running && elapsed() < min / 1000) a.schedule(elapsed());
+          if (!a || !a.running) return;
+          soundLocked.current = false;
+          setNeedsTap(false);
+          if (elapsed() < min / 1000) a.schedule(elapsed());
         })
         .catch(() => undefined); // closed meanwhile (skipped)
     };
@@ -104,6 +112,8 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
         audio.current = a;
         if (a.running) a.schedule(0);
         else {
+          soundLocked.current = true;
+          setNeedsTap(true);
           begin(); // some browsers allow it after resume()
           for (const ev of ["pointerdown", "keydown", "touchend"]) window.addEventListener(ev, onGesture, true);
         }
@@ -152,7 +162,15 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
         className={s.intro}
         data-leave={leaving || undefined}
         aria-hidden="true"
-        onClick={() => setLeaving(true)}
+        onClick={() => {
+          // While sound is blocked, the first tap turns it on (handled by the gesture listener) instead of skipping.
+          if (soundLocked.current) {
+            soundLocked.current = false;
+            setNeedsTap(false);
+            return;
+          }
+          setLeaving(true);
+        }}
         onAnimationEnd={(e) => {
           if (e.target === e.currentTarget && /leave|late/.test(e.animationName)) setGone(true);
         }}
@@ -188,7 +206,7 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
               <div className={s.personGlow} />
               {diamond && <div className={s.rays} />}
               <span className={s.ghost} aria-hidden="true">
-                {p.name}
+                {p.ghost ?? p.name}
               </span>
               {diamond &&
                 SPARKLES.map(([x, y, size, d], k) => (
@@ -235,7 +253,7 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
         <span className={s.slash} data-n="1" />
         <span className={s.slash} data-n="2" />
         <span className={s.grain} />
-        <span className={s.skip}>Tap to skip</span>
+        <span className={s.skip}>{needsTap ? "Tap for sound" : "Tap to skip"}</span>
       </div>
     </>
   );
