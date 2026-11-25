@@ -5,8 +5,8 @@ import { BallHero } from "@/sections/home/ball/BallHero";
 
 /**
  * Which homepage experience runs:
- *  - "ball":   a golf ball falls, dissolves into particles that form the SL
- *              logo; then the people, then the story as plain sections.
+ *  - "ball":   a golf ball falls (the story appears beside it), burns into
+ *              embers that form the SL logo; then the people.
  *  - "course": the original 3D golf-course scroll journey.
  * Switch back to "course" to restore the golf course exactly as it was
  * (also saved on the branch backup/golf-course-v1).
@@ -28,9 +28,8 @@ export default async function HomePage() {
   if (HOME_EXPERIENCE === "ball") {
     return (
       <>
-        <BallHero hero={home.hero} />
+        <BallHero hero={home.hero} intro={home.intro} visionMission={home.visionMission} community={home.community} />
         {peopleSection}
-        <Journey variant="story" hero={home.hero} intro={home.intro} visionMission={home.visionMission} community={home.community} />
       </>
     );
   }

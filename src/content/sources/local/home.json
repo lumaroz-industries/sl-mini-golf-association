@@ -1,33 +1,55 @@
 {
   "hero": {
     "title": "SL Mini Golf Association",
-    "taglineLines": ["Beyond the green.", "Beyond boundaries."],
+    "taglineLines": [
+      "Beyond the green.",
+      "Beyond boundaries."
+    ],
     "supporting": "Connecting players, celebrating talent and taking Indian mini golf further."
   },
   "intro": {
     "kicker": "Introducing SL Mini Golf Association",
-    "heading": "Beyond the Game. United by the Passion.",
-    "body": "SL Mini Golf Association is an independent platform dedicated to bringing India's mini-golf community together. It aims to connect players, showcase talent, celebrate achievements and highlight the journeys of individuals contributing to the sport. From local competitions to international participation, the platform creates a space to discover, recognize and celebrate the people behind mini golf.",
-    "short": "A platform built around the passion for mini golf, bringing players together and celebrating their achievements. Connecting talent, sharing journeys and taking Indian mini golf beyond boundaries."
+    "heading": "More than a game. One shared passion.",
+    "body": "An independent platform bringing India's mini-golf community together — connecting players, showcasing talent and telling the stories of the people who move the sport forward, from local greens to the international stage.",
+    "short": "Built on a love for mini golf: a home where players come together, journeys are shared and every achievement gets its moment."
   },
   "visionMission": {
     "kicker": "Vision & Mission",
-    "vision": "To see mini golf grow beyond boundaries, bringing recognition to Indian talent and building a connected community that inspires future generations of players.",
-    "mission": "To connect mini-golf players, celebrate their achievements, showcase tournament journeys and promote greater awareness and participation in the sport across India and beyond."
+    "vision": "A sport that grows beyond every boundary — where Indian talent is recognised and a connected community inspires the next generation of players.",
+    "mission": "To connect players, celebrate their wins, share their tournament journeys and grow the awareness and love of mini golf across India and beyond."
   },
   "community": {
     "kicker": "Community & Impact",
     "heading": "What we stand for",
     "items": [
-      { "id": "players-united", "title": "Players United", "body": "Bringing mini-golf players together through a shared passion." },
-      { "id": "states-connected", "title": "States Connected", "body": "Connecting players and talent from different parts of India." },
-      { "id": "achievements-celebrated", "title": "Achievements Celebrated", "body": "Recognizing the dedication, journeys and accomplishments of players." },
-      { "id": "beyond-boundaries", "title": "Beyond Boundaries", "body": "Highlighting Indian mini-golf's journey towards wider recognition." }
+      {
+        "id": "players-united",
+        "title": "Players United",
+        "body": "One passion, one community — mini-golf players brought together."
+      },
+      {
+        "id": "states-connected",
+        "title": "States Connected",
+        "body": "Players and talent from across India, connected on one platform."
+      },
+      {
+        "id": "achievements-celebrated",
+        "title": "Achievements Celebrated",
+        "body": "Every effort, every journey, every result — recognised and celebrated."
+      },
+      {
+        "id": "beyond-boundaries",
+        "title": "Beyond Boundaries",
+        "body": "Taking Indian mini golf towards the recognition it deserves."
+      }
     ]
   },
   "people": {
     "kicker": "Credits",
     "heading": "The People Behind the Platform",
-    "memberIds": ["suyash-lahane", "chaitanya-payghan"]
+    "memberIds": [
+      "suyash-lahane",
+      "chaitanya-payghan"
+    ]
   }
 }

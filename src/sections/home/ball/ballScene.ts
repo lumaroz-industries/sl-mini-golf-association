@@ -34,16 +34,17 @@ import { dimpleTexture } from "@/experience/materials/textures";
  * into embers that gather into the SL Mini Golf Association logo.
  *
  * Scroll progress p (0 → 1):
- *   0.00 – 0.42  free fall, speeding up; the ball heats on its leading side
- *   0.42 – 0.66  it burns apart into embers (from the hot underside up)
- *   0.66 – 0.90  the embers gather into the logo, the fall slows to a stop
- *   0.90 – 1.00  the logo holds (the crisp logo and tagline fade in on top)
+ *   0.00 – 0.68  free fall, speeding up; the ball heats on its leading side
+ *                (the homepage's story appears beside the ball meanwhile)
+ *   0.68 – 0.83  it burns apart into embers (from the hot underside up)
+ *   0.83 – 0.95  the embers gather into the logo, the fall slows to a stop
+ *   0.95 – 1.00  the logo holds (the crisp logo and tagline fade in on top)
  *
  * The fall keeps moving on its own while you pause, and scrolling faster
  * pushes the speed up. No post-processing; instanced geometry throughout.
  */
 
-export const P = { dissolveStart: 0.42, dissolveEnd: 0.66, formEnd: 0.9 } as const;
+export const P = { dissolveStart: 0.68, dissolveEnd: 0.83, formEnd: 0.95 } as const;
 
 /* Story time (seconds) used by the ember shader, mapped from scroll progress. */
 const T = { dissolveStart: 2.2, dissolveEnd: 4.8, formStart: 4.8, formEnd: 7.4 } as const;
@@ -61,7 +62,7 @@ const smooth = (a: number, b: number, x: number) => {
 
 /** How fast the world rushes past (0 → 1) at scroll progress p. */
 function fallSpeed(p: number) {
-  return (0.45 + 0.55 * smooth(0, 0.3, p)) * (1 - smooth(P.dissolveStart + 0.04, P.dissolveEnd + 0.1, p));
+  return (0.45 + 0.55 * smooth(0, 0.2, p)) * (1 - smooth(P.dissolveStart + 0.04, P.dissolveEnd + 0.1, p));
 }
 
 /* "Where it breaks first": the hot underside (leading face) goes first. Same on GPU and CPU. */
@@ -427,7 +428,7 @@ export class BallScene {
           vColor = mix(ember * (1.6 - 0.6 * min(age, 1.0)), aColor * 1.15, k);
           float twinkle = 0.75 + 0.25 * sin(uClock * 3.0 + aRand.x * 40.0);
           vAlpha = broken * mix(0.7 + 0.3 * exp(-age * 0.8), twinkle, k);
-          vAlpha *= mix(1.0, 0.35, smoothstep(${T.formEnd.toFixed(2)}, ${(T.formEnd + 1.2).toFixed(2)}, uTime));
+          vAlpha *= mix(1.0, 0.1, smoothstep(${T.formEnd.toFixed(2)}, ${(T.formEnd + 1.2).toFixed(2)}, uTime));
         }
       `,
       fragmentShader: /* glsl */ `
@@ -521,7 +522,7 @@ export class BallScene {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
-    const viewW = 2 * this.camera.position.z * Math.tan((34 * Math.PI) / 360) * this.camera.aspect;
+    const viewW = 2 * 14 /* the camera distance once the logo has formed */ * Math.tan((34 * Math.PI) / 360) * this.camera.aspect;
     if (this.sparkMat) this.sparkMat.uniforms.uLogoW.value = Math.min(9, viewW * (this.camera.aspect < 0.8 ? 0.88 : 0.78));
     const s = this.camera.aspect < 0.8 ? 0.75 : 1;
     this.ball?.scale.setScalar(s);
@@ -536,7 +537,7 @@ export class BallScene {
     const c = this.opts.canvas;
     const w = c.clientWidth || window.innerWidth;
     const h = c.clientHeight || window.innerHeight;
-    const viewH = 2 * this.camera.position.z * Math.tan((34 * Math.PI) / 360);
+    const viewH = 2 * 14 /* the camera distance once the logo has formed */ * Math.tan((34 * Math.PI) / 360);
     const viewW = viewH * this.camera.aspect;
     const W = this.sparkMat ? this.sparkMat.uniforms.uLogoW.value : Math.min(9, viewW * 0.78);
     return { width: (W / viewW) * w, cy: h / 2 - (0.15 / viewH) * h };
@@ -586,7 +587,7 @@ export class BallScene {
     const t = storyTime(p);
     const speed = fallSpeed(p) * (1 + this.boost);
     const falling = 1 - smooth(P.dissolveStart, P.dissolveEnd + 0.08, p);
-    const heat = smooth(0.08, 0.38, p) * (1 - smooth(P.dissolveStart + 0.1, P.dissolveEnd, p));
+    const heat = smooth(0.1, 0.6, p) * (1 - smooth(P.dissolveStart + 0.1, P.dissolveEnd, p));
 
     /* camera: above the ball looking DOWN the fall (the air streaks converge on a
        point far below, like diving), shaking and widening the faster it goes;
@@ -602,11 +603,11 @@ export class BallScene {
 
     /* the ball: tumbling and buffeted, settling as it burns */
     const r = spin(t);
-    const settle = smooth(0.3, P.dissolveStart, p);
+    const settle = smooth(0.55, P.dissolveStart, p);
     this.ball.rotation.set(r.x + (1 - settle) * c * 2.2, r.y + (1 - settle) * c * 0.9, 0);
     const wobble = (1 - settle) * 0.08;
     // It drops into the frame from above at the very start of the scroll.
-    const entry = 3.4 * (1 - smooth(0, 0.16, p)) * this.ball.scale.x;
+    const entry = 3.4 * (1 - smooth(0, 0.07, p)) * this.ball.scale.x;
     this.ball.position.set(Math.sin(c * 5.1) * wobble, entry + Math.cos(c * 4.3) * wobble, 0);
     this.ballU.uProg.value = Math.min(1.02, Math.max(0, (t - T.dissolveStart) / (T.dissolveEnd - T.dissolveStart)) * 1.02);
     this.ballU.uHeat.value = heat;
@@ -675,7 +676,7 @@ export class BallScene {
     const falling = 1 - smooth(P.dissolveStart, P.dissolveEnd + 0.08, p);
     return {
       speed: fallSpeed(p) * (1 + this.boost) * falling,
-      heat: smooth(0.08, 0.38, p) * (1 - smooth(P.dissolveStart + 0.1, P.dissolveEnd, p)),
+      heat: smooth(0.1, 0.6, p) * (1 - smooth(P.dissolveStart + 0.1, P.dissolveEnd, p)),
       burn: smooth(P.dissolveStart - 0.01, P.dissolveStart + 0.04, p) * (1 - smooth(P.dissolveEnd - 0.05, P.dissolveEnd + 0.04, p)),
       gather: smooth(P.dissolveEnd, P.dissolveEnd + 0.06, p) * (1 - smooth(P.formEnd - 0.04, P.formEnd + 0.02, p)),
     };

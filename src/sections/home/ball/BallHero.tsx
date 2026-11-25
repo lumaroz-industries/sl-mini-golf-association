@@ -18,7 +18,51 @@ import s from "./BallHero.module.css";
  * intro to finish before drawing, so the two never compete. Without WebGL —
  * or with reduced motion — the logo and tagline simply show.
  */
-export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
+interface Note {
+  kicker: string;
+  title?: string;
+  /** "01 / 04" for the community points. */
+  index?: string;
+  body: string;
+  side: "left" | "right";
+  /** Scroll window (progress) in which it shows. */
+  from: number;
+  to: number;
+}
+
+/** The homepage story, spread along the fall (before the ball starts to burn). */
+function buildNotes(intro: HomeContent["intro"], vm: HomeContent["visionMission"], community: HomeContent["community"]): Note[] {
+  const items = community.items.slice(0, 4);
+  const list: Array<Omit<Note, "side" | "from" | "to">> = [
+    { kicker: "Beyond the game", body: intro.short },
+    { kicker: intro.kicker, title: intro.heading, body: intro.body },
+    { kicker: vm.kicker, title: "Vision", body: vm.vision },
+    { kicker: vm.kicker, title: "Mission", body: vm.mission },
+    ...items.map((it, i) => ({ kicker: community.kicker, index: `${String(i + 1).padStart(2, "0")} / ${String(items.length).padStart(2, "0")}`, title: it.title, body: it.body })),
+  ];
+  const start = 0.07;
+  const end = P.dissolveStart - 0.02;
+  const span = (end - start) / list.length;
+  return list.map((n, i) => ({ ...n, side: i % 2 ? "right" : "left", from: start + i * span, to: start + (i + 1) * span }));
+}
+
+const fade = (a: number, b: number, x: number) => {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
+
+export function BallHero({
+  hero,
+  intro,
+  visionMission,
+  community,
+}: {
+  hero: HomeContent["hero"];
+  intro: HomeContent["intro"];
+  visionMission: HomeContent["visionMission"];
+  community: HomeContent["community"];
+}) {
+  const notes = buildNotes(intro, visionMission, community);
   const root = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -68,6 +112,15 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
         st.style.setProperty("--speed", scene.intensity.toFixed(3));
         st.toggleAttribute("data-formed", scene.progress > P.formEnd - 0.02);
         st.toggleAttribute("data-started", scene.progress > 0.015);
+        // The story notes beside the ball fade in and out with the scroll.
+        const p = scene.progress;
+        noteEls.forEach((n, i) => {
+          const { from, to } = notes[i];
+          const w = Math.min(0.02, (to - from) / 4);
+          const o = fade(from, from + w, p) * (1 - fade(to - w, to, p));
+          n.style.setProperty("--o", o.toFixed(3));
+          n.style.visibility = o > 0.001 ? "visible" : "hidden";
+        });
         audio?.update(scene.audio, onScreen);
       }
       raf = requestAnimationFrame(sync);
@@ -121,6 +174,7 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
       place();
     };
     window.addEventListener("resize", onResize);
+    const noteEls = Array.from(st.querySelectorAll<HTMLElement>("[data-note]"));
     let removeUnlock = () => {};
     // The Sound on/off choice (from either button on the page), remembered for next time.
     const offSound = onSoundChange((on) => {
@@ -162,6 +216,21 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
           </p>
           <p className={s.supporting}>{hero.supporting}</p>
         </div>
+        {/* The story, beside the falling ball (plain stacked text without the animation). */}
+        <div className={s.notes}>
+          {notes.map((n, i) => (
+            <article key={i} data-note="" data-side={n.side} className={s.note}>
+              <span className={s.pointer} aria-hidden="true" />
+              <span className={s.kicker}>
+                {n.kicker}
+                {n.index && <b>{n.index}</b>}
+              </span>
+              {n.title && <h2 className={s.noteTitle}>{n.title}</h2>}
+              <p className={s.noteBody}>{n.body}</p>
+            </article>
+          ))}
+        </div>
+
         <div className={s.controls}>
           <SoundToggle />
           <button

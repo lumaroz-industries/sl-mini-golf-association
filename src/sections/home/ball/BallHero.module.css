@@ -3,7 +3,7 @@
 .hero {
   position: relative;
   /* Scroll length of the fall; the stage stays pinned while you scroll through it. */
-  height: 500svh;
+  height: 950svh;
   background: #000;
 }
 
@@ -170,5 +170,207 @@
 }
 
 .hero[data-mode="static"] .controls {
+  display: none;
+}
+
+/* ================================================================ story notes
+   Annotations beside the falling ball: a thin line with a glowing dot points
+   at the ball. Driven by --o (0 → 1) from the scroll. */
+.notes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.note {
+  --o: 0;
+  position: absolute;
+  top: 30%;
+  width: min(420px, 31vw);
+  display: grid;
+  gap: 12px;
+  opacity: var(--o);
+  visibility: hidden;
+  transform: translate3d(calc((1 - var(--o)) * var(--dir) * 40px), calc((1 - var(--o)) * 16px), 0);
+  will-change: opacity, transform;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.85);
+}
+
+.note[data-side="left"] {
+  --dir: -1;
+  left: max(5vw, calc(50% - 640px));
+  text-align: right;
+  justify-items: end;
+}
+
+.note[data-side="right"] {
+  --dir: 1;
+  right: max(5vw, calc(50% - 640px));
+}
+
+/* A soft pool of dark behind the words, for legibility over the streaks. */
+.note::before {
+  content: "";
+  position: absolute;
+  inset: -30% -18%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.7), transparent);
+}
+
+/* The callout line towards the ball, ending in a glowing dot. */
+.pointer {
+  position: absolute;
+  top: 0.55em;
+  width: clamp(40px, calc(50vw - 31vw - max(5vw, 50vw - 640px) - 90px), 220px);
+  height: 1px;
+  background: linear-gradient(var(--line-dir, 90deg), rgb(255 255 255 / 0.55), rgb(255 180 107 / 0.15));
+  transform-origin: var(--origin, left);
+  transform: scaleX(var(--o));
+}
+
+.note[data-side="left"] .pointer {
+  left: calc(100% + 18px);
+  --line-dir: 90deg;
+  --origin: left;
+}
+
+.note[data-side="right"] .pointer {
+  right: calc(100% + 18px);
+  --line-dir: 270deg;
+  --origin: right;
+}
+
+.pointer::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 12px 3px rgb(255 190 120 / 0.8);
+}
+
+.note[data-side="left"] .pointer::after {
+  right: -3px;
+}
+
+.note[data-side="right"] .pointer::after {
+  left: -3px;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #ffc98a;
+}
+
+.kicker b {
+  font-weight: 700;
+  color: rgb(255 255 255 / 0.55);
+  letter-spacing: 0.14em;
+}
+
+.noteTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.1rem + 2.2vw, 3.1rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #fff;
+  text-wrap: balance;
+}
+
+.noteBody {
+  margin: 0;
+  max-width: 38ch;
+  color: rgb(235 240 245 / 0.82);
+  font-size: clamp(0.95rem, 0.88rem + 0.25vw, 1.08rem);
+  line-height: 1.6;
+}
+
+/* Phones: the ball is centred, so the note sits below it and points up. */
+@media (max-width: 760px) {
+  .note,
+  .note[data-side="left"],
+  .note[data-side="right"] {
+    --dir: 0;
+    top: auto;
+    bottom: 96px;
+    left: 20px;
+    right: 20px;
+    width: auto;
+    text-align: center;
+    justify-items: center;
+    gap: 10px;
+  }
+  .pointer,
+  .note[data-side="left"] .pointer,
+  .note[data-side="right"] .pointer {
+    top: auto;
+    bottom: calc(100% + 14px);
+    left: 50%;
+    right: auto;
+    width: 1px;
+    height: clamp(40px, 16svh, 160px);
+    background: linear-gradient(0deg, rgb(255 255 255 / 0.5), rgb(255 180 107 / 0.15));
+    transform-origin: bottom;
+    transform: scaleY(var(--o));
+  }
+  .note[data-side="left"] .pointer::after,
+  .note[data-side="right"] .pointer::after,
+  .pointer::after {
+    top: -3px;
+    left: -3px;
+    right: auto;
+  }
+  .noteTitle {
+    font-size: clamp(1.5rem, 1.1rem + 3vw, 2.1rem);
+  }
+  .noteBody {
+    font-size: 0.95rem;
+  }
+}
+
+/* Without the animation: the story as plain stacked text under the logo. */
+.hero[data-mode="static"] {
+  height: auto;
+}
+
+.hero[data-mode="static"] .stage {
+  position: relative;
+  height: auto;
+  min-height: 100svh;
+  padding-bottom: 80px;
+}
+
+.hero[data-mode="static"] .notes {
+  position: relative;
+  inset: auto;
+  display: grid;
+  gap: 56px;
+  max-width: 720px;
+  margin: 100svh auto 0;
+  padding: 0 var(--gutter);
+}
+
+.hero[data-mode="static"] .note {
+  position: static;
+  width: auto;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  text-align: left;
+  justify-items: start;
+}
+
+.hero[data-mode="static"] .pointer {
   display: none;
 }
