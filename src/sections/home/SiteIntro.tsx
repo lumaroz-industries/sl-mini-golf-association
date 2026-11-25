@@ -47,8 +47,10 @@ const letters = (word: string, from: number) =>
  * then it opens up straight into the 3D course — on its own, no tap needed.
  *
  * Plays every time the homepage is opened (also coming back from another
- * page). Tap to skip. Sound starts by itself where the browser allows it,
- * otherwise on the first tap or key press (browsers block sound until then).
+ * page). Tap to skip. Sound is always on: it plays by itself wherever the
+ * browser allows (e.g. once you have interacted with the site, or when it is
+ * installed as an app); browsers block sound before any interaction, so in
+ * that case it starts with the first tap, click or key press.
  * Server-rendered and animated with transform and opacity only, so it stays
  * smooth while the 3D course is being built underneath.
  */
@@ -60,9 +62,6 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
   const [leaving, setLeaving] = useState(false);
   const audio = useRef<IntroAudio | null>(null);
   const started = useRef(0);
-  // True while the browser is still blocking sound: the first tap turns it on instead of skipping.
-  const soundLocked = useRef(false);
-  const [needsTap, setNeedsTap] = useState(false);
 
   // Coming back to the homepage from another page plays it again.
   const [lastPath, setLastPath] = useState(path);
@@ -93,8 +92,6 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
         .resume()
         .then(() => {
           if (!a || !a.running) return;
-          soundLocked.current = false;
-          setNeedsTap(false);
           if (elapsed() < min / 1000) a.schedule(elapsed());
         })
         .catch(() => undefined); // closed meanwhile (skipped)
@@ -112,8 +109,6 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
         audio.current = a;
         if (a.running) a.schedule(0);
         else {
-          soundLocked.current = true;
-          setNeedsTap(true);
           begin(); // some browsers allow it after resume()
           for (const ev of ["pointerdown", "keydown", "touchend"]) window.addEventListener(ev, onGesture, true);
         }
@@ -162,15 +157,7 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
         className={s.intro}
         data-leave={leaving || undefined}
         aria-hidden="true"
-        onClick={() => {
-          // While sound is blocked, the first tap turns it on (handled by the gesture listener) instead of skipping.
-          if (soundLocked.current) {
-            soundLocked.current = false;
-            setNeedsTap(false);
-            return;
-          }
-          setLeaving(true);
-        }}
+        onClick={() => setLeaving(true)}
         onAnimationEnd={(e) => {
           if (e.target === e.currentTarget && /leave|late/.test(e.animationName)) setGone(true);
         }}
@@ -253,7 +240,7 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
         <span className={s.slash} data-n="1" />
         <span className={s.slash} data-n="2" />
         <span className={s.grain} />
-        <span className={s.skip}>{needsTap ? "Tap for sound" : "Tap to skip"}</span>
+        <span className={s.skip}>Tap to skip</span>
       </div>
     </>
   );

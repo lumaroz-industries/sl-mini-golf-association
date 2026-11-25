@@ -49,7 +49,16 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-IN" className={`${clash.variable} ${manrope.variable}`} suppressHydrationWarning>
-      <body id="top">{children}</body>
+      <body id="top">
+        {/* A refreshed or reopened page always starts at the top (browsers would
+            otherwise jump back to where you were). Links to a #section still work. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if("scrollRestoration"in history)history.scrollRestoration="manual";if(!location.hash){window.scrollTo(0,0);addEventListener("pageshow",function(e){if(e.persisted)window.scrollTo(0,0)})}}catch(e){}`,
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

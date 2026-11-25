@@ -3,8 +3,9 @@
 /**
  * Sound for the falling-ball hero, synthesised with the Web Audio API and
  * driven by the scene every frame, so it follows your scroll:
- *   - wind that roars and brightens with the fall speed, and a deep rumble,
- *   - crackling heat while the ball glows like a meteor,
+ *   - wind made from deep "brown" noise: a roar that opens up with speed,
+ *     slow gusts, a howling whistle that rises, and a deep rumble,
+ *   - a low fire roar while the ball glows like a meteor,
  *   - a whoosh + boom each time it smashes through a ring of light,
  *   - a sizzling burst as it burns apart, then the embers' shimmer,
  *   - a bright chime as the logo forms.
@@ -26,10 +27,14 @@ export class FallAudio {
   private dry: GainNode;
   private wet: GainNode;
   private noise: AudioBuffer;
+  /** Deep, soft noise (most energy in the lows) — sounds like wind, not hiss. */
+  private brown: AudioBuffer;
   private windGain!: GainNode;
   private windFilter!: BiquadFilterNode;
   private rumbleGain!: GainNode;
-  private crackleGain!: GainNode;
+  private fireGain!: GainNode;
+  private howlGain!: GainNode;
+  private howlFilter!: BiquadFilterNode;
   private sizzleGain!: GainNode;
   private glitterGain!: GainNode;
   private started = false;
@@ -62,15 +67,24 @@ export class FallAudio {
       const d = this.noise.getChannelData(ch);
       for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     }
+    this.brown = this.ctx.createBuffer(2, this.ctx.sampleRate * 4, this.ctx.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = this.brown.getChannelData(ch);
+      let last = 0;
+      for (let i = 0; i < d.length; i++) {
+        last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02;
+        d[i] = last * 3.5;
+      }
+    }
   }
 
   get running() {
     return this.ctx.state === "running";
   }
 
-  private loop(): AudioBufferSourceNode {
+  private loop(buffer: AudioBuffer = this.brown): AudioBufferSourceNode {
     const s = this.ctx.createBufferSource();
-    s.buffer = this.noise;
+    s.buffer = buffer;
     s.loop = true;
     s.start(0, Math.random() * 2);
     return s;
@@ -83,48 +97,67 @@ export class FallAudio {
     node.connect(g).connect(this.wet);
   }
 
+  /** A slow wobble for gusts (sine LFO added onto a parameter). */
+  private lfo(target: AudioParam, rate: number, depth: number) {
+    const o = this.ctx.createOscillator();
+    o.frequency.value = rate;
+    const g = this.ctx.createGain();
+    g.gain.value = depth;
+    o.connect(g).connect(target);
+    o.start();
+  }
+
   /** Builds the continuous layers (once the browser allows sound). */
   private build() {
     if (this.started) return;
     this.started = true;
-    // Wind: band-passed noise, brighter and louder with speed.
+    // Wind roar: brown noise through a low-pass that opens with speed; slow gusts.
     this.windFilter = this.ctx.createBiquadFilter();
-    this.windFilter.type = "bandpass";
-    this.windFilter.Q.value = 0.7;
+    this.windFilter.type = "lowpass";
+    this.windFilter.Q.value = 1.4;
+    this.windFilter.frequency.value = 300;
+    this.lfo(this.windFilter.frequency, 0.23, 120);
+    const gust = this.ctx.createGain();
+    gust.gain.value = 1;
+    this.lfo(gust.gain, 0.17, 0.25);
     this.windGain = this.ctx.createGain();
     this.windGain.gain.value = 0;
-    this.loop().connect(this.windFilter).connect(this.windGain);
-    this.send(this.windGain, 0.25);
-    // Rumble: low noise under everything.
+    this.loop().connect(this.windFilter).connect(gust).connect(this.windGain);
+    this.send(this.windGain, 0.2);
+    // Howl: a narrow, resonant band that rises with speed and wavers — the whistle of air.
+    this.howlFilter = this.ctx.createBiquadFilter();
+    this.howlFilter.type = "bandpass";
+    this.howlFilter.Q.value = 9;
+    this.howlFilter.frequency.value = 420;
+    this.lfo(this.howlFilter.frequency, 0.31, 60);
+    this.howlGain = this.ctx.createGain();
+    this.howlGain.gain.value = 0;
+    this.loop().connect(this.howlFilter).connect(this.howlGain);
+    this.send(this.howlGain, 0.4);
+    // Rumble: the very lowest part, felt more than heard.
     const lp = this.ctx.createBiquadFilter();
     lp.type = "lowpass";
-    lp.frequency.value = 110;
+    lp.frequency.value = 90;
     this.rumbleGain = this.ctx.createGain();
     this.rumbleGain.gain.value = 0;
     this.loop().connect(lp).connect(this.rumbleGain);
     this.send(this.rumbleGain, 0.1);
-    // Crackle: high, gated noise — the heat.
-    const hp = this.ctx.createBiquadFilter();
-    hp.type = "highpass";
-    hp.frequency.value = 2600;
-    const gate = this.ctx.createGain();
-    const lfo = this.ctx.createOscillator();
-    lfo.type = "square";
-    lfo.frequency.value = 23;
-    const lfoAmt = this.ctx.createGain();
-    lfoAmt.gain.value = 0.5;
-    lfo.connect(lfoAmt).connect(gate.gain);
-    gate.gain.value = 0.5;
-    lfo.start();
-    this.crackleGain = this.ctx.createGain();
-    this.crackleGain.gain.value = 0;
-    this.loop().connect(hp).connect(gate).connect(this.crackleGain);
-    this.send(this.crackleGain, 0.3);
-    // Sizzle: the burn-up.
+    // Fire roar: low, fluttering — the meteor's heat.
+    const fl = this.ctx.createBiquadFilter();
+    fl.type = "lowpass";
+    fl.frequency.value = 650;
+    const flutter = this.ctx.createGain();
+    flutter.gain.value = 1;
+    this.lfo(flutter.gain, 8.5, 0.3);
+    this.fireGain = this.ctx.createGain();
+    this.fireGain.gain.value = 0;
+    this.loop().connect(fl).connect(flutter).connect(this.fireGain);
+    this.send(this.fireGain, 0.3);
+    // Burn-up: a soft, mid "whoomp" of fire (no hiss).
     const bp = this.ctx.createBiquadFilter();
     bp.type = "bandpass";
-    bp.frequency.value = 5200;
-    bp.Q.value = 0.8;
+    bp.frequency.value = 900;
+    bp.Q.value = 0.7;
     this.sizzleGain = this.ctx.createGain();
     this.sizzleGain.gain.value = 0;
     this.loop().connect(bp).connect(this.sizzleGain);
@@ -136,16 +169,11 @@ export class FallAudio {
       const o = this.ctx.createOscillator();
       o.type = "sine";
       o.frequency.value = f;
-      const trem = this.ctx.createOscillator();
-      trem.frequency.value = 3 + Math.random() * 4;
-      const tremAmt = this.ctx.createGain();
-      tremAmt.gain.value = 0.5;
       const v = this.ctx.createGain();
       v.gain.value = 0.5;
-      trem.connect(tremAmt).connect(v.gain);
+      this.lfo(v.gain, 3 + Math.random() * 4, 0.5);
       o.connect(v).connect(this.glitterGain);
       o.start();
-      trem.start();
     }
     this.send(this.glitterGain, 0.9);
   }
@@ -167,11 +195,13 @@ export class FallAudio {
     const now = this.ctx.currentTime;
     const k = 0.08; // smoothing
     this.master.gain.setTargetAtTime(on ? 0.8 : 0, now, 0.2);
-    this.windGain.gain.setTargetAtTime(0.04 + 0.42 * s.speed, now, k);
-    this.windFilter.frequency.setTargetAtTime(280 + 2600 * s.speed, now, k);
-    this.rumbleGain.gain.setTargetAtTime(0.6 * s.speed, now, k);
-    this.crackleGain.gain.setTargetAtTime(0.09 * s.heat, now, k);
-    this.sizzleGain.gain.setTargetAtTime(0.16 * s.burn, now, k);
+    this.windGain.gain.setTargetAtTime(0.08 + 0.75 * s.speed, now, k);
+    this.windFilter.frequency.setTargetAtTime(260 + 1100 * s.speed, now, k);
+    this.howlGain.gain.setTargetAtTime(0.35 * s.speed * s.speed, now, k);
+    this.howlFilter.frequency.setTargetAtTime(380 + 520 * s.speed, now, 0.15);
+    this.rumbleGain.gain.setTargetAtTime(0.7 * s.speed, now, k);
+    this.fireGain.gain.setTargetAtTime(0.35 * s.heat, now, k);
+    this.sizzleGain.gain.setTargetAtTime(0.22 * s.burn, now, k);
     this.glitterGain.gain.setTargetAtTime(0.03 * Math.max(s.gather, s.burn * 0.4), now, 0.2);
   }
 
@@ -202,13 +232,13 @@ export class FallAudio {
 
   private whoosh(t: number, dur: number, level: number) {
     const s = this.ctx.createBufferSource();
-    s.buffer = this.noise;
+    s.buffer = this.brown;
     const bp = this.ctx.createBiquadFilter();
-    bp.type = "bandpass";
-    bp.Q.value = 0.8;
-    bp.frequency.setValueAtTime(400, t);
-    bp.frequency.exponentialRampToValueAtTime(3500, t + dur * 0.5);
-    bp.frequency.exponentialRampToValueAtTime(300, t + dur);
+    bp.type = "lowpass";
+    bp.Q.value = 2;
+    bp.frequency.setValueAtTime(250, t);
+    bp.frequency.exponentialRampToValueAtTime(1600, t + dur * 0.5);
+    bp.frequency.exponentialRampToValueAtTime(200, t + dur);
     const g = this.env(t, level, dur * 0.5, dur * 0.5);
     s.connect(bp).connect(g);
     this.send(g, 0.4);
@@ -230,11 +260,11 @@ export class FallAudio {
 
   private burst(t: number, dur: number, level: number) {
     const s = this.ctx.createBufferSource();
-    s.buffer = this.noise;
+    s.buffer = this.brown;
     const hp = this.ctx.createBiquadFilter();
-    hp.type = "highpass";
-    hp.frequency.setValueAtTime(1200, t);
-    hp.frequency.exponentialRampToValueAtTime(6000, t + dur);
+    hp.type = "lowpass";
+    hp.frequency.setValueAtTime(2200, t);
+    hp.frequency.exponentialRampToValueAtTime(300, t + dur);
     const g = this.env(t, level, 0.02, dur);
     s.connect(hp).connect(g);
     this.send(g, 0.7);
