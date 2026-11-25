@@ -22,8 +22,170 @@
   background: #000;
   cursor: pointer;
   user-select: none;
-  /* Safety net only, if scripts never run (normally data-leave ends it). */
-  animation: late 0.7s cubic-bezier(0.65, 0, 0.35, 1) 9s forwards;
+}
+
+/* Safety net only (normally data-leave ends it), counted from the Enter tap. */
+.intro[data-entered] {
+  animation: late 0.7s cubic-bezier(0.65, 0, 0.35, 1) 10s forwards;
+}
+
+.acts {
+  position: absolute;
+  inset: 0;
+}
+
+/* =============================================================== enter */
+.gate {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 34px;
+  padding: 24px;
+  background: #000;
+  cursor: pointer;
+  transition:
+    opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0.6s;
+}
+
+.intro[data-entered] .gate {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.gateGlow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(40% 32% at 50% 48%, rgb(227 194 122 / 0.1), transparent 70%);
+  animation: gateBreathe 4s ease-in-out infinite;
+}
+
+@keyframes gateBreathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.gateLogo {
+  position: relative;
+  width: min(360px, 70vw);
+  aspect-ratio: 520 / 120;
+  animation: logoIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.gateLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* A slow light passing over the logo, again and again. */
+.gateShine {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  -webkit-mask: url(/brand/slmga-logo-dark.svg) center / contain no-repeat;
+  mask: url(/brand/slmga-logo-dark.svg) center / contain no-repeat;
+}
+
+.gateShine::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 300%;
+  background: linear-gradient(105deg, transparent 40%, #e3c27a 46%, #fff 50%, #e3c27a 54%, transparent 60%);
+  will-change: transform;
+  animation: gateSweep 3.6s cubic-bezier(0.45, 0, 0.25, 1) 0.8s infinite;
+}
+
+@keyframes gateSweep {
+  0% {
+    transform: translateX(0);
+  }
+  55%,
+  100% {
+    transform: translateX(-66.667%);
+  }
+}
+
+.enterBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 38px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, #121212, #050505) padding-box,
+    linear-gradient(135deg, #fbecc4, #b38d45 45%, #e3c27a 75%, #fbecc4) border-box;
+  color: #fbecc4;
+  font: 700 0.875rem / 1 var(--font-body, inherit);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.6),
+    0 12px 40px rgb(227 194 122 / 0.18);
+  animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s;
+}
+
+.enterBtn span {
+  margin-right: -0.42em; /* optical centring of the spaced word */
+}
+
+/* A soft ring pulsing out from the button. */
+.enterBtn::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 1px solid rgb(227 194 122 / 0.6);
+  animation: pulse 2.2s ease-out 1.4s infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.35, 1.7);
+    opacity: 0;
+  }
+}
+
+.enterBtn:hover,
+.enterBtn:focus-visible {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.6),
+    0 16px 50px rgb(227 194 122 / 0.32);
+  outline: none;
+  border-radius: 999px; /* keep the pill shape when focused */
+}
+
+.gateNote {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.5);
+  animation: fadeIn 0.8s ease 0.9s both;
 }
 
 :global(html[data-site-intro="skip"]) .intro {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { preload } from "react-dom";
 import { IntroAudio } from "./introSound";
@@ -47,10 +47,12 @@ const letters = (word: string, from: number) =>
  * then it opens up straight into the 3D course — on its own, no tap needed.
  *
  * Plays every time the homepage is opened (also coming back from another
- * page). Tap to skip. Sound is always on: it plays by itself wherever the
- * browser allows (e.g. once you have interacted with the site, or when it is
- * installed as an app); browsers block sound before any interaction, so in
- * that case it starts with the first tap, click or key press.
+ * page). Tap to skip. Sound is always on. Browsers mute a page until the
+ * visitor has tapped or clicked on it, so a fresh visit first shows an
+ * "Enter" screen (SL logo + gold Enter): that tap starts the intro with full
+ * sound (and unlocks the falling-ball sound later). If the visitor has
+ * already interacted with the site (e.g. coming back to the homepage), the
+ * Enter screen is skipped and the intro plays with sound straight away.
  * Server-rendered and animated with transform and opacity only, so it stays
  * smooth while the 3D course is being built underneath.
  */
@@ -60,6 +62,8 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
   const [run, setRun] = useState(0);
   const [gone, setGone] = useState(!home);
   const [leaving, setLeaving] = useState(false);
+  // False while the Enter screen shows; the acts (and their animations) only start once entered.
+  const [entered, setEntered] = useState(false);
   const audio = useRef<IntroAudio | null>(null);
   const started = useRef(0);
 
@@ -71,12 +75,32 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
       setRun((n) => n + 1);
       setGone(false);
       setLeaving(false);
+      setEntered(false);
     } else setGone(true);
+  }
+
+  // Already interacted with the site (sound allowed), or reduced motion: no Enter screen.
+  useLayoutEffect(() => {
+    if (!home || gone || entered) return;
+    const active = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation?.hasBeenActive;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- decided before first paint
+    if (active || window.matchMedia("(prefers-reduced-motion: reduce)").matches) setEntered(true);
+  }, [home, gone, entered, run]);
+
+  /** The visitor's tap on the Enter screen: start the sound inside the tap (so the browser allows it), then the intro. */
+  function enter() {
+    try {
+      const a = new IntroAudio();
+      void a.ctx.resume();
+      audio.current = a;
+    } catch {}
+    setEntered(true);
   }
 
   useEffect(() => {
     if (!home || gone) return;
     document.documentElement.dataset.siteIntro = "play";
+    if (!entered) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const min = reduced ? REDUCED_MS : SEQUENCE_MS;
     started.current = performance.now();
@@ -105,7 +129,7 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
     };
     if (!reduced) {
       try {
-        a = new IntroAudio();
+        a = audio.current ?? new IntroAudio();
         audio.current = a;
         if (a.running) a.schedule(0);
         else {
@@ -133,7 +157,7 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
       window.clearInterval(timer);
       removeGesture();
     };
-  }, [home, gone, run]);
+  }, [home, gone, run, entered]);
 
   // Let the sound fade with the picture, and tell the 3D course it may use the graphics card fully.
   useEffect(() => {
@@ -156,91 +180,118 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
         key={run}
         className={s.intro}
         data-leave={leaving || undefined}
-        aria-hidden="true"
-        onClick={() => setLeaving(true)}
+        data-entered={entered || undefined}
+        onClick={() => (entered ? setLeaving(true) : enter())}
         onAnimationEnd={(e) => {
           if (e.target === e.currentTarget && /leave|late/.test(e.animationName)) setGone(true);
         }}
       >
-        {/* Act 1 — the brand */}
-        <section className={`${s.act} ${s.brandAct}`}>
-          <div className={s.glow} />
-          <div className={s.brand}>
-            <div className={s.logoWrap}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className={s.logo} src="/brand/slmga-logo-dark.svg" alt="" width={520} height={120} fetchPriority="high" />
-              <span className={s.shine} />
-            </div>
-            <span className={s.rule} />
-            <p className={s.tagline}>
-              {tagline.map((t, i) => (
-                <span key={t} style={{ "--i": i } as React.CSSProperties}>
-                  {t}
-                </span>
-              ))}
-            </p>
+        {/* Enter screen: the visitor's one tap lets the browser play the sound. */}
+        <div className={s.gate} aria-hidden={entered || undefined}>
+          <div className={s.gateGlow} />
+          <div className={s.gateLogo}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/slmga-logo-dark.svg" alt="SL Mini Golf Association" width={520} height={120} />
+            <span className={s.gateShine} />
           </div>
-        </section>
+          <button type="button" className={s.enterBtn} autoFocus={!entered} tabIndex={entered ? -1 : 0} onClick={(e) => (e.stopPropagation(), enter())}>
+            <span>Enter</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <p className={s.gateNote}>
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+              <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
+              <path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+            Sound on for the full experience
+          </p>
+        </div>
 
-        {/* Acts 2 and 3 — the people behind it */}
-        {people.slice(0, 2).map((p, i) => {
-          const [first, ...restWords] = p.name.split(" ");
-          const rest = restWords.join(" ");
-          const diamond = p.finish === "diamond";
-          const roles = p.role.split(/\s*&\s*/);
-          return (
-            <section key={p.name} className={`${s.act} ${s.person}`} data-finish={p.finish} data-act={i + 2}>
-              <div className={s.personGlow} />
-              {diamond && <div className={s.rays} />}
-              <span className={s.ghost} aria-hidden="true">
-                {p.ghost ?? p.name}
-              </span>
-              {diamond &&
-                SPARKLES.map(([x, y, size, d], k) => (
-                  <i key={k} className={s.sparkle} style={{ left: `${x}%`, top: `${y}%`, "--size": `${size}px`, "--d": `${d}s` } as React.CSSProperties} />
-                ))}
-              {p.photo && (
-                <div className={s.portrait} style={{ "--photo": `url(${p.photo})` } as React.CSSProperties}>
+        {entered && (
+          <div className={s.acts} aria-hidden="true">
+            {/* Act 1 — the brand */}
+            <section className={`${s.act} ${s.brandAct}`}>
+              <div className={s.glow} />
+              <div className={s.brand}>
+                <div className={s.logoWrap}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.photo} alt="" fetchPriority="high" loading="eager" decoding="sync" data-intro-img="" />
-                  {diamond && <span className={s.portraitSheen} />}
-                  <span className={s.flash} />
+                  <img className={s.logo} src="/brand/slmga-logo-dark.svg" alt="" width={520} height={120} fetchPriority="high" />
+                  <span className={s.shine} />
                 </div>
-              )}
-              <div className={s.card}>
-                <span className={s.kicker}>
-                  <i />
-                  {diamond && <b className={s.gem}>◆</b>}
-                  {i === 0 ? "Founded by" : "Designed & built by"}
-                </span>
-                <h2 className={s.name} data-shine={diamond || undefined}>
-                  <span className={s.line}>{diamond ? letters(first, 0) : first}</span>
-                  <span className={s.line}>{diamond ? letters(rest, first.length) : rest}</span>
-                </h2>
-                {diamond ? (
-                  <span className={s.chips}>
-                    {roles.map((r, k) => (
-                      <span key={r} className={s.chip} style={{ "--c": k } as React.CSSProperties}>
-                        {r}
-                      </span>
-                    ))}
-                  </span>
-                ) : (
-                  <span className={s.role}>{p.role}</span>
-                )}
-                {p.handle && <span className={s.handle}>{p.handle}</span>}
-                {diamond && <span className={s.enter}>Entering SL Mini Golf Association</span>}
+                <span className={s.rule} />
+                <p className={s.tagline}>
+                  {tagline.map((t, i) => (
+                    <span key={t} style={{ "--i": i } as React.CSSProperties}>
+                      {t}
+                    </span>
+                  ))}
+                </p>
               </div>
-              {diamond && <span className={s.flare} />}
             </section>
-          );
-        })}
 
-        {/* The slash from the SL logo, sweeping across between acts. */}
-        <span className={s.slash} data-n="1" />
-        <span className={s.slash} data-n="2" />
-        <span className={s.grain} />
-        <span className={s.skip}>Tap to skip</span>
+            {/* Acts 2 and 3 — the people behind it */}
+            {people.slice(0, 2).map((p, i) => {
+              const [first, ...restWords] = p.name.split(" ");
+              const rest = restWords.join(" ");
+              const diamond = p.finish === "diamond";
+              const roles = p.role.split(/\s*&\s*/);
+              return (
+                <section key={p.name} className={`${s.act} ${s.person}`} data-finish={p.finish} data-act={i + 2}>
+                  <div className={s.personGlow} />
+                  {diamond && <div className={s.rays} />}
+                  <span className={s.ghost} aria-hidden="true">
+                    {p.ghost ?? p.name}
+                  </span>
+                  {diamond &&
+                    SPARKLES.map(([x, y, size, d], k) => (
+                      <i key={k} className={s.sparkle} style={{ left: `${x}%`, top: `${y}%`, "--size": `${size}px`, "--d": `${d}s` } as React.CSSProperties} />
+                    ))}
+                  {p.photo && (
+                    <div className={s.portrait} style={{ "--photo": `url(${p.photo})` } as React.CSSProperties}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={p.photo} alt="" fetchPriority="high" loading="eager" decoding="sync" data-intro-img="" />
+                      {diamond && <span className={s.portraitSheen} />}
+                      <span className={s.flash} />
+                    </div>
+                  )}
+                  <div className={s.card}>
+                    <span className={s.kicker}>
+                      <i />
+                      {diamond && <b className={s.gem}>◆</b>}
+                      {i === 0 ? "Founded by" : "Designed & built by"}
+                    </span>
+                    <h2 className={s.name} data-shine={diamond || undefined}>
+                      <span className={s.line}>{diamond ? letters(first, 0) : first}</span>
+                      <span className={s.line}>{diamond ? letters(rest, first.length) : rest}</span>
+                    </h2>
+                    {diamond ? (
+                      <span className={s.chips}>
+                        {roles.map((r, k) => (
+                          <span key={r} className={s.chip} style={{ "--c": k } as React.CSSProperties}>
+                            {r}
+                          </span>
+                        ))}
+                      </span>
+                    ) : (
+                      <span className={s.role}>{p.role}</span>
+                    )}
+                    {p.handle && <span className={s.handle}>{p.handle}</span>}
+                    {diamond && <span className={s.enter}>Entering SL Mini Golf Association</span>}
+                  </div>
+                  {diamond && <span className={s.flare} />}
+                </section>
+              );
+            })}
+
+            {/* The slash from the SL logo, sweeping across between acts. */}
+            <span className={s.slash} data-n="1" />
+            <span className={s.slash} data-n="2" />
+            <span className={s.grain} />
+            <span className={s.skip}>Tap to skip</span>
+          </div>
+        )}
       </div>
     </>
   );
