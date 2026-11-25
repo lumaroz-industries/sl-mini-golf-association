@@ -88,20 +88,121 @@
   margin-left: auto;
 }
 
-@media (max-width: 760px) {
+/* Phone menu: a gold "Menu" button that drops down every admin page. */
+.menuBtn,
+.menu {
+  display: none;
+}
+
+@media (max-width: 900px) {
   .bar {
-    flex-wrap: wrap;
-    height: auto;
-    padding-block: 10px;
-    gap: 8px;
+    gap: 10px;
   }
   .nav {
-    order: 3;
-    width: 100%;
-    margin-left: 0;
+    display: none;
   }
+  .menuBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 4px;
+    padding: 8px 14px;
+    border: 1px solid rgb(227 194 122 / 0.38);
+    border-radius: 999px;
+    background: rgb(227 194 122 / 0.08);
+    color: var(--gold-hi);
+    font: 600 var(--fs-sm) / 1 inherit;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .menuIcon {
+    display: grid;
+    gap: 3px;
+    width: 14px;
+  }
+  .menuIcon i {
+    display: block;
+    height: 1.5px;
+    border-radius: 2px;
+    background: var(--gold);
+    transition: transform 0.25s, opacity 0.2s;
+  }
+  .menuIcon[data-open] i:nth-child(1) {
+    transform: translateY(4.5px) rotate(45deg);
+  }
+  .menuIcon[data-open] i:nth-child(2) {
+    opacity: 0;
+  }
+  .menuIcon[data-open] i:nth-child(3) {
+    transform: translateY(-4.5px) rotate(-45deg);
+  }
+  .menu[data-open] {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: var(--gutter);
+    right: var(--gutter);
+    display: grid;
+    gap: 4px;
+    padding: 10px;
+    border: 1px solid rgb(227 194 122 / 0.28);
+    border-radius: 16px;
+    background: linear-gradient(180deg, #0e0d0b, #070707);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.7), inset 0 1px 0 rgb(251 236 196 / 0.08);
+    animation: menuIn 0.22s ease-out;
+  }
+  .menu > a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: var(--fg-muted);
+  }
+  .menu > a[aria-current="page"] {
+    color: var(--gold-hi);
+    background: rgb(227 194 122 / 0.1);
+  }
+  .menu > a span {
+    color: var(--gold);
+    font-size: 0.7rem;
+  }
+  .barEnd {
+    display: none;
+  }
+  .menuBtn {
+    margin-left: auto;
+  }
+  .menuEnd {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    padding-top: 12px;
+    border-top: 1px solid rgb(227 194 122 / 0.16);
+  }
+  .menuEnd > * {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@keyframes menuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@media (max-width: 520px) {
   .brand span {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu[data-open] {
+    animation: none;
   }
 }
 
