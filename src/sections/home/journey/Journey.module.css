@@ -7,12 +7,12 @@
 
 .journey {
   position: relative;
-  --journey-length: 1000svh;
+  --journey-length: 560svh;
 }
 
 @media (max-width: 760px) {
   .journey {
-    --journey-length: 820svh;
+    --journey-length: 470svh;
   }
 }
 

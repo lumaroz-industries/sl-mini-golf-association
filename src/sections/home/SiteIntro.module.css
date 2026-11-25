@@ -1,0 +1,169 @@
+/*
+ * Homepage opening animation — emerald, ≈2.3 s:
+ * logo + light sweep → rule + tagline → opens up into the 3D course.
+ * Only transform, opacity and filter animate, so it stays smooth on phones.
+ */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #050807;
+  cursor: pointer;
+  user-select: none;
+  animation: out 0.5s cubic-bezier(0.65, 0, 0.35, 1) 1.85s forwards;
+}
+
+:global(html[data-site-intro="skip"]) .intro {
+  display: none;
+}
+
+.intro[data-skip] {
+  animation: out 0.3s ease forwards;
+}
+
+/* Opens up towards the viewer, like stepping into the course. */
+@keyframes out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.06);
+  }
+}
+
+.glow {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(38% 30% at 50% 46%, rgb(0 168 107 / 0.2), transparent 70%),
+    radial-gradient(60% 45% at 50% 110%, rgb(5 43 32 / 0.9), transparent 70%);
+  animation: fadeIn 0.7s ease-out both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.brand {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding: 24px;
+  text-align: center;
+}
+
+.logoWrap {
+  position: relative;
+  width: min(440px, 76vw);
+  aspect-ratio: 520 / 120;
+  animation: logoIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+@keyframes logoIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+    filter: blur(10px);
+  }
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* A band of emerald-white light passing across the letters. */
+.shine {
+  position: absolute;
+  inset: 0;
+  -webkit-mask: url(/brand/slmga-logo-dark.svg) center / contain no-repeat;
+  mask: url(/brand/slmga-logo-dark.svg) center / contain no-repeat;
+  background: linear-gradient(105deg, transparent 35%, #00a86b 45%, #eafff5 50%, #00a86b 55%, transparent 65%) 0 0 / 300% 100%;
+  background-position: 100% 0;
+  animation: sweep 0.9s cubic-bezier(0.45, 0, 0.25, 1) 0.5s both;
+}
+
+@keyframes sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+.rule {
+  width: min(300px, 58vw);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #00a86b 20%, #b9f5dc 50%, #00a86b 80%, transparent);
+  animation: grow 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+}
+
+.tagline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 0.5em;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 0.85rem + 0.9vw, 1.375rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.tagline span {
+  animation: rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) calc(0.7s + var(--i) * 0.18s) both;
+}
+
+.tagline span + span {
+  color: #a7b0ac;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.skip {
+  position: absolute;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  left: 50%;
+  translate: -50% 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(167 176 172 / 0.6);
+  animation: fadeIn 0.4s ease 0.6s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro {
+    animation: out 0.4s ease 1.2s forwards;
+  }
+  .intro *,
+  .intro *::before {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
+  }
+  .shine {
+    display: none;
+  }
+}

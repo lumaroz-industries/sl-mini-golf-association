@@ -2,6 +2,7 @@ import { SiteHeader } from "@/components/nav/SiteHeader";
 import { SiteFooter } from "@/components/footer/SiteFooter";
 import { getActiveSocialLinks, getSiteSettings } from "@/content/repository";
 import { getBaseUrl } from "@/lib/site-url";
+import { SiteIntro } from "@/sections/home/SiteIntro";
 
 /** The public website: header, footer and organisation structured data. */
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -23,6 +24,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, "\\u003c") }} />
+      {/* Homepage opening animation; lives here (not in the page) so it covers the screen. */}
+      <SiteIntro tagline={site.tagline} />
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
