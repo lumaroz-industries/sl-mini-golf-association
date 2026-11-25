@@ -237,11 +237,30 @@ export function BallHero({
             type="button"
             className={`diamond-btn ${s.skip}`}
             onClick={() => {
-              // Jump straight to the formed logo at the end of the fall.
+              // Race through the whole fall to the formed logo — a very fast auto-scroll.
               const el = root.current;
               if (!el) return;
               const top = el.getBoundingClientRect().top + window.scrollY;
-              window.scrollTo({ top: top + el.offsetHeight - window.innerHeight, behavior: "instant" });
+              const from = window.scrollY;
+              const to = top + el.offsetHeight - window.innerHeight;
+              if (to <= from) return;
+              const duration = 1800;
+              const start = performance.now();
+              let stop = false;
+              const cancel = () => {
+                stop = true;
+              };
+              // Scrolling yourself takes over again.
+              for (const ev of ["wheel", "touchstart", "keydown"]) window.addEventListener(ev, cancel, { once: true, passive: true });
+              const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
+              const step = (now: number) => {
+                if (stop) return;
+                const k = Math.min(1, (now - start) / duration);
+                window.scrollTo({ top: from + (to - from) * ease(k), behavior: "instant" });
+                if (k < 1) requestAnimationFrame(step);
+                else for (const ev of ["wheel", "touchstart", "keydown"]) window.removeEventListener(ev, cancel);
+              };
+              requestAnimationFrame(step);
             }}
           >
             Skip

@@ -7,8 +7,8 @@
  *     slow gusts, a howling whistle that rises, and a deep rumble,
  *   - a low fire roar while the ball glows like a meteor,
  *   - a whoosh + boom each time it smashes through a ring of light,
- *   - a sizzling burst as it burns apart, then the embers' shimmer,
- *   - a bright chime as the logo forms.
+ *   - a burst as it burns apart, then the embers' shimmer,
+ *   - silence once the logo has formed.
  *
  * Browsers only allow sound once the visitor has tapped or clicked on the
  * site (scrolling alone doesn't count); after that it plays by itself.
@@ -19,6 +19,8 @@ export interface FallAudioState {
   heat: number;
   burn: number;
   gather: number;
+  /** The logo has formed: everything fades to silence. */
+  formed?: boolean;
 }
 
 export class FallAudio {
@@ -40,7 +42,6 @@ export class FallAudio {
   private started = false;
   private lastRing = 0;
   private lastBurn = -10;
-  private lastFormed = -10;
   /** The visitor's Sound on/off choice. */
   enabled = true;
 
@@ -198,7 +199,8 @@ export class FallAudio {
     if (!this.started || !this.running) return;
     const now = this.ctx.currentTime;
     const k = 0.2; // smoothing: no sudden jumps, even when scrolling fast
-    this.master.gain.setTargetAtTime(on && this.enabled ? 0.8 : 0, now, this.enabled ? 0.2 : 0.06);
+    const audible = on && this.enabled && !s.formed;
+    this.master.gain.setTargetAtTime(audible ? 0.8 : 0, now, s.formed ? 0.35 : this.enabled ? 0.2 : 0.06);
     // Fast scrolling can push the speed past 1: compress it so the wind never overloads.
     const sp = Math.min(1, Math.tanh(s.speed * 1.2) / Math.tanh(1.2));
     this.windGain.gain.setTargetAtTime(0.08 + 0.55 * sp, now, k);
@@ -226,11 +228,8 @@ export class FallAudio {
       this.lastBurn = t;
       this.boom(t, 0.36);
       this.burst(t, 1.4, 0.3);
-    } else {
-      if (t - this.lastFormed < 3) return;
-      this.lastFormed = t;
-      this.chime(t, [1046.5, 1318.51, 1567.98, 2093], 0.18);
     }
+    // "formed": the logo appears in silence (the fall's sound fades out in update()).
   }
 
   private env(t: number, peak: number, attack: number, release: number) {
@@ -281,24 +280,6 @@ export class FallAudio {
     this.send(g, 0.7);
     s.start(t, Math.random() * 2);
     s.stop(t + dur + 0.1);
-  }
-
-  private chime(t: number, freqs: number[], level: number) {
-    freqs.forEach((f, i) => {
-      for (const [mult, amt] of [
-        [1, 1],
-        [2.76, 0.22],
-      ] as const) {
-        const o = this.ctx.createOscillator();
-        o.type = "sine";
-        o.frequency.value = f * mult;
-        const g = this.env(t + i * 0.07, level * amt, 0.005, 2.2 / mult);
-        o.connect(g);
-        this.send(g, 0.9);
-        o.start(t + i * 0.07);
-        o.stop(t + 3);
-      }
-    });
   }
 
   dispose() {

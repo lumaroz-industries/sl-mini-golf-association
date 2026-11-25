@@ -47,6 +47,11 @@ a {
 
 img, svg { display: block; max-width: 100%; }
 
+/* Phones flash a blue box over whatever is tapped; the site has its own feedback. */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
 button {
   font: inherit;
   color: inherit;

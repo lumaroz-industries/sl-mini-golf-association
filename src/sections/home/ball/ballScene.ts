@@ -679,6 +679,8 @@ export class BallScene {
       heat: smooth(0.1, 0.6, p) * (1 - smooth(P.dissolveStart + 0.1, P.dissolveEnd, p)),
       burn: smooth(P.dissolveStart - 0.01, P.dissolveStart + 0.04, p) * (1 - smooth(P.dissolveEnd - 0.05, P.dissolveEnd + 0.04, p)),
       gather: smooth(P.dissolveEnd, P.dissolveEnd + 0.06, p) * (1 - smooth(P.formEnd - 0.04, P.formEnd + 0.02, p)),
+      /** The logo is on screen: the fall's sound goes quiet. */
+      formed: p >= P.formEnd - 0.03,
     };
   }
 
