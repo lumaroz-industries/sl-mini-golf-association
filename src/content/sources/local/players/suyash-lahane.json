@@ -3,15 +3,16 @@
   "name": "Suyash Lahane",
   "gender": "male",
   "photo": {
-    "src": "/people/suyash-lahane-v2.webp",
+    "src": "/players/suyash-lahane/young-man-in-navy-suit-portrait-a2p6.webp",
     "alt": "Portrait of Suyash Lahane",
-    "width": 800,
-    "height": 1000
+    "width": 1086,
+    "height": 1448
   },
   "medals": {
     "gold": 3,
     "silver": 2,
     "bronze": 5
   },
-  "results": []
+  "results": [],
+  "draft": false
 }
