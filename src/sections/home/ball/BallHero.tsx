@@ -2,25 +2,31 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { HomeContent } from "@/content/schema";
-import { T } from "./ballScene";
+import { P } from "./ballScene";
 import s from "./BallHero.module.css";
 
 /**
- * Homepage hero: a golf ball falls through the dark, dissolves into glowing
- * particles and they gather into the SL Mini Golf Association logo; the
- * tagline then appears beneath it. Plays once the opening intro has faded
- * (or straight away when there is no intro). Without WebGL — or with reduced
- * motion — the logo and tagline simply show.
+ * Homepage hero, driven by scroll: a golf ball in free fall tears through the
+ * sky — air streaks, clouds and rings of light rushing past, the camera
+ * shaking — heats up like a meteor, burns apart into embers, and the embers
+ * gather into the SL Mini Golf Association logo with the tagline beneath.
+ * Scroll back up and it plays in reverse.
+ *
+ * It is its own section (not part of the opening intro): it waits for the
+ * intro to finish before drawing, so the two never compete. Without WebGL —
+ * or with reduced motion — the logo and tagline simply show.
  */
 export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
   const root = useRef<HTMLElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
-  const [phase, setPhase] = useState<"static" | "loading" | "playing" | "formed">("loading");
+  const [mode, setMode] = useState<"static" | "live">("live");
 
   useEffect(() => {
     const el = root.current;
+    const st = stage.current;
     const cv = canvas.current;
-    if (!el || !cv) return;
+    if (!el || !st || !cv) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let gl = false;
     try {
@@ -28,21 +34,38 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
     } catch {}
     if (!gl || reduced) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- capability check after mount
-      setPhase("static");
+      setMode("static");
       el.setAttribute("data-ready", "");
       return;
     }
 
     let scene: import("./ballScene").BallScene | undefined;
     let cancelled = false;
-    let formedTimer = 0;
+    let raf = 0;
     const light = Math.min(window.innerWidth, window.innerHeight) < 600 || (navigator.hardwareConcurrency ?? 8) <= 4;
 
-    const begin = () => {
-      if (cancelled || !scene) return;
-      setPhase("playing");
-      scene.play(0);
-      formedTimer = window.setTimeout(() => setPhase("formed"), T.formEnd * 1000);
+    const progress = () => {
+      const r = el.getBoundingClientRect();
+      const travel = r.height - window.innerHeight;
+      return travel > 0 ? Math.min(1, Math.max(0, -r.top / travel)) : 0;
+    };
+
+    function place() {
+      if (!scene || !st) return;
+      const r = scene.logoRect();
+      st.style.setProperty("--logo-w", `${r.width}px`);
+      st.style.setProperty("--logo-cy", `${r.cy}px`);
+    }
+
+    // Page-side effects that follow the scene: vignette strength and the logo/tagline reveal.
+    const sync = () => {
+      if (scene) {
+        scene.setProgress(progress());
+        st.style.setProperty("--speed", scene.intensity.toFixed(3));
+        st.toggleAttribute("data-formed", scene.progress > P.formEnd - 0.02);
+        st.toggleAttribute("data-started", scene.progress > 0.015);
+      }
+      raf = requestAnimationFrame(sync);
     };
 
     (async () => {
@@ -50,40 +73,36 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
         const { BallScene } = await import("./ballScene");
         if (cancelled) return;
         scene = new BallScene({ canvas: cv, light });
-        // Testing aid: ?debug-ball exposes the scene to freeze it at a moment.
         if (location.search.includes("debug-ball")) (window as unknown as { __slBall: unknown }).__slBall = scene;
         await scene.prepare();
         if (cancelled) return;
         place();
         el.setAttribute("data-ready", "");
-        // Wait for the opening intro to fade, if it is playing.
-        if (document.documentElement.dataset.siteIntro === "play") window.addEventListener("sl-intro-done", () => window.setTimeout(begin, 250), { once: true });
-        else begin();
+        const go = () => {
+          if (cancelled || !scene) return;
+          scene.start();
+          raf = requestAnimationFrame(sync);
+        };
+        // Let the opening intro have the graphics card to itself first.
+        if (document.documentElement.dataset.siteIntro === "play") window.addEventListener("sl-intro-done", go, { once: true });
+        else go();
       } catch (err) {
         console.error("Hero animation unavailable:", err);
-        setPhase("static");
+        setMode("static");
         el.setAttribute("data-ready", "");
       }
     })();
 
-    // Lay the crisp logo (and the tagline under it) exactly where the particles form it.
-    function place() {
-      if (!scene || !el) return;
-      const r = scene.logoRect();
-      el.style.setProperty("--logo-w", `${r.width}px`);
-      el.style.setProperty("--logo-cy", `${r.cy}px`);
-    }
     const onResize = () => {
       scene?.resize();
       place();
     };
     window.addEventListener("resize", onResize);
-    // Pause drawing while the hero is scrolled out of view.
     const io = new IntersectionObserver(([e]) => scene?.setVisible(e.isIntersecting));
     io.observe(el);
     return () => {
       cancelled = true;
-      clearTimeout(formedTimer);
+      cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
       io.disconnect();
       scene?.dispose();
@@ -91,24 +110,27 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
   }, []);
 
   return (
-    <section ref={root} className={s.hero} data-journey-root="" data-phase={phase} aria-labelledby="hero-title">
-      <canvas ref={canvas} className={s.canvas} aria-hidden="true" />
-      {/* The crisp logo: fades in over the particle logo once it has formed (or shows at once without animation). */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className={s.logo} src="/brand/slmga-logo-dark.svg" alt="" width={1806} height={250} aria-hidden="true" />
-      <div className={s.copy}>
-        <h1 id="hero-title" className="visually-hidden">
-          {hero.title}
-        </h1>
-        <p className={s.tagline}>
-          <span>{hero.taglineLines[0]}</span> <span>{hero.taglineLines[1]}</span>
-        </p>
-        <p className={s.supporting}>{hero.supporting}</p>
+    <section ref={root} className={s.hero} data-journey-root="" data-mode={mode} aria-labelledby="hero-title">
+      <div ref={stage} className={s.stage}>
+        <canvas ref={canvas} className={s.canvas} aria-hidden="true" />
+        <div className={s.vignette} aria-hidden="true" />
+        {/* The crisp logo: fades in over the particle logo once it has formed (or shows at once without animation). */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className={s.logo} src="/brand/slmga-logo-dark.svg" alt="" width={1806} height={250} aria-hidden="true" />
+        <div className={s.copy}>
+          <h1 id="hero-title" className="visually-hidden">
+            {hero.title}
+          </h1>
+          <p className={s.tagline}>
+            <span>{hero.taglineLines[0]}</span> <span>{hero.taglineLines[1]}</span>
+          </p>
+          <p className={s.supporting}>{hero.supporting}</p>
+        </div>
+        <span className={s.cue} aria-hidden="true">
+          Scroll to fall
+          <i />
+        </span>
       </div>
-      <span className={s.cue} aria-hidden="true">
-        Scroll
-        <i />
-      </span>
     </section>
   );
 }

@@ -1,9 +1,18 @@
-/* Homepage hero: the falling ball that becomes the logo. */
+/* Homepage hero: a scroll-driven free fall that ends in the logo. */
 
 .hero {
   position: relative;
+  /* Scroll length of the fall; the stage stays pinned while you scroll through it. */
+  height: 420svh;
+  background: #000;
+}
+
+.stage {
+  --speed: 0;
+  position: sticky;
+  top: 0;
   height: 100svh;
-  min-height: 560px;
+  min-height: 520px;
   overflow: hidden;
   background: #000;
 }
@@ -16,6 +25,14 @@
   display: block;
 }
 
+/* Darker, tighter edges the faster it falls — like tunnel vision. */
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, transparent calc(62% - var(--speed) * 22%), rgb(0 0 0 / calc(0.35 + var(--speed) * 0.5)) 100%);
+}
+
 .logo {
   position: absolute;
   left: 50%;
@@ -24,20 +41,24 @@
   height: auto;
   translate: -50% -50%;
   opacity: 0;
-  transition: opacity 1.2s var(--ease-out);
+  transition: opacity 1s var(--ease-out);
   pointer-events: none;
 }
 
-.hero[data-phase="formed"] .logo,
-.hero[data-phase="static"] .logo {
+.stage[data-formed] .logo,
+.hero[data-mode="static"] .logo {
   opacity: 1;
 }
 
-.hero[data-phase="static"] .canvas {
+.hero[data-mode="static"] {
+  height: 100svh;
+}
+
+.hero[data-mode="static"] .canvas {
   display: none;
 }
 
-/* Tagline under the logo, once the particles have formed it. */
+/* Tagline under the logo, once the embers have formed it. */
 .copy {
   position: absolute;
   left: 0;
@@ -51,12 +72,12 @@
   opacity: 0;
   transform: translateY(14px);
   transition:
-    opacity 1.2s var(--ease-out),
-    transform 1.2s var(--ease-out);
+    opacity 1s var(--ease-out),
+    transform 1s var(--ease-out);
 }
 
-.hero[data-phase="formed"] .copy,
-.hero[data-phase="static"] .copy {
+.stage[data-formed] .copy,
+.hero[data-mode="static"] .copy {
   opacity: 1;
   transform: none;
 }
@@ -82,6 +103,7 @@
   line-height: 1.6;
 }
 
+/* "Scroll to fall" — shown at the top, gone once the fall begins. */
 .cue {
   position: absolute;
   left: 50%;
@@ -94,16 +116,20 @@
   font-weight: 700;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--fg-muted);
+  color: rgb(255 255 255 / 0.7);
+  transition: opacity 0.6s var(--ease-out);
+}
+
+.stage[data-started] .cue,
+.hero[data-mode="static"] .cue {
   opacity: 0;
-  transition: opacity 1s var(--ease-out) 0.6s;
 }
 
 .cue i {
   width: 1px;
   height: 40px;
-  background: linear-gradient(#e3c27a, transparent);
-  animation: cue 2.2s var(--ease-in-out) infinite;
+  background: linear-gradient(#ffb46b, transparent);
+  animation: cue 1.6s var(--ease-in-out) infinite;
   transform-origin: top;
 }
 
@@ -119,9 +145,3 @@
     opacity: 0;
   }
 }
-
-.hero[data-phase="formed"] .cue,
-.hero[data-phase="static"] .cue {
-  opacity: 1;
-}
-
