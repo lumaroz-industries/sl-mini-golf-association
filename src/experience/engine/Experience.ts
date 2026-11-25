@@ -139,6 +139,20 @@ export class Experience {
       this.dirty = true;
     };
     const idle = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    const schedule = () => (idle ? idle(addEnvironment, { timeout: 600 }) : setTimeout(addEnvironment, 120));
+    // While the homepage opening plays over the course, its animation gets
+    // the graphics card first: the lighting is prepared once it has finished.
+    if (document.documentElement.dataset.siteIntro === "play") {
+      let done = false;
+      const go = () => {
+        if (done) return;
+        done = true;
+        schedule();
+      };
+      window.addEventListener("sl-intro-done", go, { once: true });
+      setTimeout(go, 12000);
+      return;
+    }
     if (idle) idle(addEnvironment, { timeout: 600 });
     else setTimeout(addEnvironment, 120);
   }

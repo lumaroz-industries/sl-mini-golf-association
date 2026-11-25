@@ -315,6 +315,14 @@
   --glow: 185 225 255;
 }
 
+/* A stronger pool of icy light for the designer. */
+.person[data-finish="diamond"] .personGlow {
+  background:
+    radial-gradient(55% 60% at 68% 55%, rgb(185 225 255 / 0.3), transparent 70%),
+    radial-gradient(35% 40% at 30% 45%, rgb(185 225 255 / 0.08), transparent 70%),
+    #000;
+}
+
 .personGlow {
   position: absolute;
   inset: 0;
@@ -431,9 +439,11 @@
   animation: slide 1.2s cubic-bezier(0.45, 0, 0.25, 1) calc(var(--t) + 0.6s) both;
 }
 
+/* No z-index: the card stays in the act's layer, so the name's shine blends
+   with the black behind it (and is invisible there). It is above the
+   rays, ghost name and portrait by document order. */
 .card {
   position: relative;
-  z-index: 2;
   align-self: center;
   justify-self: start;
   display: grid;
@@ -521,15 +531,57 @@
   }
 }
 
-/* Diamond: a faint prism of colour inside the white, like light through a gem. */
+/* Diamond: cut-crystal lettering — bright white tops falling to icy blue,
+   like light through a gem (fixed, so it costs nothing to draw). */
 .person[data-finish="diamond"] .line {
-  background-image: linear-gradient(100deg, #7f9fb3 0%, #d6ecfa 20%, #fff 34%, #ffe9f6 42%, #fff 50%, #e3f6ff 58%, #fff 66%, #d6ecfa 80%, #7f9fb3 100%);
-  animation: glint 3s ease-in-out calc(var(--t) + 0.8s) both;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f1f9ff 38%, #a9cfe6 58%, #7fa9c2 70%, #e8f6ff 100%);
+  background-size: 100% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: none;
 }
 
-/* Soft icy glow behind the name (static, so it costs nothing to animate around). */
-.person[data-finish="diamond"] .name {
-  background: radial-gradient(60% 70% at 30% 50%, rgb(185 225 255 / 0.1), transparent 70%);
+/* The diamond shine: a bright band of light sweeping across the name, twice.
+   It is its own layer that slides (graphics card only) and only lights up
+   the letters (overlay blending leaves the black around them untouched). */
+.name[data-shine] {
+  position: relative;
+  overflow: hidden;
+  padding-right: 0.1em;
+}
+
+.name[data-shine]::after {
+  content: "";
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(100deg, transparent 0%, rgb(255 255 255 / 0.15) 30%, #fff 50%, rgb(255 255 255 / 0.15) 70%, transparent 100%);
+  mix-blend-mode: overlay;
+  transform: translateX(-120%) skewX(-18deg);
+  will-change: transform;
+  animation: shineBar 1.7s cubic-bezier(0.45, 0, 0.25, 1) calc(var(--t) + 0.95s) 2 both;
+  pointer-events: none;
+}
+
+@keyframes shineBar {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  70%,
+  100% {
+    transform: translateX(260%) skewX(-18deg);
+  }
+}
+
+/* A soft icy halo behind the name. */
+.person[data-finish="diamond"] .card::before {
+  content: "";
+  position: absolute;
+  inset: -20% -15%;
+  background: radial-gradient(55% 50% at 35% 45%, rgb(185 225 255 / 0.14), transparent 70%);
+  pointer-events: none;
 }
 
 @keyframes glint {

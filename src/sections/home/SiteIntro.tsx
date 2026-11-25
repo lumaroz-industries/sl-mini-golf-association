@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { preload } from "react-dom";
 import { IntroAudio } from "./introSound";
 import s from "./SiteIntro.module.css";
 
@@ -75,6 +76,8 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const min = reduced ? REDUCED_MS : SEQUENCE_MS;
     started.current = performance.now();
+    // Decode the portraits now, so they are ready the moment their act begins.
+    document.querySelectorAll<HTMLImageElement>("[data-intro-img]").forEach((img) => void img.decode?.().catch(() => undefined));
 
     // Sound: right away if the browser allows it, otherwise on the first tap or key press.
     let a: IntroAudio | null = null;
@@ -121,12 +124,17 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
     };
   }, [home, gone, run]);
 
-  // Let the sound fade with the picture.
+  // Let the sound fade with the picture, and tell the 3D course it may use the graphics card fully.
   useEffect(() => {
     if (!leaving) return;
+    document.documentElement.dataset.siteIntro = "done";
+    window.dispatchEvent(new Event("sl-intro-done"));
     audio.current?.fadeOut(1.4);
     audio.current = null;
   }, [leaving]);
+
+  // The portraits load first, at top priority (the designer's before anything else).
+  if (home) for (const p of [...people].reverse()) if (p.photo) preload(p.photo, { as: "image", fetchPriority: "high" });
 
   if (gone) return null;
   return (
@@ -183,7 +191,7 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
               {p.photo && (
                 <div className={s.portrait} style={{ "--photo": `url(${p.photo})` } as React.CSSProperties}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.photo} alt="" fetchPriority="high" />
+                  <img src={p.photo} alt="" fetchPriority="high" loading="eager" decoding="sync" data-intro-img="" />
                   {diamond && <span className={s.portraitSheen} />}
                   <span className={s.flash} />
                 </div>
@@ -194,7 +202,7 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
                   {diamond && <b className={s.gem}>◆</b>}
                   {i === 0 ? "Founded by" : "Designed & built by"}
                 </span>
-                <h2 className={s.name}>
+                <h2 className={s.name} data-shine={diamond || undefined}>
                   <span className={s.line}>{diamond ? letters(first, 0) : first}</span>
                   <span className={s.line}>{diamond ? letters(rest, first.length) : rest}</span>
                 </h2>
