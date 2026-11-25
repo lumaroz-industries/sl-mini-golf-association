@@ -1009,3 +1009,26 @@
     animation: none;
   }
 }
+
+/* ============================================================== buttons */
+.skipBtn {
+  position: absolute;
+  z-index: 7;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: 50%;
+  translate: -50% 0;
+  animation: fadeIn 0.5s ease 0.8s both;
+}
+
+.soundBtn {
+  position: absolute;
+  z-index: 9;
+  top: max(18px, env(safe-area-inset-top));
+  right: 18px;
+  animation: fadeIn 0.5s ease 0.3s both;
+}
+
+.intro[data-leave] .soundBtn,
+.intro[data-leave] .skipBtn {
+  pointer-events: none;
+}

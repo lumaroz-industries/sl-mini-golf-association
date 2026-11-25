@@ -4,6 +4,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { preload } from "react-dom";
 import { IntroAudio } from "./introSound";
+import { SoundToggle } from "@/components/sound/SoundToggle";
+import { isSoundOn } from "@/components/sound/soundPref";
 import s from "./SiteIntro.module.css";
 
 export interface IntroPerson {
@@ -84,17 +86,35 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
     if (!home || gone || entered) return;
     const active = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation?.hasBeenActive;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- decided before first paint
-    if (active || window.matchMedia("(prefers-reduced-motion: reduce)").matches) setEntered(true);
+    // Sound turned off by the visitor: no tap needed, so no Enter screen either.
+    if (active || !isSoundOn() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) setEntered(true);
   }, [home, gone, entered, run]);
 
   /** The visitor's tap on the Enter screen: start the sound inside the tap (so the browser allows it), then the intro. */
   function enter() {
+    if (isSoundOn())
+      try {
+        const a = new IntroAudio();
+        void a.ctx.resume();
+        audio.current = a;
+      } catch {}
+    setEntered(true);
+  }
+
+  /** Sound on/off from the button (inside the click, so the browser allows it). */
+  function toggleSound(on: boolean) {
+    if (!on) {
+      audio.current?.fadeOut(0.25);
+      audio.current = null;
+      return;
+    }
+    if (!entered) return; // the Enter tap will start it
     try {
       const a = new IntroAudio();
-      void a.ctx.resume();
       audio.current = a;
+      const at = (performance.now() - started.current) / 1000;
+      void a.ctx.resume().then(() => a.schedule(at));
     } catch {}
-    setEntered(true);
   }
 
   useEffect(() => {
@@ -127,7 +147,7 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
     const removeGesture = () => {
       for (const ev of ["pointerdown", "keydown", "touchend"]) window.removeEventListener(ev, onGesture, true);
     };
-    if (!reduced) {
+    if (!reduced && isSoundOn()) {
       try {
         a = audio.current ?? new IntroAudio();
         audio.current = a;
@@ -186,6 +206,8 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
           if (e.target === e.currentTarget && /leave|late/.test(e.animationName)) setGone(true);
         }}
       >
+        <SoundToggle className={s.soundBtn} onToggle={toggleSound} />
+
         {/* Enter screen: the visitor's one tap lets the browser play the sound. */}
         <div className={s.gate} aria-hidden={entered || undefined}>
           <div className={s.gateGlow} />
@@ -210,9 +232,9 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
         </div>
 
         {entered && (
-          <div className={s.acts} aria-hidden="true">
+          <div className={s.acts}>
             {/* Act 1 — the brand */}
-            <section className={`${s.act} ${s.brandAct}`}>
+            <section className={`${s.act} ${s.brandAct}`} aria-hidden="true">
               <div className={s.glow} />
               <div className={s.brand}>
                 <div className={s.logoWrap}>
@@ -238,7 +260,7 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
               const diamond = p.finish === "diamond";
               const roles = p.role.split(/\s*&\s*/);
               return (
-                <section key={p.name} className={`${s.act} ${s.person}`} data-finish={p.finish} data-act={i + 2}>
+                <section key={p.name} aria-hidden="true" className={`${s.act} ${s.person}`} data-finish={p.finish} data-act={i + 2}>
                   <div className={s.personGlow} />
                   {diamond && <div className={s.rays} />}
                   <span className={s.ghost} aria-hidden="true">
@@ -286,10 +308,22 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
             })}
 
             {/* The slash from the SL logo, sweeping across between acts. */}
-            <span className={s.slash} data-n="1" />
-            <span className={s.slash} data-n="2" />
+            <span className={s.slash} data-n="1" aria-hidden="true" />
+            <span className={s.slash} data-n="2" aria-hidden="true" />
             <span className={s.grain} />
-            <span className={s.skip}>Tap to skip</span>
+            <button
+              type="button"
+              className={`diamond-btn ${s.skipBtn}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setLeaving(true);
+              }}
+            >
+              Skip intro
+              <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+                <path d="M5 5l7 7-7 7M13 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
           </div>
         )}
       </div>

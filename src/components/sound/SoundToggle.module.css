@@ -1,0 +1,48 @@
+/* Diamond-white pill, shared by the sound and skip buttons on the homepage. */
+.btn,
+:global(.diamond-btn) {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgb(20 24 28 / 0.75), rgb(6 8 10 / 0.75)) padding-box,
+    linear-gradient(135deg, #ffffff, #9fc3da 35%, #ffffff 55%, #7f9fb3 80%, #e8f6ff) border-box;
+  color: #f2f9ff;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.5),
+    0 8px 26px rgb(185 225 255 / 0.14),
+    inset 0 1px 0 rgb(255 255 255 / 0.18);
+  text-shadow: 0 0 10px rgb(185 225 255 / 0.5);
+  transition:
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s,
+    opacity 0.25s;
+}
+
+.btn:hover,
+.btn:focus-visible,
+:global(.diamond-btn):hover,
+:global(.diamond-btn):focus-visible {
+  transform: translateY(-1px);
+  border-radius: 999px;
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.5),
+    0 10px 32px rgb(185 225 255 / 0.28),
+    inset 0 1px 0 rgb(255 255 255 / 0.25);
+}
+
+.btn:not([data-on]) {
+  opacity: 0.75;
+}

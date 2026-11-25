@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { HomeContent } from "@/content/schema";
 import { P } from "./ballScene";
+import { SoundToggle } from "@/components/sound/SoundToggle";
+import { isSoundOn, onSoundChange } from "@/components/sound/soundPref";
 import s from "./BallHero.module.css";
 
 /**
@@ -88,6 +90,7 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
           // Sound: plays by itself if the browser allows; otherwise from the first tap, click or key.
           try {
             audio = new FallAudio();
+            audio.enabled = isSoundOn();
             void audio.unlock().then((on) => {
               if (on || cancelled) return;
               const unlock = () => {
@@ -119,6 +122,12 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
     };
     window.addEventListener("resize", onResize);
     let removeUnlock = () => {};
+    // The Sound on/off choice (from either button on the page), remembered for next time.
+    const offSound = onSoundChange((on) => {
+      if (!audio) return;
+      audio.enabled = on;
+      if (on) void audio.unlock(); // the button click lets the browser start it
+    });
     const io = new IntersectionObserver(([e]) => {
       onScreen = e.isIntersecting;
       scene?.setVisible(e.isIntersecting);
@@ -130,6 +139,7 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
       window.removeEventListener("resize", onResize);
       io.disconnect();
       removeUnlock();
+      offSound();
       audio?.dispose();
       scene?.dispose();
     };
@@ -151,6 +161,25 @@ export function BallHero({ hero }: { hero: HomeContent["hero"] }) {
             <span>{hero.taglineLines[0]}</span> <span>{hero.taglineLines[1]}</span>
           </p>
           <p className={s.supporting}>{hero.supporting}</p>
+        </div>
+        <div className={s.controls}>
+          <SoundToggle />
+          <button
+            type="button"
+            className={`diamond-btn ${s.skip}`}
+            onClick={() => {
+              // Jump straight to the formed logo at the end of the fall.
+              const el = root.current;
+              if (!el) return;
+              const top = el.getBoundingClientRect().top + window.scrollY;
+              window.scrollTo({ top: top + el.offsetHeight - window.innerHeight, behavior: "instant" });
+            }}
+          >
+            Skip
+            <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+              <path d="M12 4v15M6 13l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         </div>
         <span className={s.cue} aria-hidden="true">
           Scroll to fall

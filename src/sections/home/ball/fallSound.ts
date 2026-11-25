@@ -39,6 +39,10 @@ export class FallAudio {
   private glitterGain!: GainNode;
   private started = false;
   private lastRing = 0;
+  private lastBurn = -10;
+  private lastFormed = -10;
+  /** The visitor's Sound on/off choice. */
+  enabled = true;
 
   constructor() {
     const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -193,13 +197,15 @@ export class FallAudio {
   update(s: FallAudioState, on: boolean) {
     if (!this.started || !this.running) return;
     const now = this.ctx.currentTime;
-    const k = 0.08; // smoothing
-    this.master.gain.setTargetAtTime(on ? 0.8 : 0, now, 0.2);
-    this.windGain.gain.setTargetAtTime(0.08 + 0.75 * s.speed, now, k);
-    this.windFilter.frequency.setTargetAtTime(260 + 1100 * s.speed, now, k);
-    this.howlGain.gain.setTargetAtTime(0.35 * s.speed * s.speed, now, k);
-    this.howlFilter.frequency.setTargetAtTime(380 + 520 * s.speed, now, 0.15);
-    this.rumbleGain.gain.setTargetAtTime(0.7 * s.speed, now, k);
+    const k = 0.2; // smoothing: no sudden jumps, even when scrolling fast
+    this.master.gain.setTargetAtTime(on && this.enabled ? 0.8 : 0, now, this.enabled ? 0.2 : 0.06);
+    // Fast scrolling can push the speed past 1: compress it so the wind never overloads.
+    const sp = Math.min(1, Math.tanh(s.speed * 1.2) / Math.tanh(1.2));
+    this.windGain.gain.setTargetAtTime(0.08 + 0.55 * sp, now, k);
+    this.windFilter.frequency.setTargetAtTime(260 + 1000 * sp, now, 0.3);
+    this.howlGain.gain.setTargetAtTime(0.22 * sp * sp, now, k);
+    this.howlFilter.frequency.setTargetAtTime(380 + 480 * sp, now, 0.35);
+    this.rumbleGain.gain.setTargetAtTime(0.5 * sp, now, k);
     this.fireGain.gain.setTargetAtTime(0.35 * s.heat, now, k);
     this.sizzleGain.gain.setTargetAtTime(0.22 * s.burn, now, k);
     this.glitterGain.gain.setTargetAtTime(0.03 * Math.max(s.gather, s.burn * 0.4), now, 0.2);
@@ -207,17 +213,22 @@ export class FallAudio {
 
   /** One-off moments. */
   event(e: "ring" | "burn" | "formed") {
-    if (!this.started || !this.running) return;
+    if (!this.started || !this.running || !this.enabled) return;
     const t = this.ctx.currentTime + 0.01;
+    // Each sound needs a breather before it can play again (no pile-ups on fast scrolls).
     if (e === "ring") {
-      if (t - this.lastRing < 0.35) return;
+      if (t - this.lastRing < 0.7) return;
       this.lastRing = t;
-      this.whoosh(t, 0.55, 0.45);
-      this.boom(t + 0.18, 0.5);
+      this.whoosh(t, 0.55, 0.4);
+      this.boom(t + 0.18, 0.42);
     } else if (e === "burn") {
-      this.boom(t, 0.4);
-      this.burst(t, 1.4, 0.35);
+      if (t - this.lastBurn < 2.5) return;
+      this.lastBurn = t;
+      this.boom(t, 0.36);
+      this.burst(t, 1.4, 0.3);
     } else {
+      if (t - this.lastFormed < 3) return;
+      this.lastFormed = t;
       this.chime(t, [1046.5, 1318.51, 1567.98, 2093], 0.18);
     }
   }

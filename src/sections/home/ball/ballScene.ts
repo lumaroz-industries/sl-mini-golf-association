@@ -636,7 +636,7 @@ export class BallScene {
       flash = Math.max(flash, 1 - Math.min(1, Math.abs(y - this.ball.position.y) / 1.4));
       // The ball goes through it (the ring rises past the ball).
       const prev = this.ringY[i];
-      if (this.running && prev !== undefined && prev < this.ball.position.y && y >= this.ball.position.y && y - prev < 5 && falling > 0.3) this.opts.onEvent?.("ring");
+      if (this.running && prev !== undefined && prev < this.ball.position.y && y >= this.ball.position.y && y - prev < 2 && falling > 0.3) this.opts.onEvent?.("ring");
       this.ringY[i] = y;
     });
     this.ringMat.opacity = 0.85 * falling;
@@ -650,8 +650,10 @@ export class BallScene {
     this.emberMat.uniforms.uSpeed.value = speed;
 
     // Story moments, going forward.
+    // (Skipped while jumping through big stretches at once, e.g. the Skip button.)
+    const steady = Math.abs(p - this.lastP) < 0.03;
     if (this.running) {
-      if (this.lastP < P.dissolveStart && p >= P.dissolveStart) this.opts.onEvent?.("burn");
+      if (steady && this.lastP < P.dissolveStart && p >= P.dissolveStart) this.opts.onEvent?.("burn");
       if (this.lastP < P.formEnd - 0.02 && p >= P.formEnd - 0.02) this.opts.onEvent?.("formed");
     }
     this.lastP = p;

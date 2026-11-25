@@ -145,3 +145,30 @@
     opacity: 0;
   }
 }
+
+/* Sound on/off and Skip, bottom corners of the pinned stage. */
+.controls {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: space-between;
+  padding: 0 clamp(16px, 3vw, 32px);
+  pointer-events: none;
+}
+
+.controls > * {
+  pointer-events: auto;
+}
+
+/* Skip disappears once the logo has formed. */
+.stage[data-formed] .skip {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hero[data-mode="static"] .controls {
+  display: none;
+}
