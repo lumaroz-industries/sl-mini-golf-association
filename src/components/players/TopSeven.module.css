@@ -73,7 +73,6 @@
      so a tilted edge can sit behind the wrapper's own plane. Only the card
      itself takes the pointer; hover events still reach this element. */
   pointer-events: none;
-  --dim: 0.4;
 }
 
 .slot > * {
@@ -87,7 +86,7 @@
   z-index: 20;
   border-radius: 22px;
   background: #020604;
-  opacity: var(--dim);
+  opacity: 0.4;
   pointer-events: none;
 }
 

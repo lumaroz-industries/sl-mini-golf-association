@@ -32,7 +32,7 @@
   /* Flat on purpose: the card tilts as one piece, and its layers (body, tap
      button, arrow) keep a strict z-index order. */
   transform-style: flat;
-  transition: transform 0.25s var(--ease-out);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   box-shadow:
     0 2px 0 rgb(255 255 255 / 0.03),
     0 18px 30px -14px rgb(0 0 0 / 0.9),

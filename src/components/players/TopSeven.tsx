@@ -16,11 +16,11 @@ const MAX = 3;
 const clamp = (n: number) => Math.max(MIN, Math.min(MAX, n));
 const MOBILE_STEP = 66;
 /** Hover must rest on a card this long before it comes forward (stops flicker on quick sweeps). */
-const HOVER_INTENT_MS = 70;
+const HOVER_INTENT_MS = 110;
 
-/* Spring tuned slightly under critical damping: quick, soft landing, no wobble. */
-const STIFFNESS = 230;
-const DAMPING = 28;
+/* Critically damped spring: quick, glides in and stops without any wobble. */
+const STIFFNESS = 180;
+const DAMPING = 27;
 
 type Pose = { x: number; z: number; r: number; s: number; dim: number };
 const KEYS: Array<keyof Pose> = ["x", "z", "r", "s", "dim"];
@@ -49,6 +49,8 @@ export function TopSeven({ slots, revealLabel }: TopSevenProps) {
   const [front, setFront] = useState(0);
   const [wide, setWide] = useState(true);
   const els = useRef<Array<HTMLLIElement | null>>([]);
+  const shades = useRef<Array<HTMLSpanElement | null>>([]);
+  const tiltFrame = useRef(0);
   const target = useRef(0); // front position the springs head for (fractional while dragging)
   const current = useRef<Array<Pose & { v: Pose }>>([]);
   const raf = useRef(0);
@@ -77,7 +79,10 @@ export function TopSeven({ slots, revealLabel }: TopSevenProps) {
     const el = els.current[i];
     if (!el) return;
     el.style.transform = `translate3d(calc(-50% + ${p.x.toFixed(2)}px), 0, ${p.z.toFixed(2)}px) rotateY(${p.r.toFixed(3)}deg) scale(${p.s.toFixed(4)})`;
-    el.style.setProperty("--dim", p.dim.toFixed(3));
+    // Opacity set on the shade itself: a custom property here would make the
+    // browser restyle the whole card on every frame.
+    const shade = shades.current[i];
+    if (shade) shade.style.opacity = p.dim.toFixed(3);
   };
 
   /** One spring step for every card; keeps running until everything settles. */
@@ -137,18 +142,24 @@ export function TopSeven({ slots, revealLabel }: TopSevenProps) {
 
   useEffect(() => () => window.clearTimeout(hoverTimer.current), []);
 
-  // Pointer tilt on the front card (mouse only).
+  // Pointer tilt on the front card (mouse only): the card's own transform,
+  // once per frame, eased by its CSS transition.
   const tilt = (e: React.PointerEvent<HTMLElement>) => {
     if (e.pointerType !== "mouse") return;
-    const el = e.currentTarget;
-    const r = el.getBoundingClientRect();
+    const card = e.currentTarget.firstElementChild as HTMLElement | null;
+    if (!card) return;
+    const r = e.currentTarget.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width;
     const py = (e.clientY - r.top) / r.height;
-    el.style.setProperty("--tx", `${((px - 0.5) * 16).toFixed(2)}deg`);
-    el.style.setProperty("--ty", `${((0.5 - py) * 14).toFixed(2)}deg`);
+    cancelAnimationFrame(tiltFrame.current);
+    tiltFrame.current = requestAnimationFrame(() => {
+      card.style.transform = `rotateX(${((0.5 - py) * 14).toFixed(2)}deg) rotateY(${((px - 0.5) * 16).toFixed(2)}deg)`;
+    });
   };
   const untilt = (e: React.PointerEvent<HTMLElement>) => {
-    for (const v of ["--tx", "--ty"]) e.currentTarget.style.removeProperty(v);
+    cancelAnimationFrame(tiltFrame.current);
+    const card = e.currentTarget.firstElementChild as HTMLElement | null;
+    if (card) card.style.transform = "";
   };
 
   return (
@@ -243,7 +254,13 @@ export function TopSeven({ slots, revealLabel }: TopSevenProps) {
                   />
                 }
               />
-              <span className={styles.shade} aria-hidden="true" />
+              <span
+                className={styles.shade}
+                ref={(el) => {
+                  shades.current[i] = el;
+                }}
+                aria-hidden="true"
+              />
               <span className={styles.shadow} aria-hidden="true" />
             </li>
           );
