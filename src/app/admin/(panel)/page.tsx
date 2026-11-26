@@ -23,6 +23,7 @@ export default async function Dashboard() {
     { href: "/admin/articles", title: "Articles", text: "Longer stories with photos, galleries and videos.", n: counts.data?.articles, unit: "article" },
     { href: "/admin/gallery", title: "Gallery", text: "Photo albums from tournaments and players.", n: counts.data?.gallery, unit: "album" },
     { href: "/admin/players", title: "Players", text: "The Maharashtra player directory and every player's results.", n: counts.data?.players, unit: "player" },
+    { href: "/admin/card-maker", title: "Card Maker", text: "Turn a portrait into a finished player-card photo.", n: undefined, unit: "tool" },
   ];
   return (
     <>
@@ -40,9 +41,18 @@ export default async function Dashboard() {
       <div className={s.grid}>
         {tiles.map((t) => (
           <Link key={t.href} href={t.href} className={s.tile}>
-            <span className={s.count}>{t.n === undefined ? "—" : `${t.n} ${t.unit}${t.n === 1 ? "" : "s"}`}</span>
+            <span className={s.tileTop}>
+              <span className={s.tileNum}>{t.n === undefined ? "◆" : t.n}</span>
+              <span className={s.count}>{t.n === undefined ? (t.unit === "tool" ? "Tool" : "—") : `${t.unit}${t.n === 1 ? "" : "s"}`}</span>
+            </span>
             <span className={s.tileTitle}>{t.title}</span>
             <p>{t.text}</p>
+            <span className={s.tileGo}>
+              Open
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </span>
           </Link>
         ))}
       </div>
