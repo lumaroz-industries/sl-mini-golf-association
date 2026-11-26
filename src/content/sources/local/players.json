@@ -6,6 +6,11 @@
   "revealLabel": "Reveal soon",
   "featured": [
     {
+      "slug": "ishika-hanwat",
+      "side": "left",
+      "place": 3
+    },
+    {
       "slug": "sakshi-lahane",
       "side": "left",
       "place": 1
