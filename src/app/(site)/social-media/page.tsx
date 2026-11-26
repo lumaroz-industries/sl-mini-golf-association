@@ -49,7 +49,7 @@ type Card = { group: "official" | "organisation" | "person" | "channel" } & (
 );
 
 /** The association's profile picture (the same one as on its Instagram). */
-const OFFICIAL_PICTURE: ImageAsset = { src: "/social/slmga-profile.webp", alt: "SL Mini Golf Association", width: 640, height: 640 };
+const OFFICIAL_PICTURE: ImageAsset = { src: "/social/slmga-profile-v2.webp", alt: "SL Mini Golf Association", width: 640, height: 640 };
 
 const TYPE_TAG = { organisation: "Organisation", person: "Person", channel: "Channel" } as const;
 
