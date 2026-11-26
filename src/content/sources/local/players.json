@@ -6,18 +6,23 @@
   "revealLabel": "Reveal soon",
   "featured": [
     {
-      "slug": "pranjali-surduse",
-      "side": "center"
+      "slug": "sakshi-lahane",
+      "side": "left",
+      "place": 1
     },
     {
-      "slug": "saurabh-pise",
-      "side": "right",
-      "place": 2
+      "slug": "pranjali-surduse",
+      "side": "center"
     },
     {
       "slug": "nehal-bagmar",
       "side": "right",
       "place": 1
+    },
+    {
+      "slug": "saurabh-pise",
+      "side": "right",
+      "place": 2
     },
     {
       "slug": "suyash-lahane",
