@@ -2,10 +2,17 @@
   "slug": "saurabh-pise",
   "name": "Saurabh Pise",
   "gender": "male",
+  "photo": {
+    "src": "/players/saurabh-pise/confident-professional-in-navy-suit-45hx.webp",
+    "alt": "Saurabh Pise in an India team blazer.",
+    "width": 1086,
+    "height": 1448
+  },
   "medals": {
     "gold": 3,
     "silver": 1,
     "bronze": 2
   },
-  "results": []
+  "results": [],
+  "draft": false
 }
