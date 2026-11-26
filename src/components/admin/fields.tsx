@@ -154,7 +154,7 @@ export function ImageField({
   value?: ImageValue;
   onChange: (v: ImageValue | undefined) => void;
   onUploaded: (u: Upload) => void;
-  collection: "updates" | "articles" | "players";
+  collection: "updates" | "articles" | "players" | "officials";
   slug: string;
   withCredit?: boolean;
   /** Local preview for a photo uploaded elsewhere (not live until Publish). */

@@ -1,5 +1,5 @@
 import { failure, guard, json } from "@/lib/admin/api";
-import { saveAlbum, saveEntry, savePlayer, type SaveAlbumInput, type SaveEntryInput } from "@/lib/admin/content";
+import { reorderOfficials, saveAlbum, saveEntry, saveOfficial, savePlayer, type SaveAlbumInput, type SaveEntryInput } from "@/lib/admin/content";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -14,6 +14,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ collecti
     if (collection === "updates" || collection === "articles") return json(200, { ok: true, ...(await saveEntry(collection, input as SaveEntryInput)) });
     if (collection === "gallery") return json(200, { ok: true, ...(await saveAlbum(input as SaveAlbumInput)) });
     if (collection === "players") return json(200, { ok: true, ...(await savePlayer(input)) });
+    if (collection === "officials") return json(200, { ok: true, ...(input?.order ? await reorderOfficials(input.order) : await saveOfficial(input)) });
     return json(404, { ok: false, message: "Not found." });
   } catch (e) {
     return failure(e);

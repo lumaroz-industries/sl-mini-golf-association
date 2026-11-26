@@ -2,7 +2,7 @@ import "server-only";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { z } from "zod";
 import sharp from "sharp";
-import { ArticleFrontmatter, GalleryAlbumFile, GalleryManifest, Player, PlayersPageContent, UpdateFrontmatter } from "@/content/schema";
+import { ArticleFrontmatter, GalleryAlbumFile, GalleryManifest, Official, OfficialsPageContent, Player, PlayersPageContent, UpdateFrontmatter } from "@/content/schema";
 import playersPage from "@/content/sources/local/players.json";
 import articleCategories from "@/content/sources/local/article-categories.json";
 import galleryCategories from "@/content/sources/local/gallery-categories.json";
@@ -201,7 +201,7 @@ export async function deleteEntry(collection: Collection, slug: string): Promise
 const MAX_UPLOAD = 4 * 1024 * 1024;
 
 /** A photo for an update or article: one 1600px-wide WebP, no metadata. */
-export async function processImage(collection: Collection | "players", slug: string, original: string, data: Buffer) {
+export async function processImage(collection: Collection | "players" | "officials", slug: string, original: string, data: Buffer) {
   if (!SLUG.test(slug)) throw new ContentError("Set the web address (slug) before adding photos.");
   if (data.length > MAX_UPLOAD) throw new ContentError("This photo is too large.");
   const img = sharp(data, { failOn: "none" }).rotate();
@@ -582,4 +582,103 @@ export async function deletePlayer(slug: string): Promise<string> {
     changes.push({ path: PLAYERS_PAGE, text: JSON.stringify(next, null, 2) + "\n" });
   }
   return storage.commit(`Admin: Delete player "${String(p.name ?? slug)}"`, changes);
+}
+
+/* ---------------------------------------------------------------- officials */
+
+const OFFICIALS_PAGE = `${CONTENT}/officials.json`;
+
+type OfficialsFile = Record<string, unknown> & { officials: Array<Record<string, unknown>>; levels: Array<{ id: string; title: string; subtitle: string }> };
+
+async function readOfficialsFile(): Promise<OfficialsFile> {
+  const text = await getStorage().readText(OFFICIALS_PAGE);
+  if (!text) throw new ContentError("The officials page settings are missing.");
+  return JSON.parse(text);
+}
+
+export interface OfficialListItem {
+  id: string;
+  name: string;
+  role: string;
+  level: string;
+  photo?: string;
+  draft: boolean;
+}
+
+/** Every official (drafts included), in page order, with the levels they can belong to. */
+export async function listOfficials(): Promise<{ levels: Array<{ id: string; title: string; subtitle: string }>; officials: OfficialListItem[] }> {
+  const f = await readOfficialsFile();
+  return {
+    levels: f.levels.map((l) => ({ id: l.id, title: l.title, subtitle: l.subtitle })),
+    officials: f.officials.map((o) => ({
+      id: String(o.id),
+      name: String(o.name),
+      role: String(o.role),
+      level: String(o.level),
+      photo: (o.photo as { src?: string } | undefined)?.src,
+      draft: o.draft === true,
+    })),
+  };
+}
+
+export async function readOfficial(id: string): Promise<Record<string, unknown> | null> {
+  if (!SLUG.test(id)) return null;
+  return (await readOfficialsFile()).officials.find((o) => o.id === id) ?? null;
+}
+
+/** Adds or edits an official (with any new photo), keeping their place in the order. */
+export async function saveOfficial(input: { mode: "create" | "edit"; data: Record<string, unknown>; uploads?: Upload[] }): Promise<{ id: string; slug: string; commit: string; draft: boolean }> {
+  const storage = getStorage();
+  const data = clean({ ...input.data });
+  const id = String(data.id ?? "");
+  if (!SLUG.test(id) || id === "new") throw new ContentError("Choose a web address using lowercase letters, numbers and hyphens, e.g. first-last.");
+  const parsed = Official.safeParse(data);
+  if (!parsed.success) throw new ContentError("Some details need fixing.", issuesOf(parsed.error));
+  const page = await readOfficialsFile();
+  if (!page.levels.some((l) => l.id === data.level)) throw new ContentError("Choose India or Maharashtra.");
+  const at = page.officials.findIndex((o) => o.id === id);
+  if (input.mode === "create" && at !== -1) throw new ContentError(`There is already an official with this web address (${id}). Choose another.`);
+  if (input.mode === "edit" && at === -1) throw new ContentError("This official no longer exists — they may have been deleted.");
+  const officials = [...page.officials];
+  if (at === -1) officials.push(data);
+  else officials[at] = data;
+  const next = { ...page, officials };
+  const check = OfficialsPageContent.safeParse(next);
+  if (!check.success) throw new ContentError("Some details need fixing.", issuesOf(check.error));
+
+  const text = JSON.stringify(next, null, 2) + "\n";
+  const folder = `public/officials/${id}`;
+  const used = (p: string) => text.includes("/" + p.replace(/^public\//, ""));
+  const changes: Change[] = [{ path: OFFICIALS_PAGE, text }];
+  for (const u of input.uploads ?? []) {
+    if (!u.path.startsWith(`${folder}/`) || !/^[a-z0-9-]+\.webp$/.test(u.path.slice(folder.length + 1)) || !BLOB_ID.test(u.blob)) throw new ContentError("An uploaded photo is invalid — please upload it again.");
+    if (used(u.path)) changes.push({ path: u.path, blob: u.blob });
+  }
+  const uploaded = new Set((input.uploads ?? []).map((u) => u.path));
+  for (const old of await storage.list(folder)) if (!used(old) && !uploaded.has(old)) changes.push({ path: old, delete: true });
+
+  const draft = data.draft === true;
+  const commit = await storage.commit(`Admin: ${draft ? "Save draft" : input.mode === "create" ? "Add" : "Edit"} official "${String(data.name)}"`, changes);
+  return { id, slug: id, commit, draft };
+}
+
+export async function deleteOfficial(id: string): Promise<string> {
+  const page = await readOfficialsFile();
+  const o = page.officials.find((x) => x.id === id);
+  if (!o) throw new ContentError("This official no longer exists.");
+  const storage = getStorage();
+  const next = { ...page, officials: page.officials.filter((x) => x.id !== id) };
+  const changes: Change[] = [{ path: OFFICIALS_PAGE, text: JSON.stringify(next, null, 2) + "\n" }, ...(await storage.list(`public/officials/${id}`)).map((x) => ({ path: x, delete: true as const }))];
+  return storage.commit(`Admin: Delete official "${String(o.name)}"`, changes);
+}
+
+/** Saves the order of the officials (as shown on the page within each level). */
+export async function reorderOfficials(ids: unknown): Promise<{ commit: string }> {
+  if (!Array.isArray(ids)) throw new ContentError("The order is missing.");
+  const page = await readOfficialsFile();
+  const byId = new Map(page.officials.map((o) => [String(o.id), o]));
+  if (ids.length !== byId.size || ids.some((i) => !byId.has(String(i)))) throw new ContentError("The list changed meanwhile — reload the page and try again.");
+  const next = { ...page, officials: ids.map((i) => byId.get(String(i))!) };
+  const commit = await getStorage().commit("Admin: Reorder the officials", [{ path: OFFICIALS_PAGE, text: JSON.stringify(next, null, 2) + "\n" }]);
+  return { commit };
 }

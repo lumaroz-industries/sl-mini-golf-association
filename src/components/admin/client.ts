@@ -55,7 +55,7 @@ export async function shrinkImage(file: File, maxWidth: number): Promise<Blob> {
   throw new Error(`"${file.name}" is too large even after shrinking.`);
 }
 
-export async function uploadPhoto(collection: "updates" | "articles" | "gallery" | "players", slug: string, file: File, name: string, maxWidth: number) {
+export async function uploadPhoto(collection: "updates" | "articles" | "gallery" | "players" | "officials", slug: string, file: File, name: string, maxWidth: number) {
   const blob = await shrinkImage(file, maxWidth);
   const q = new URLSearchParams({ collection, slug, name });
   return api("POST", `/api/admin/upload?${q}`, blob);

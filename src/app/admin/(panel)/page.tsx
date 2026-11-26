@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { listAlbums, listEntries, listPlayers } from "@/lib/admin/content";
+import { listAlbums, listEntries, listOfficials, listPlayers } from "@/lib/admin/content";
 import { githubConfig } from "@/lib/admin/storage";
 import { attempt, PageHead, SetupNotice } from "@/components/admin/Page";
 import s from "@/components/admin/admin.module.css";
@@ -14,8 +14,8 @@ export default async function Dashboard() {
   const gh = githubConfig();
   const onVercel = !!process.env.VERCEL;
   const counts = await attempt(async () => {
-    const [u, a, g, p] = await Promise.all([listEntries("updates"), listEntries("articles"), listAlbums(), listPlayers()]);
-    return { updates: u.length, articles: a.length, gallery: g.length, players: p.length };
+    const [u, a, g, p, o] = await Promise.all([listEntries("updates"), listEntries("articles"), listAlbums(), listPlayers(), listOfficials()]);
+    return { updates: u.length, articles: a.length, gallery: g.length, players: p.length, officials: o.officials.length };
   });
   const { owner, dev } = await getTeam();
   const tiles = [
@@ -23,6 +23,7 @@ export default async function Dashboard() {
     { href: "/admin/articles", title: "Articles", text: "Longer stories with photos, galleries and videos.", n: counts.data?.articles, unit: "article" },
     { href: "/admin/gallery", title: "Gallery", text: "Photo albums from tournaments and players.", n: counts.data?.gallery, unit: "album" },
     { href: "/admin/players", title: "Players", text: "The Maharashtra player directory and every player's results.", n: counts.data?.players, unit: "player" },
+    { href: "/admin/officials", title: "Officials", text: "The officials of India and Maharashtra, with their cards.", n: counts.data?.officials, unit: "official" },
     { href: "/admin/card-maker", title: "Card Maker", text: "Turn a portrait into a finished player-card photo.", n: undefined, unit: "tool" },
   ];
   return (

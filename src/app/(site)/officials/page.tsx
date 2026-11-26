@@ -75,12 +75,12 @@ export default async function OfficialsPage() {
               {lv.list.length > 0
                 ? lv.list.map((o, i) => (
                     <li key={o.id} style={{ "--i": i } as React.CSSProperties}>
-                      <OfficialCard official={o} revealLabel={content.revealLabel} />
+                      <OfficialCard official={o} revealLabel={content.revealLabel} levelName={lv.title} orgShort={o.organisation && o.organisation === lv.organisation?.name ? lv.organisation.short : undefined} />
                     </li>
                   ))
                 : Array.from({ length: lv.placeholders }, (_, i) => (
                     <li key={i} style={{ "--i": i } as React.CSSProperties} aria-hidden={i > 0 || undefined}>
-                      <OfficialCard revealLabel={content.revealLabel} role="Official" />
+                      <OfficialCard revealLabel={content.revealLabel} role="Official" levelName={lv.title} orgShort={lv.organisation?.short} />
                     </li>
                   ))}
             </ul>
