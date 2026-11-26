@@ -64,6 +64,8 @@ export default async function ArticlePage({ params }: Params) {
   const older = index < all.length - 1 ? all[index + 1] : undefined;
   const url = new URL(`/articles/${article.slug}`, base).toString();
   const showToc = toc.filter((t) => t.level === 2).length >= 3;
+  // Written by SL Mini Golf Association itself: show the SL mark, not initials.
+  const byAssociation = !article.author.photo && article.author.name.trim().toLowerCase() === site.name.trim().toLowerCase();
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -87,10 +89,7 @@ export default async function ArticlePage({ params }: Params) {
 
       <article className={styles.article}>
         <header className={styles.hero}>
-          <div className={styles.heroMedia}>
-            <ArticleCover article={article} sizes="100vw" priority />
-          </div>
-          <div className={styles.heroShade} aria-hidden="true" />
+          <div className={styles.heroGlow} aria-hidden="true" />
           <div className={`container ${styles.heroInner}`}>
             <nav className={styles.crumbs} aria-label="Breadcrumb">
               <Link href="/articles">Articles</Link>
@@ -102,7 +101,7 @@ export default async function ArticlePage({ params }: Params) {
             <h1 className={styles.title}>{article.title}</h1>
             <p className={styles.excerpt}>{article.excerpt}</p>
             <div className={styles.meta}>
-              <Avatar name={article.author.name} portrait={article.author.photo} size="sm" />
+              <Avatar name={article.author.name} portrait={article.author.photo} size="sm" brand={byAssociation} />
               <span className={styles.metaAuthor}>
                 <b>{article.author.name}</b>
                 {article.author.role && <span>{article.author.role}</span>}
@@ -122,7 +121,14 @@ export default async function ArticlePage({ params }: Params) {
               </span>
             </div>
           </div>
-          {article.cover?.credit && <p className={styles.credit}>Photo: {article.cover.credit}</p>}
+          {/* The cover, framed as a wide banner under the title (it no longer sits behind the text). */}
+          <div className={`container ${styles.bannerWrap}`}>
+            <figure className={styles.banner}>
+              <ArticleCover article={article} sizes="(max-width: 1200px) 100vw, 1200px" priority />
+              <span className={styles.bannerSheen} aria-hidden="true" />
+            </figure>
+            {article.cover?.credit && <p className={styles.credit}>Photo: {article.cover.credit}</p>}
+          </div>
         </header>
 
         <div className={`container ${styles.layout}`} data-toc={showToc || undefined}>
@@ -131,7 +137,7 @@ export default async function ArticlePage({ params }: Params) {
               <Toc items={toc} />
             </aside>
           )}
-          <div id="article-body" className={prose.prose}>
+          <div id="article-body" className={`${prose.prose} ${styles.body}`}>
             {content}
           </div>
         </div>
@@ -150,7 +156,7 @@ export default async function ArticlePage({ params }: Params) {
           </div>
 
           <div className={styles.authorCard}>
-            <Avatar name={article.author.name} portrait={article.author.photo} size="lg" />
+            <Avatar name={article.author.name} portrait={article.author.photo} size="lg" brand={byAssociation} />
             <div>
               <span className={styles.authorLabel}>Written by</span>
               <p className={styles.authorName}>{article.author.name}</p>

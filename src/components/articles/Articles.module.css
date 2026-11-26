@@ -434,9 +434,12 @@
   display: grid;
   gap: 12px;
   padding: 20px 22px;
-  border: 1px solid var(--line);
+  border: 1px solid transparent;
   border-radius: var(--radius);
-  background: rgb(255 255 255 / 0.02);
+  background:
+    linear-gradient(170deg, #0d1411, #060908) padding-box,
+    linear-gradient(140deg, rgb(0 168 107 / 0.6), rgb(255 255 255 / 0.06) 45%, rgb(227 194 122 / 0.45)) border-box;
+  box-shadow: 0 24px 60px -36px #000;
 }
 
 .tocTitle {
