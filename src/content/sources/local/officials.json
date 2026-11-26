@@ -1,28 +1,64 @@
 {
   "kicker": "Officials",
-  "heading": "The people behind the game",
-  "intro": "The officials of SL Mini Golf Association \u2014 the people who organise, run and look after mini golf in Maharashtra.",
-  "groups": [
+  "heading": "The officials behind the game",
+  "intro": "The people who lead, organise and officiate mini golf \u2014 across India, and here in Maharashtra.",
+  "levels": [
     {
-      "id": "leadership",
-      "title": "Leadership",
-      "note": "Guiding the association.",
-      "placeholders": 4
+      "id": "india",
+      "title": "India",
+      "subtitle": "National officials",
+      "note": "The officials leading mini golf across the country.",
+      "accent": "tricolour",
+      "groups": [
+        {
+          "id": "leadership",
+          "title": "Leadership",
+          "note": "Leading the sport.",
+          "placeholders": 4
+        },
+        {
+          "id": "committee",
+          "title": "Committee",
+          "note": "Running the game behind the scenes.",
+          "placeholders": 4
+        },
+        {
+          "id": "tournament",
+          "title": "Tournament officials",
+          "note": "On the course at every event.",
+          "placeholders": 4
+        }
+      ]
     },
     {
-      "id": "committee",
-      "title": "Committee",
-      "note": "Running the association day to day.",
-      "placeholders": 4
-    },
-    {
-      "id": "officials",
-      "title": "Tournament officials",
-      "note": "On the course at every event.",
-      "placeholders": 4
+      "id": "maharashtra",
+      "title": "Maharashtra",
+      "subtitle": "State officials",
+      "note": "The officials leading mini golf in Maharashtra.",
+      "accent": "saffron",
+      "groups": [
+        {
+          "id": "leadership",
+          "title": "Leadership",
+          "note": "Leading the sport.",
+          "placeholders": 4
+        },
+        {
+          "id": "committee",
+          "title": "Committee",
+          "note": "Running the game behind the scenes.",
+          "placeholders": 4
+        },
+        {
+          "id": "tournament",
+          "title": "Tournament officials",
+          "note": "On the course at every event.",
+          "placeholders": 4
+        }
+      ]
     }
   ],
   "officials": [],
   "revealLabel": "To be announced",
-  "note": "Officials are listed as they are confirmed by SL Mini Golf Association."
+  "note": "Officials are added here as their details are confirmed."
 }

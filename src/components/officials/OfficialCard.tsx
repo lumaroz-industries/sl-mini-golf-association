@@ -38,6 +38,7 @@ export function OfficialCard({ official, revealLabel, role }: { official?: Offic
       <div className={s.body}>
         <span className={s.role}>{official.role}</span>
         <h3 className={s.name}>{official.name}</h3>
+        {official.organisation && <span className={s.org}>{official.organisation}</span>}
         {(official.district || official.since) && (
           <span className={s.meta}>{[official.district, official.since && `Since ${official.since}`].filter(Boolean).join(" · ")}</span>
         )}

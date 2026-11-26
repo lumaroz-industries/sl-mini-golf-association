@@ -82,9 +82,8 @@
   box-shadow: 0 0 30px rgb(227 194 122 / 0.15);
 }
 
-.boardCrest img {
-  width: 46px;
-  height: auto;
+.boardCrest {
+  color: #e3c27a;
 }
 
 .boardTitle,
@@ -125,7 +124,7 @@
 
 .boardList li {
   display: grid;
-  grid-template-columns: 28px 1fr auto;
+  grid-template-columns: 1fr auto;
   align-items: baseline;
   gap: 10px;
   padding: 10px 4px;
@@ -160,7 +159,7 @@
 
 /* =============================================================== groups */
 .group + .group {
-  margin-top: clamp(48px, 6vw, 80px);
+  margin-top: clamp(36px, 4vw, 56px);
 }
 
 .groupHead {
@@ -181,7 +180,7 @@
   gap: 12px;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.35rem);
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -389,5 +388,219 @@
   }
   .board {
     transform: none;
+  }
+}
+
+/* ============================================================== levels
+   India (tricolour) and Maharashtra (saffron), each a chapter of the page. */
+.level {
+  --a1: #ff9933;
+  --a2: #f4f4f4;
+  --a3: #138808;
+  --glowc: 255 153 51;
+  position: relative;
+  padding-block: clamp(48px, 7vw, 96px);
+}
+
+.level[data-accent="saffron"] {
+  --a1: #ff9a3c;
+  --a2: #e8601f;
+  --a3: #8f2a0c;
+  --glowc: 240 120 40;
+}
+
+.level::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: radial-gradient(45% 40% at 12% 8%, rgb(var(--glowc) / 0.08), transparent 70%);
+  pointer-events: none;
+}
+
+.levelHead {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: 18px clamp(18px, 3vw, 36px);
+  margin-bottom: clamp(32px, 4vw, 52px);
+  padding-bottom: 22px;
+}
+
+.levelNo {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 2rem + 6vw, 7.5rem);
+  font-weight: 700;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgb(var(--glowc) / 0.55);
+}
+
+.levelSub {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--a1);
+}
+
+.levelTitle {
+  margin: 6px 0 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.levelNote {
+  margin: 10px 0 0;
+  max-width: 52ch;
+  color: var(--fg-muted);
+}
+
+/* The accent stripe under the heading: tricolour, or saffron-to-maroon. */
+.levelBand {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--a1) 0 33.3%, var(--a2) 33.3% 66.6%, var(--a3) 66.6%);
+  -webkit-mask-image: linear-gradient(90deg, #000 40%, transparent);
+  mask-image: linear-gradient(90deg, #000 40%, transparent);
+}
+
+.level[data-accent="saffron"] .levelBand {
+  background: linear-gradient(90deg, var(--a1), var(--a2) 50%, var(--a3));
+}
+
+/* Cards pick up the chapter's colour on their edge and role. */
+.level .card {
+  background:
+    linear-gradient(170deg, #0d1411, #060908) padding-box,
+    linear-gradient(140deg, rgb(var(--glowc) / 0.6), rgb(255 255 255 / 0.06) 40%, rgb(227 194 122 / 0.45)) border-box;
+}
+
+.level .role {
+  color: var(--a1);
+}
+
+.org {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--fg);
+}
+
+/* Jump links in the hero: India / Maharashtra with their counts. */
+.jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.jumpLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  background: rgb(255 255 255 / 0.03);
+  font-weight: 700;
+  transition: border-color var(--dur-fast), background var(--dur-fast), transform var(--dur-fast);
+}
+
+.jumpLink:hover {
+  transform: translateY(-2px);
+  background: rgb(255 255 255 / 0.06);
+}
+
+.jumpLink i {
+  width: 18px;
+  height: 12px;
+  border-radius: 2px;
+  background: linear-gradient(#ff9933 0 33.3%, #f4f4f4 33.3% 66.6%, #138808 66.6%);
+}
+
+.jumpLink[data-accent="saffron"] i {
+  background: linear-gradient(135deg, #ff9a3c, #e8601f 55%, #8f2a0c);
+}
+
+.jumpLink b {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+  font-size: 0.75rem;
+}
+
+/* Board: one block per level. */
+.boardLevel {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+}
+
+.boardLevel + .boardLevel {
+  margin-top: 6px;
+}
+
+.boardLevelName {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #fbecc4;
+}
+
+.boardLevelName::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgb(227 194 122 / 0.4), transparent);
+}
+
+.boardLevel[data-accent="tricolour"] .boardLevelName::before,
+.boardLevel[data-accent="saffron"] .boardLevelName::before {
+  content: "";
+  width: 14px;
+  height: 9px;
+  border-radius: 1.5px;
+  background: linear-gradient(#ff9933 0 33.3%, #f4f4f4 33.3% 66.6%, #138808 66.6%);
+}
+
+.boardLevel[data-accent="saffron"] .boardLevelName::before {
+  background: linear-gradient(135deg, #ff9a3c, #e8601f 55%, #8f2a0c);
+}
+
+.boardList li {
+  padding: 7px 4px;
+}
+
+.note {
+  padding-bottom: 10px;
+}
+
+@media (max-width: 640px) {
+  .levelHead {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .levelNo {
+    font-size: 3rem;
+  }
+  .levelTitle {
+    font-size: clamp(1.9rem, 9.5vw, 2.6rem);
   }
 }

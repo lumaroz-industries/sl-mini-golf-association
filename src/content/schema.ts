@@ -473,16 +473,20 @@ export type PlayersPageContent = z.infer<typeof PlayersPageContent>;
 /* ------------------------------------------------------------- officials */
 
 /**
- * One official of SL Mini Golf Association. Officials have no page of their
- * own: everything about them is on their card on the Officials page.
+ * One of the officials of mini golf in India or Maharashtra. Officials have
+ * no page of their own: everything about them is on their card.
  */
 export const Official = z.object({
   id: z.string().min(1),
   name: z.string().trim().min(1).max(60),
   /** Their position, e.g. "President", "Secretary", "Tournament Director". */
   role: z.string().trim().min(1).max(60),
-  /** Which group of the page they are listed under (see `groups`). */
+  /** "india" (national) or "maharashtra" (state) — see `levels`. */
+  level: z.string().min(1),
+  /** Which group of that level they are listed under, e.g. "leadership". */
   group: z.string().min(1),
+  /** The body they serve, e.g. the national or state federation. */
+  organisation: optionalText,
   photo: ImageAsset.optional(),
   district: optionalText,
   /** Year they took up the role, e.g. 2025. */
@@ -495,12 +499,26 @@ export const Official = z.object({
 });
 export type Official = z.infer<typeof Official>;
 
+const OfficialsGroup = z.object({ id: z.string().min(1), title: z.string().min(1), note: optionalText, placeholders: z.number().int().min(0).max(12).default(4) });
+
 export const OfficialsPageContent = z.object({
   kicker: z.string().min(1),
   heading: z.string().min(1),
   intro: z.string().min(1),
-  /** The page's sections, in order (e.g. leadership, committee, officials). */
-  groups: z.array(z.object({ id: z.string().min(1), title: z.string().min(1), note: optionalText, placeholders: z.number().int().min(0).max(12).default(3) })).min(1),
+  /** The two chapters of the page: India (national) and Maharashtra (state). */
+  levels: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        title: z.string().min(1),
+        subtitle: z.string().min(1),
+        note: optionalText,
+        /** Accent of the chapter: tricolour for India, saffron for Maharashtra. */
+        accent: z.enum(["tricolour", "saffron"]),
+        groups: z.array(OfficialsGroup).min(1),
+      }),
+    )
+    .min(1),
   officials: z.array(Official).default([]),
   /** Shown on the empty card slots until officials are announced. */
   revealLabel: z.string().min(1),
