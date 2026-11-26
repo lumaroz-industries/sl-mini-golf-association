@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { findNavItem } from "@/config/navigation";
-import { getPlayers, getPlayersPageContent, getTopSeven } from "@/content/repository";
+import { getInternationalPlayers, getPlayers, getPlayersPageContent, getTopSeven } from "@/content/repository";
 import { PlayerDirectory } from "@/components/players/PlayerDirectory";
 import { MedalDefs } from "@/components/players/MedalDefs";
 import { initialsOf, medalTotals, totalMedals } from "@/lib/players";
 import { TopSeven } from "@/components/players/TopSeven";
+import { InternationalPlayers } from "@/components/players/InternationalPlayers";
 import { buildSlots } from "@/components/players/slots";
 import styles from "./page.module.css";
 
@@ -29,7 +30,7 @@ function Heading({ text }: { text: string }) {
 }
 
 export default async function PlayersPage() {
-  const [content, top, players] = await Promise.all([getPlayersPageContent(), getTopSeven(), getPlayers()]);
+  const [content, top, players, intl] = await Promise.all([getPlayersPageContent(), getTopSeven(), getPlayers(), getInternationalPlayers()]);
   const slots = buildSlots(top);
   const topSlugs = new Set(top.map((t) => t.slug));
   const directory = players.map((p) => {
@@ -48,6 +49,24 @@ export default async function PlayersPage() {
       topSeven: topSlugs.has(p.slug),
     };
   });
+
+  // The International section's cards: medals and latest international results.
+  const international = intl.map((p) => {
+    const medals = medalTotals(p);
+    const results = p.results.filter((r) => r.level === "international").sort((a, b) => b.year - a.year);
+    return {
+      slug: p.slug,
+      name: p.name,
+      photo: p.photo,
+      district: p.district,
+      medals,
+      total: totalMedals(medals),
+      topSeven: topSlugs.has(p.slug),
+      results: results.slice(0, 3).map((r) => ({ event: r.event, year: r.year, place: r.place, medal: r.medal, position: r.position })),
+      resultCount: results.length,
+    };
+  });
+  const { players: _order, ...intlText } = content.international;
 
   return (
     <div className={styles.page}>
@@ -69,6 +88,7 @@ export default async function PlayersPage() {
       </section>
 
       <MedalDefs />
+      <InternationalPlayers players={international} revealLabel={content.revealLabel} {...intlText} />
       <PlayerDirectory players={directory} {...content.directory} />
     </div>
   );

@@ -1,0 +1,80 @@
+/* International players section, between the Top 7 and the directory. */
+.section {
+  position: relative;
+  padding-block: clamp(72px, 10vw, 140px) clamp(40px, 6vw, 80px);
+  isolation: isolate;
+}
+
+.glow {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    radial-gradient(45% 40% at 50% 30%, rgb(185 225 255 / 0.08), transparent 70%),
+    radial-gradient(60% 50% at 50% 70%, rgb(0 168 107 / 0.07), transparent 70%),
+    linear-gradient(90deg, transparent, rgb(185 225 255 / 0.3), transparent) top / 100% 1px no-repeat;
+  pointer-events: none;
+}
+
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 16px;
+  margin-bottom: clamp(36px, 5vw, 64px);
+  text-align: center;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--dmd-ice);
+}
+
+.kicker i {
+  font-style: normal;
+  background: linear-gradient(135deg, #fff, #ffd1f0 40%, #b9e6ff 70%, #fff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 6px rgb(185 230 255 / 0.7));
+}
+
+.count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid rgb(185 230 255 / 0.4);
+  letter-spacing: 0;
+  color: #fff;
+}
+
+.title {
+  max-width: 100%;
+  margin: 0;
+  font-size: clamp(2.1rem, 7vw, 5.5rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.intro {
+  max-width: 50ch;
+  margin: 0;
+  font-size: var(--fs-md);
+  color: var(--fg-muted);
+}
+
+.emptyBody {
+  margin: 28px 0 0;
+  color: var(--fg-muted);
+  text-align: center;
+}

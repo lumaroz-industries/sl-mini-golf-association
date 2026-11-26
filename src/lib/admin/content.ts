@@ -390,6 +390,8 @@ export interface PlayerListItem {
   results: number;
   photo?: string;
   topSeven: boolean;
+  international: boolean;
+  card?: "state" | "national" | "international";
 }
 
 /* ------------------------------------------------------------------ top 7 */
@@ -464,10 +466,51 @@ export async function saveTopSeven(lineup: Partial<Record<string, unknown>>): Pr
   return { commit };
 }
 
+/* ---------------------------------------------------------- international */
+
+type IntlSection = { players?: string[] } & Record<string, unknown>;
+
+/** The International section's players, in order. */
+export async function readInternational(): Promise<string[]> {
+  const page = await readPlayersPage();
+  return ((page.international as IntlSection | undefined)?.players ?? []).filter((s) => typeof s === "string");
+}
+
+async function internationalSlugs(): Promise<Set<string>> {
+  try {
+    return new Set(await readInternational());
+  } catch {
+    return new Set(((playersPage as { international?: IntlSection }).international?.players ?? []) as string[]);
+  }
+}
+
+/** Saves the International section chosen in the admin: existing, published players, each once, in order. */
+export async function saveInternational(list: unknown): Promise<{ commit: string }> {
+  if (!Array.isArray(list)) throw new ContentError("The list of players is missing.");
+  const players: string[] = [];
+  for (const v of list) {
+    const slug = String(v);
+    if (!SLUG.test(slug)) throw new ContentError("One of the players is invalid.");
+    if (players.includes(slug)) throw new ContentError("A player can only be in the International section once.");
+    const p = await readPlayer(slug);
+    if (!p) throw new ContentError(`The player "${slug}" no longer exists.`);
+    if (p.draft === true) throw new ContentError(`${String(p.name ?? slug)} is still a draft — publish them first, then add them here.`);
+    players.push(slug);
+  }
+  const page = await readPlayersPage();
+  const current = PlayersPageContent.safeParse(page);
+  const section = current.success ? current.data.international : ((page.international as IntlSection | undefined) ?? {});
+  const next = { ...page, international: { ...section, players } };
+  const parsed = PlayersPageContent.safeParse(next);
+  if (!parsed.success) throw new ContentError("The list needs fixing.", issuesOf(parsed.error));
+  const commit = await getStorage().commit("Admin: Update the International players", [{ path: PLAYERS_PAGE, text: JSON.stringify(next, null, 2) + "\n" }]);
+  return { commit };
+}
+
 export async function listPlayers(): Promise<PlayerListItem[]> {
   const storage = getStorage();
   const files = (await storage.list(`${CONTENT}/players`)).filter((f) => f.endsWith(".json"));
-  const top = await topSevenSlugs();
+  const [top, intl] = await Promise.all([topSevenSlugs(), internationalSlugs()]);
   const items = await Promise.all(
     files.map(async (f): Promise<PlayerListItem | null> => {
       const text = await storage.readText(f);
@@ -483,6 +526,8 @@ export async function listPlayers(): Promise<PlayerListItem[]> {
         results: Array.isArray(d.results) ? d.results.length : 0,
         photo: (d.photo as { src?: string } | undefined)?.src,
         topSeven: top.has(slug),
+        international: intl.has(slug),
+        card: d.card === "national" || d.card === "international" || d.card === "state" ? d.card : undefined,
       };
     }),
   );
@@ -499,7 +544,7 @@ export async function savePlayer(input: { mode: "create" | "edit"; data: Record<
   const storage = getStorage();
   const data = clean({ ...input.data });
   const slug = String(data.slug ?? "");
-  if (!SLUG.test(slug) || slug === "new" || slug === "top-7") throw new ContentError("Choose a web address using lowercase letters, numbers and hyphens, e.g. first-last.");
+  if (!SLUG.test(slug) || slug === "new" || slug === "top-7" || slug === "international") throw new ContentError("Choose a web address using lowercase letters, numbers and hyphens, e.g. first-last.");
   const file = `${CONTENT}/players/${slug}.json`;
   const existing = await storage.readText(file);
   if (input.mode === "create" && existing !== null) throw new ContentError(`There is already a player at this web address (${slug}). Choose another.`);
@@ -529,5 +574,12 @@ export async function deletePlayer(slug: string): Promise<string> {
   if ((await topSevenSlugs()).has(slug)) throw new ContentError("This player is in Maharashtra's Top 7. Take them out of the line-up first (Players → Top 7).");
   const storage = getStorage();
   const changes: Change[] = [{ path: `${CONTENT}/players/${slug}.json`, delete: true }, ...(await storage.list(`public/players/${slug}`)).map((x) => ({ path: x, delete: true as const }))];
+  // Take them out of the International section too.
+  const page = await readPlayersPage();
+  const intl = page.international as IntlSection | undefined;
+  if (intl?.players?.includes(slug)) {
+    const next = { ...page, international: { ...intl, players: intl.players.filter((s) => s !== slug) } };
+    changes.push({ path: PLAYERS_PAGE, text: JSON.stringify(next, null, 2) + "\n" });
+  }
   return storage.commit(`Admin: Delete player "${String(p.name ?? slug)}"`, changes);
 }

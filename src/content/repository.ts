@@ -259,6 +259,12 @@ export async function getPlayer(slug: string) {
   return (await getPlayers()).find((p) => p.slug === slug);
 }
 
+/** The International section's players, in the admins' order (unknown or draft players are left out). */
+export async function getInternationalPlayers() {
+  const [content, players] = await Promise.all([getPlayersPageContent(), getPlayers()]);
+  return content.international.players.flatMap((slug) => players.filter((p) => p.slug === slug));
+}
+
 /** The Top 7 line-up resolved to player records (unknown or draft players leave an empty place). */
 export async function getTopSeven() {
   const [content, players] = await Promise.all([getPlayersPageContent(), getPlayers()]);

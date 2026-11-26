@@ -40,6 +40,21 @@
       "place": 3
     }
   ],
+  "international": {
+    "kicker": "International players",
+    "heading": "On the world stage",
+    "intro": "Maharashtra's players who compete at international level. Tap a card to turn it over.",
+    "emptyBody": "Maharashtra's international players will be added here soon.",
+    "players": [
+      "pranjali-surduse",
+      "sakshi-lahane",
+      "nehal-bagmar",
+      "ishika-hanwat",
+      "saurabh-pise",
+      "suyash-lahane",
+      "anushka-pullarwar"
+    ]
+  },
   "directory": {
     "kicker": "All Maharashtra players",
     "heading": "Player directory",

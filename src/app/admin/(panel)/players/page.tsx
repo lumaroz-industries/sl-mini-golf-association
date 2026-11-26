@@ -10,13 +10,16 @@ export default async function PlayersList() {
   const r = await attempt(() => listPlayers());
   return (
     <>
-      <PageHead kicker="Players" title="Players" lede="Every Maharashtra player in the directory, with their results. Top 7 players are marked." action={{ href: "/admin/players/new", label: "+ New player" }} />
+      <PageHead kicker="Players" title="Players" lede="Every Maharashtra player in the directory, with their results. Top 7 and International players are marked." action={{ href: "/admin/players/new", label: "+ New player" }} />
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", margin: "-8px 0 24px" }}>
         <Link href="/admin/players/top-7" className={`${s.btn}`}>
           ★ Choose the Top 7
         </Link>
+        <Link href="/admin/players/international" className={`${s.btn}`}>
+          ◆ International players
+        </Link>
         <span className={s.help} style={{ alignSelf: "center" }}>
-          {r.data ? `${r.data.filter((p) => p.topSeven).length} of 7 places filled` : ""}
+          {r.data ? `${r.data.filter((p) => p.topSeven).length} of 7 places filled · ${r.data.filter((p) => p.international).length} in International` : ""}
         </span>
       </div>
       {r.error && <SetupNotice>{r.error}</SetupNotice>}
@@ -33,6 +36,7 @@ export default async function PlayersList() {
               <div className={s.rowMeta}>
                 <StatusPill draft={p.draft} />
                 {p.topSeven && <span className={s.pill}>Top 7</span>}
+                {p.international && <span className={s.pill}>International</span>}
                 {p.district && <span>{p.district}</span>}
                 <span>
                   {p.results} result{p.results === 1 ? "" : "s"}

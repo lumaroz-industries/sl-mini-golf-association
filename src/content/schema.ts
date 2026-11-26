@@ -446,6 +446,26 @@ export const PlayersPageContent = z
     /** Shown on cards whose player has not been announced yet. */
     revealLabel: z.string().min(1),
     featured: z.array(FeaturedSlot).max(7),
+    /**
+     * The International players section (between the Top 7 and the directory):
+     * Maharashtra's international players, Top 7 included, in the order chosen
+     * in the admin (Players → International).
+     */
+    international: z
+      .object({
+        kicker: z.string().min(1),
+        heading: z.string().min(1),
+        intro: z.string().min(1),
+        emptyBody: z.string().min(1),
+        players: z.array(slug).max(80).default([]),
+      })
+      .default({
+        kicker: "International players",
+        heading: "On the world stage",
+        intro: "Maharashtra's players who compete at international level. Tap a card to turn it over.",
+        emptyBody: "Maharashtra's international players will be added here soon.",
+        players: [],
+      }),
     directory: z.object({
       kicker: z.string().min(1),
       heading: z.string().min(1),
@@ -466,6 +486,8 @@ export const PlayersPageContent = z
     if (c.featured.some((p) => p.side === "center" && p.place !== undefined)) ctx.addIssue({ code: "custom", path: ["featured"], message: "The centre card does not take a place." });
     const slugs = c.featured.map((p) => p.slug);
     if (new Set(slugs).size !== slugs.length) ctx.addIssue({ code: "custom", path: ["featured"], message: "Each player appears only once in the Top 7." });
+    const intl = c.international.players;
+    if (new Set(intl).size !== intl.length) ctx.addIssue({ code: "custom", path: ["international", "players"], message: "Each player appears only once in the International section." });
   });
 export type PlayersPageContent = z.infer<typeof PlayersPageContent>;
 
