@@ -10,7 +10,7 @@ import "server-only";
 import { cache } from "react";
 import { deriveHandle } from "@/config/social-platforms";
 import { z } from "zod";
-import { ArticleCategory, ArticlesPageContent, GalleryPageContent, PlayersPageContent, UpdatesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
+import { ArticleCategory, ArticlesPageContent, GalleryPageContent, OfficialsPageContent, PlayersPageContent, UpdatesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
 import { loadArticles, type RawArticle } from "./articles";
 import { loadUpdates, type RawUpdate } from "./updates";
 import { loadGallery, type GalleryAlbum } from "./gallery";
@@ -25,6 +25,7 @@ import articleCategoriesJson from "./sources/local/article-categories.json";
 import updatesPageJson from "./sources/local/updates.json";
 import galleryPageJson from "./sources/local/gallery.json";
 import playersJson from "./sources/local/players.json";
+import officialsJson from "./sources/local/officials.json";
 
 interface ContentSource {
   site(): Promise<unknown>;
@@ -240,6 +241,12 @@ export async function getAlbum(slug: string): Promise<GalleryAlbum | undefined> 
 }
 
 /* ----------------------------------------------------------------- players */
+
+/** The Officials page: its sections and the published officials. */
+export const getOfficialsPageContent = cache(async (): Promise<OfficialsPageContent> => {
+  const c = parse(OfficialsPageContent, officialsJson, "officials page");
+  return { ...c, officials: c.officials.filter((o) => !o.draft) };
+});
 
 export const getPlayersPageContent = cache(async (): Promise<PlayersPageContent> =>
   parse(PlayersPageContent, await source.players(), "players page"),

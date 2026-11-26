@@ -1,0 +1,28 @@
+{
+  "kicker": "Officials",
+  "heading": "The people behind the game",
+  "intro": "The officials of SL Mini Golf Association \u2014 the people who organise, run and look after mini golf in Maharashtra.",
+  "groups": [
+    {
+      "id": "leadership",
+      "title": "Leadership",
+      "note": "Guiding the association.",
+      "placeholders": 4
+    },
+    {
+      "id": "committee",
+      "title": "Committee",
+      "note": "Running the association day to day.",
+      "placeholders": 4
+    },
+    {
+      "id": "officials",
+      "title": "Tournament officials",
+      "note": "On the course at every event.",
+      "placeholders": 4
+    }
+  ],
+  "officials": [],
+  "revealLabel": "To be announced",
+  "note": "Officials are listed as they are confirmed by SL Mini Golf Association."
+}

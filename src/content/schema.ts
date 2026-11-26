@@ -469,3 +469,41 @@ export const PlayersPageContent = z
   });
 export type PlayersPageContent = z.infer<typeof PlayersPageContent>;
 
+
+/* ------------------------------------------------------------- officials */
+
+/**
+ * One official of SL Mini Golf Association. Officials have no page of their
+ * own: everything about them is on their card on the Officials page.
+ */
+export const Official = z.object({
+  id: z.string().min(1),
+  name: z.string().trim().min(1).max(60),
+  /** Their position, e.g. "President", "Secretary", "Tournament Director". */
+  role: z.string().trim().min(1).max(60),
+  /** Which group of the page they are listed under (see `groups`). */
+  group: z.string().min(1),
+  photo: ImageAsset.optional(),
+  district: optionalText,
+  /** Year they took up the role, e.g. 2025. */
+  since: z.number().int().min(1950).max(2100).optional(),
+  /** One or two lines about them. */
+  bio: optionalText,
+  instagram: z.string().url().optional(),
+  email: z.string().email().optional(),
+  draft: z.boolean().default(false),
+});
+export type Official = z.infer<typeof Official>;
+
+export const OfficialsPageContent = z.object({
+  kicker: z.string().min(1),
+  heading: z.string().min(1),
+  intro: z.string().min(1),
+  /** The page's sections, in order (e.g. leadership, committee, officials). */
+  groups: z.array(z.object({ id: z.string().min(1), title: z.string().min(1), note: optionalText, placeholders: z.number().int().min(0).max(12).default(3) })).min(1),
+  officials: z.array(Official).default([]),
+  /** Shown on the empty card slots until officials are announced. */
+  revealLabel: z.string().min(1),
+  note: optionalText,
+});
+export type OfficialsPageContent = z.infer<typeof OfficialsPageContent>;
