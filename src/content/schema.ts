@@ -410,6 +410,8 @@ export const Player = z.object({
   card: z.enum(["state", "national", "international"]).optional(),
   /** Real photograph only (portrait works best). Without one, cards show initials. */
   photo: ImageAsset.optional(),
+  /** Optional different photo for the International players section (otherwise `photo` is used there too). */
+  intlPhoto: ImageAsset.optional(),
   /**
    * Medal totals shown on the cards. Leave a count out (rather than 0) when it
    * is not known yet. If no totals are given, they are counted from `results`.

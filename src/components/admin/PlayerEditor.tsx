@@ -26,6 +26,8 @@ export interface PlayerInitial {
   district?: string;
   card?: "state" | "national" | "international";
   photo?: ImageValue;
+  /** Optional different photo for the International players section. */
+  intlPhoto?: ImageValue;
   medals?: { gold?: number; silver?: number; bronze?: number };
   results?: Array<{ event: string; year: number; level: string; category?: string; place?: string; medal?: "gold" | "silver" | "bronze"; position?: number }>;
   bio?: string;
@@ -62,6 +64,7 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
   const [district, setDistrict] = useState(initial.district ?? "");
   const [card, setCard] = useState<"state" | "national" | "international">(initial.card ?? "state");
   const [photo, setPhoto] = useState<ImageValue | undefined>(initial.photo);
+  const [intlPhoto, setIntlPhoto] = useState<ImageValue | undefined>(initial.intlPhoto);
   const [manual, setManual] = useState(!!initial.medals);
   const [medals, setMedals] = useState({
     gold: initial.medals?.gold?.toString() ?? "",
@@ -97,6 +100,7 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
     if (!name.trim()) return "Add the player's name.";
     if (!effectiveSlug) return "Add a web address.";
     if (photo && !photo.alt.trim()) return "Describe the photo.";
+    if (intlPhoto && !intlPhoto.alt.trim()) return "Describe the International card photo.";
     for (const [i, r] of rows.entries()) {
       if (!r.event.trim()) return `Result ${i + 1}: add the event name (or remove the row).`;
       if (!/^\d{4}$/.test(r.year)) return `Result ${i + 1}: the year must be four digits, e.g. 2026.`;
@@ -112,6 +116,7 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
         district,
         card: card === "state" ? undefined : card,
         photo: photo ? { src: photo.src, alt: photo.alt, width: photo.width, height: photo.height } : undefined,
+        intlPhoto: intlPhoto ? { src: intlPhoto.src, alt: intlPhoto.alt, width: intlPhoto.width, height: intlPhoto.height } : undefined,
         medals: manual ? { gold: num(medals.gold), silver: num(medals.silver), bronze: num(medals.bronze) } : undefined,
         results: rows.map((r) => ({
           event: r.event,
@@ -169,6 +174,8 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
             Want a studio-style card photo? <Link href={`/admin/card-maker?player=${effectiveSlug}`} style={{ color: "var(--gold)", textDecoration: "underline" }}>Open the Card Maker</Link>.
           </p>
         )}
+        <ImageField label="International card photo" value={intlPhoto} onChange={setIntlPhoto} onUploaded={(u) => setUploads((x) => [...x, u])} collection="players" slug={effectiveSlug} withCredit={false} />
+        <p className={s.help}>Optional. A different photo for this player&apos;s card in the International players section. Leave empty to use the photo above.</p>
       </Section>
 
       <Section title={`Results (${rows.length})`} hint="Every competition result. These power the Level and Year filters and the player's results list.">

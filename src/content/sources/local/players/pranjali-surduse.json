@@ -9,6 +9,12 @@
     "width": 960,
     "height": 1200
   },
+  "intlPhoto": {
+    "src": "/players/pranjali-surduse/international.webp",
+    "alt": "Pranjali Surduse in an India team blazer, arms folded",
+    "width": 1086,
+    "height": 1448
+  },
   "medals": {
     "gold": 7,
     "silver": 1,

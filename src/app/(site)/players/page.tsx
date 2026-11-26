@@ -57,7 +57,7 @@ export default async function PlayersPage() {
     return {
       slug: p.slug,
       name: p.name,
-      photo: p.photo,
+      photo: p.intlPhoto ?? p.photo,
       district: p.district,
       medals,
       total: totalMedals(medals),
