@@ -691,84 +691,6 @@
     linear-gradient(145deg, #ffffff 0%, #d9eefb 12%, #ffd6ef 22%, #7f9fb3 34%, #1b2830 46%, #b9e6ff 60%, #ffffff 70%, #e6d9ff 80%, #6f8fa3 90%, #1b2830 100%);
 }
 
-/* ============================================================ golf flag
-   The card's level (State / National / International) flown on a golf flag:
-   a metal pin with a pennant in the card's metal. */
-.flag {
-  display: inline-flex;
-  align-items: flex-start;
-  height: calc(var(--w) * 0.11);
-}
-
-.pin {
-  width: 2px;
-  height: 100%;
-  border-radius: 2px;
-  background: linear-gradient(180deg, var(--gold-hi), var(--gold-lo));
-  box-shadow: 0 0 6px rgb(var(--m) / 0.4);
-}
-
-/* Pin cap: a tiny ball on top. */
-.pin::before {
-  content: "";
-  display: block;
-  width: 6px;
-  height: 6px;
-  margin: -3px 0 0 -2px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #fff, var(--gold-hi) 40%, var(--gold-lo));
-}
-
-.pennant {
-  position: relative;
-  margin-top: 2px;
-  padding: calc(var(--w) * 0.012) calc(var(--w) * 0.05) calc(var(--w) * 0.012) calc(var(--w) * 0.024);
-  font-family: var(--font-display);
-  font-size: max(0.5rem, calc(var(--w) * 0.034));
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #120c04;
-  background:
-    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.08) 0 1px, transparent 1px 3px),
-    linear-gradient(135deg, var(--gold-hi), var(--gold) 45%, var(--gold-lo));
-  clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 50%, 100% 100%, 0 100%);
-  filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.6));
-  transform-origin: left center;
-  animation: wave 3.6s ease-in-out infinite;
-}
-
-.card[data-card="national"] .pennant {
-  background:
-    linear-gradient(90deg, #ff9933 0 4px, #f4f4f4 4px 7px, #138808 7px 10px, transparent 10px),
-    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.08) 0 1px, transparent 1px 3px),
-    linear-gradient(135deg, var(--gold-hi), var(--gold) 45%, var(--gold-lo));
-  padding-left: calc(var(--w) * 0.024 + 10px);
-}
-
-.card[data-card="international"] .pennant {
-  background:
-    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.1) 0 1px, transparent 1px 3px),
-    linear-gradient(135deg, #ffffff, #d9eefb 30%, #ffd6ef 50%, #b9e6ff 70%, #7f9fb3);
-  color: #0b1620;
-}
-
-@keyframes wave {
-  0%,
-  100% {
-    transform: skewY(0deg) scaleX(1);
-  }
-  50% {
-    transform: skewY(-2deg) scaleX(0.97);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pennant {
-    animation: none;
-  }
-}
-
 /* The putting-green hole and flag, line art behind the medal row. */
 .hole {
   position: absolute;
@@ -792,54 +714,47 @@
   fill: rgb(var(--m) / 0.1);
 }
 
-/* ================================================================ level tab
-   The level joins the badge as one plaque: [ TOP 7 | ⚑ STATE ]. The tab is
-   filled with the card's metal; nothing hangs over the photo. */
-.badge {
-  display: inline-flex;
-  align-items: stretch;
-  padding: 0;
-  overflow: hidden;
-}
-
-.badge > span {
-  padding: 5px 9px 4px 10px;
-}
-
-.level {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 9px 3px 8px;
-  font-style: normal;
-  font-family: var(--font-display);
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #120c04;
+/* ================================================================ level tag
+   Top right, mirroring the badge on the left: same black enamel plaque and
+   metal rim, themed per level. */
+.levelTag {
+  position: relative;
+  padding: 5px 10px 4px;
+  border-radius: 5px;
+  border: 1px solid transparent;
   background:
-    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.1) 0 1px, transparent 1px 3px),
-    linear-gradient(135deg, var(--gold-hi), var(--gold) 50%, var(--gold-lo));
-  box-shadow: inset 1px 0 0 rgb(0 0 0 / 0.5);
+    linear-gradient(#0a0a0a, #0a0a0a) padding-box,
+    var(--lvl-rim) border-box;
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  box-shadow: 0 6px 14px -6px rgb(0 0 0 / 0.9);
 }
 
-.card[data-large] .level,
-.card[data-large] .badge > span {
+.levelTag > span {
+  background: var(--lvl-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card[data-large] .levelTag {
   font-size: 0.75rem;
 }
 
-.card[data-card="national"] .level {
-  background:
-    linear-gradient(90deg, #ff9933 0 3px, #f4f4f4 3px 5px, #138808 5px 7px, transparent 7px),
-    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.1) 0 1px, transparent 1px 3px),
-    linear-gradient(135deg, var(--gold-hi), var(--gold) 50%, var(--gold-lo));
-  padding-left: 13px;
+.card[data-card="state"] .levelTag {
+  --lvl-rim: linear-gradient(135deg, #ffe3b3, #f4a23c 40%, #a33a12 75%, #f4a23c);
+  --lvl-text: linear-gradient(180deg, #ffe3b3, #f4a23c 55%, #c2541a);
 }
 
-.card[data-card="international"] .level {
-  color: #0b1620;
-  background:
-    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.12) 0 1px, transparent 1px 3px),
-    linear-gradient(135deg, #ffffff, #d9eefb 30%, #ffd6ef 55%, #b9e6ff 75%, #8fb0c4);
+.card[data-card="national"] .levelTag {
+  --lvl-rim: linear-gradient(135deg, #ff9933 0%, #ffd9a8 30%, #f4f4f4 50%, #9be29b 70%, #138808 100%);
+  --lvl-text: linear-gradient(90deg, #ffb066 0%, #ffffff 50%, #4fcf4f 100%);
+}
+
+.card[data-card="international"] .levelTag {
+  --lvl-rim: linear-gradient(135deg, #ffffff, #d9eefb 30%, #ffd6ef 55%, #b9e6ff 75%, #8fb0c4);
+  --lvl-text: linear-gradient(180deg, #ffffff 0%, #eef8ff 40%, #9ec6de 75%, #e8f6ff 100%);
 }

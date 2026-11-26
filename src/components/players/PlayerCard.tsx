@@ -26,7 +26,12 @@ interface PlayerCardProps {
 }
 
 /** The three card designs, chosen per player in the admin. */
-const TIERS = { state: "State", national: "National", international: "International" } as const;
+/** Short level tags, shown on the plaque at the top right. */
+const TIERS = {
+  state: { tag: "ST", name: "State" },
+  national: { tag: "NAT", name: "National" },
+  international: { tag: "INTL", name: "International" },
+} as const;
 
 const MEDALS: Array<{ kind: MedalKind; label: string }> = [
   { kind: "gold", label: "Gold" },
@@ -39,7 +44,8 @@ const MEDALS: Array<{ kind: MedalKind; label: string }> = [
  * (set per player in the admin): State (saffron and deep red with gold),
  * National (gold with a tricolour band) and International (diamond —
  * platinum, a faceted lattice and prismatic light). All share a black
- * premium body with golf details: the level on the badge with a golf flag, a
+ * premium body with golf details (the level as a short tag — ST / NAT / INTL —
+ * on a plaque mirroring the badge), a
  * ball-dimple texture, putting-green contours, a hole with its flag and a
  * golf ball set in the rule.
  * Cards without an announced player show the SL mark and "Reveal soon".
@@ -99,15 +105,12 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
         <span className={styles.corners} aria-hidden="true" />
 
         <div className={styles.top} aria-hidden="true">
-          {/* One plaque: the card's badge, and its level on a metal-filled tab with a golf flag. */}
           <span className={styles.badge}>
             <span>{badge}</span>
-            <em className={styles.level}>
-              <svg viewBox="0 0 10 14" width="7" height="10" aria-hidden="true">
-                <path d="M1.5 14V1M1.5 1.4l7 2.6-7 2.6" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-              </svg>
-              {TIERS[tier]}
-            </em>
+          </span>
+          {/* The level, on a plaque mirroring the badge: ST / NAT / INTL. */}
+          <span className={styles.levelTag} title={`${TIERS[tier].name} level`}>
+            <span>{TIERS[tier].tag}</span>
           </span>
         </div>
 
