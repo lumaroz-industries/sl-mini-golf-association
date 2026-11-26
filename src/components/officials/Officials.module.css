@@ -1,4 +1,4 @@
-/* Officials page: a clubhouse honours board, then the officials' cards by group. */
+/* Officials page: the national and state officials, level by level. */
 
 .page {
   position: relative;
@@ -269,9 +269,6 @@
 @media (prefers-reduced-motion: reduce) {
   .grid > li {
     animation: none;
-  }
-  .board {
-    transform: none;
   }
 }
 
