@@ -3,6 +3,12 @@
   "name": "Aayush Bante",
   "gender": "male",
   "card": "international",
+  "photo": {
+    "src": "/players/aayush-bante/confident-portrait-against-emerald-green-k60w.webp",
+    "alt": "Aayush Bante",
+    "width": 1086,
+    "height": 1448
+  },
   "intlPhoto": {
     "src": "/players/aayush-bante/confident-portrait-against-emerald-green-7z53.webp",
     "alt": "Aayush Bante",
