@@ -64,7 +64,7 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
               alt={player.photo.alt}
               width={player.photo.width}
               height={player.photo.height}
-              sizes={large ? "(max-width: 760px) 80vw, 420px" : "(max-width: 760px) 64vw, 300px"}
+              sizes={large ? "(max-width: 760px) 80vw, 420px" : "(max-width: 760px) 72vw, 300px"}
               priority={priority}
               className={styles.photoImg}
               draggable={false}
@@ -101,6 +101,12 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
         {tier === "national" && <span className={styles.tricolour} aria-hidden="true" />}
         {tier === "international" && <span className={styles.facets} aria-hidden="true" />}
         <span className={styles.shine} aria-hidden="true" />
+        <span className={styles.holo} aria-hidden="true" />
+        <span className={styles.glints} aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
 
         <span className={styles.corners} aria-hidden="true" />
 

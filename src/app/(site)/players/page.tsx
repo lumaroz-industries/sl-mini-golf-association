@@ -61,7 +61,6 @@ export default async function PlayersPage() {
       district: p.district,
       medals,
       total: totalMedals(medals),
-      topSeven: topSlugs.has(p.slug),
       results: results.slice(0, 3).map((r) => ({ event: r.event, year: r.year, place: r.place, medal: r.medal, position: r.position })),
       resultCount: results.length,
     };

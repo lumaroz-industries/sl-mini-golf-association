@@ -14,7 +14,7 @@ interface TopSevenProps {
 const MIN = -3;
 const MAX = 3;
 const clamp = (n: number) => Math.max(MIN, Math.min(MAX, n));
-const MOBILE_STEP = 62;
+const MOBILE_STEP = 66;
 /** Hover must rest on a card this long before it comes forward (stops flicker on quick sweeps). */
 const HOVER_INTENT_MS = 70;
 

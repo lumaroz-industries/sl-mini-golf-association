@@ -16,7 +16,7 @@
 
 @media (max-width: 760px) {
   .stage {
-    height: calc(min(64vw, 260px) * 1.4 + 130px);
+    height: calc(min(70vw, 290px) * 1.4 + 130px);
   }
 }
 
@@ -176,7 +176,7 @@
 @media (max-width: 760px) {
   .nav {
     /* vertical centre of the phone-sized card */
-    top: calc(20px + min(64vw, 260px) * 0.7);
+    top: calc(20px + min(70vw, 290px) * 0.7);
   }
 
   .navPrev {
