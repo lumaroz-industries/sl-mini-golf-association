@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { OutlinedTitle } from "@/components/hero/OutlinedTitle";
+import { MagazineStack } from "@/components/hero/MagazineStack";
+import hero from "@/components/hero/Hero.module.css";
 import { findNavItem } from "@/config/navigation";
 import { getArticleCategories, getArticles, getArticlesPageContent } from "@/content/repository";
 import { ArticleBrowser } from "@/components/articles/ArticleBrowser";
@@ -23,11 +26,22 @@ export default async function ArticlesPage() {
     <div className={styles.page}>
       <div className={styles.glow} aria-hidden="true" />
       <div className="container">
-        <header className={styles.header}>
-          <span className="kicker">{content.kicker}</span>
-          <h1 className={styles.title}>{content.heading}</h1>
-          <p className={styles.intro}>{content.intro}</p>
-        </header>
+        <div className={`${hero.split} ${styles.hero}`}>
+          <header className={styles.header}>
+            <span className="kicker">{content.kicker}</span>
+            <OutlinedTitle text={content.heading} className={styles.title} />
+            <p className={styles.intro}>{content.intro}</p>
+            <p className={hero.stats}>
+              <span className={hero.stat}>
+                <b>{articles.length}</b> {articles.length === 1 ? "story" : "stories"}
+              </span>
+              <span className={hero.stat}>
+                <b>{categories.length}</b> topics
+              </span>
+            </p>
+          </header>
+          <MagazineStack lead={lead} />
+        </div>
 
         {lead ? (
           <div className={styles.body}>

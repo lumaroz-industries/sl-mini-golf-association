@@ -1,0 +1,410 @@
+/* Shared hero pieces for the Articles and Updates pages. */
+
+/* ---------------------------------------------------------- outlined word */
+.outline {
+  color: transparent;
+  -webkit-text-stroke: 2px rgb(255 255 255 / 0.92);
+  background: linear-gradient(100deg, transparent 40%, rgb(0 168 107 / 0.35) 50%, transparent 60%) 0 0 / 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: sweep 6s ease-in-out 1s infinite;
+}
+
+@keyframes sweep {
+  0%,
+  60% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+/* Two-column hero: copy on the left, the visual on the right. */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(255 255 255 / 0.03);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.stat b {
+  color: var(--fg);
+}
+
+/* ========================================================== magazine stack */
+.stack {
+  position: relative;
+  justify-self: center;
+  width: min(360px, 78vw);
+  aspect-ratio: 0.8;
+}
+
+/* On phones the featured story's own card follows right below: no need for the stack. */
+@media (max-width: 600px) {
+  .stack {
+    display: none;
+  }
+}
+
+.stackGlow {
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 168 107 / 0.25), rgb(227 194 122 / 0.06) 55%, transparent 75%);
+}
+
+.sheet {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(170deg, #0f1613, #060908) padding-box,
+    linear-gradient(140deg, rgb(0 168 107 / 0.7), rgb(255 255 255 / 0.06) 40%, rgb(227 194 122 / 0.55)) border-box;
+  box-shadow: 0 40px 80px -30px #000;
+  overflow: hidden;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sheetBack {
+  transform: translate(-20%, -6%) rotate(-12deg) scale(0.9);
+  opacity: 0.55;
+}
+
+.sheetMid {
+  transform: translate(14%, -2%) rotate(9deg) scale(0.94);
+  opacity: 0.75;
+}
+
+.sheetFront {
+  transform: rotate(-2deg);
+  display: grid;
+  grid-template-rows: 1.15fr auto;
+  animation: float 7s ease-in-out infinite;
+}
+
+.stack:hover .sheetBack {
+  transform: translate(-30%, -8%) rotate(-17deg) scale(0.9);
+}
+
+.stack:hover .sheetMid {
+  transform: translate(24%, -4%) rotate(14deg) scale(0.94);
+}
+
+@keyframes float {
+  50% {
+    translate: 0 -10px;
+  }
+}
+
+/* Placeholder text lines on the cards behind. */
+.lines {
+  position: absolute;
+  inset: 58% 12% 12%;
+  background:
+    linear-gradient(rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.14)) 0 0 / 70% 9px no-repeat,
+    linear-gradient(rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.08)) 0 24px / 100% 6px no-repeat,
+    linear-gradient(rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.08)) 0 40px / 85% 6px no-repeat,
+    linear-gradient(rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.08)) 0 56px / 60% 6px no-repeat;
+}
+
+.sheetCover {
+  position: relative;
+  overflow: hidden;
+}
+
+.sheetCover img,
+.sheetCover > span {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sheetText {
+  display: grid;
+  gap: 8px;
+  padding: 18px 20px 22px;
+}
+
+.sheetKicker {
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.sheetTitle {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.12;
+}
+
+/* Gold bookmark ribbon. */
+.ribbon {
+  position: absolute;
+  top: -2px;
+  right: 22px;
+  width: 26px;
+  height: 46px;
+  background: linear-gradient(180deg, #fbecc4, #e3c27a 50%, #8c6a2e);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  filter: drop-shadow(0 4px 6px rgb(0 0 0 / 0.6));
+}
+
+.sheen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sheen::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.18), transparent);
+  transform: skewX(-16deg);
+  animation: glide 5s ease-in-out 1.5s infinite;
+}
+
+@keyframes glide {
+  0%,
+  55% {
+    left: -60%;
+  }
+  100% {
+    left: 140%;
+  }
+}
+
+/* ================================================================ news desk */
+.desk {
+  position: relative;
+  justify-self: center;
+  width: min(420px, 100%);
+  min-width: 0;
+}
+
+.board,
+.ticker {
+  min-width: 0;
+}
+
+.deskGlow {
+  position: absolute;
+  inset: -25%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 168 107 / 0.22), transparent 72%);
+}
+
+/* A golf-course scoreboard: black panel, metal frame, bolts in the corners. */
+.board {
+  position: relative;
+  padding: 22px 22px 18px;
+  border-radius: 18px;
+  border: 1px solid transparent;
+  background:
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.015) 0 2px, transparent 2px 4px) padding-box,
+    linear-gradient(175deg, #0b100e, #030504) padding-box,
+    linear-gradient(140deg, rgb(0 168 107 / 0.75), rgb(255 255 255 / 0.06) 40%, rgb(227 194 122 / 0.6)) border-box;
+  box-shadow:
+    0 40px 80px -30px #000,
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+  transform: perspective(1200px) rotateY(-8deg) rotateX(3deg);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.desk:hover .board {
+  transform: perspective(1200px) rotateY(0) rotateX(0);
+}
+
+.screws {
+  position: absolute;
+  inset: 9px;
+  pointer-events: none;
+  --b: radial-gradient(circle, #6d7478 0 2px, #1b1f1e 2.5px, transparent 3px);
+  background:
+    var(--b) top left / 8px 8px no-repeat,
+    var(--b) top right / 8px 8px no-repeat,
+    var(--b) bottom left / 8px 8px no-repeat,
+    var(--b) bottom right / 8px 8px no-repeat;
+}
+
+.boardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 6px 14px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #ff6b6b;
+}
+
+.live i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3b3b;
+  box-shadow: 0 0 10px #ff3b3b;
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.boardTitle {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #fbecc4, #b38d45);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 8px 6px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgb(255 255 255 / 0.07);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+/* LED digits: glowing emerald in a dark cell. */
+.led {
+  min-width: 52px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #010302;
+  box-shadow: inset 0 0 0 1px rgb(0 168 107 / 0.25);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: center;
+  color: #3dffb0;
+  text-shadow:
+    0 0 6px rgb(61 255 176 / 0.8),
+    0 0 18px rgb(0 168 107 / 0.6);
+}
+
+.ticker {
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #010302;
+  box-shadow: inset 0 0 0 1px rgb(227 194 122 / 0.2);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.tickerTrack {
+  display: inline-flex;
+  gap: 28px;
+  padding: 9px 0;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e3c27a;
+  text-shadow: 0 0 8px rgb(227 194 122 / 0.5);
+  animation: tick 22s linear infinite;
+}
+
+.tickerTrack span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tickerTrack i {
+  font-style: normal;
+  font-size: 0.6em;
+  color: var(--accent);
+}
+
+@keyframes tick {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .outline,
+  .sheetFront,
+  .sheen::before,
+  .live i,
+  .tickerTrack {
+    animation: none;
+  }
+}

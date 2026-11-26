@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { OutlinedTitle } from "@/components/hero/OutlinedTitle";
+import { NewsDesk } from "@/components/hero/NewsDesk";
+import hero from "@/components/hero/Hero.module.css";
 import { findNavItem } from "@/config/navigation";
 import { getPeopleByIds, getPeopleInstagram, getSiteSettings, getUpdates, getUpdatesPageContent } from "@/content/repository";
 import { updateTypes } from "@/content/schema";
@@ -30,9 +33,10 @@ export default async function UpdatesPage() {
     <div className={styles.page}>
       <div className={styles.glow} aria-hidden="true" />
       <div className={`container ${styles.inner}`}>
+        <div className={`${hero.split} ${styles.hero}`}>
         <header className={styles.header}>
           <span className="kicker">{content.kicker}</span>
-          <h1 className={styles.title}>{content.heading}</h1>
+          <OutlinedTitle text={content.heading} className={styles.title} />
           <p className={styles.intro}>{content.intro}</p>
           <a className={styles.rss} href="/updates/feed.xml">
             <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
@@ -42,10 +46,15 @@ export default async function UpdatesPage() {
             RSS feed
           </a>
         </header>
+          <NewsDesk
+            rows={(["announcement", "tournament", "result", "community"] as const).map((k) => ({ label: content.typeLabels[k], count: updates.filter((x) => x.type === k).length }))}
+            headlines={updates.slice(0, 5).map((x) => x.title)}
+          />
+        </div>
 
         {updates.length === 0 ? (
           <>
-          <div className={styles.emptyRow}>
+          <div className={`${styles.emptyRow} ${styles.emptyCard}`}>
             <div className={`${u.timeline} ${styles.emptyLine}`} aria-hidden="true">
               <span className={u.line} />
               <span className={u.ball} />

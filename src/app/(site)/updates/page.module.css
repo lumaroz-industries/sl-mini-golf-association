@@ -18,15 +18,19 @@
   pointer-events: none;
 }
 
-.inner {
-  max-width: calc(860px + 2 * var(--gutter));
+/* The timeline keeps a readable width; the hero spans the page like the others. */
+.inner > :not(.hero) {
+  max-width: 860px;
+}
+
+.hero {
+  margin-bottom: clamp(40px, 6vw, 72px);
 }
 
 .header {
   display: grid;
   justify-items: start;
   gap: 22px;
-  margin-bottom: clamp(40px, 6vw, 72px);
 }
 
 .title {
@@ -80,4 +84,27 @@
 .emptyLine {
   min-height: 220px;
   padding: 0;
+}
+
+/* Empty state as a premium card. */
+.emptyCard {
+  position: relative;
+  padding: clamp(24px, 3.4vw, 40px);
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  background:
+    radial-gradient(70% 90% at 0% 0%, rgb(0 168 107 / 0.1), transparent 60%) padding-box,
+    linear-gradient(170deg, #0d1411, #060908) padding-box,
+    linear-gradient(140deg, rgb(0 168 107 / 0.7), rgb(255 255 255 / 0.06) 40%, rgb(227 194 122 / 0.55)) border-box;
+  box-shadow: 0 30px 70px -40px #000;
+}
+
+.emptyCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.5), transparent);
 }

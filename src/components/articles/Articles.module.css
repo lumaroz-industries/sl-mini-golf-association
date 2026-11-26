@@ -558,3 +558,59 @@
     transform: none;
   }
 }
+
+/* ============================================================ premium cards
+   Emerald-to-gold hairline edge, a light streak on top, a lift and a band of
+   light on hover — matching Contact and Social Media. */
+.card {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(170deg, #0d1411, #060908) padding-box,
+    linear-gradient(140deg, rgb(0 168 107 / 0.55), rgb(255 255 255 / 0.06) 40%, rgb(255 255 255 / 0.04) 60%, rgb(227 194 122 / 0.45)) border-box;
+  box-shadow: 0 30px 70px -40px #000;
+}
+
+.card[data-lead] {
+  border-color: transparent;
+  background:
+    linear-gradient(170deg, #0d1411, #060908) padding-box,
+    linear-gradient(140deg, rgb(0 168 107 / 0.85), rgb(255 255 255 / 0.06) 40%, rgb(255 255 255 / 0.04) 60%, rgb(227 194 122 / 0.7)) border-box;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.5), transparent);
+  pointer-events: none;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  top: -20%;
+  bottom: -20%;
+  left: -60%;
+  width: 35%;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.1), transparent);
+  transform: skewX(-16deg);
+  transition: left 0.9s cubic-bezier(0.45, 0, 0.25, 1);
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+      0 40px 80px -36px #000,
+      0 0 60px -24px rgb(0 168 107 / 0.45);
+  }
+  .card:hover::after {
+    left: 140%;
+  }
+}
