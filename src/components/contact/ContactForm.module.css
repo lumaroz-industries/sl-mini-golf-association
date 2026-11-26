@@ -3,11 +3,14 @@
   display: grid;
   gap: 22px;
   padding: clamp(24px, 3.4vw, 44px);
-  border: 1px solid var(--line-accent);
+  border: 1px solid transparent;
   border-radius: var(--radius-lg);
+  /* Emerald-to-gold hairline edge around a dark glass panel. */
   background:
-    linear-gradient(160deg, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0) 55%),
-    rgb(8 14 12 / 0.72);
+    linear-gradient(160deg, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0) 55%) padding-box,
+    linear-gradient(rgb(8 14 12 / 0.86), rgb(5 8 7 / 0.9)) padding-box,
+    linear-gradient(140deg, rgb(0 168 107 / 0.7), rgb(255 255 255 / 0.06) 35%, rgb(255 255 255 / 0.04) 60%, rgb(227 194 122 / 0.55)) border-box;
+  overflow: hidden;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 40px 90px -40px rgb(0 0 0 / 0.9);
@@ -358,4 +361,79 @@ a.secondary {
   align-items: center;
   gap: 8px;
   text-decoration: none;
+}
+
+/* A light streak along the top edge. */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  pointer-events: none;
+}
+
+/* Putting-green contour lines, faint, in the lower right corner. */
+.contours {
+  position: absolute;
+  right: -90px;
+  bottom: -90px;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, transparent 0 22px, rgb(0 168 107 / 0.09) 22px 23px);
+  -webkit-mask-image: radial-gradient(closest-side, #000 30%, transparent);
+  mask-image: radial-gradient(closest-side, #000 30%, transparent);
+  pointer-events: none;
+}
+
+.card > :not(.contours) {
+  position: relative;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.flag {
+  flex-shrink: 0;
+  color: var(--accent);
+  filter: drop-shadow(0 0 8px rgb(0 168 107 / 0.5));
+}
+
+/* A band of light across the button on hover. */
+.submit {
+  position: relative;
+  overflow: hidden;
+}
+
+.submit::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.45), transparent);
+  transform: skewX(-18deg);
+  transition: left 0.7s cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.submit:hover:not(:disabled)::after {
+  left: 130%;
+}
+
+.input:focus {
+  box-shadow:
+    0 0 0 4px rgb(0 168 107 / 0.16),
+    0 0 24px rgb(0 168 107 / 0.18);
+}
+
+.flag {
+  width: 0.62em;
+  height: 0.85em;
 }

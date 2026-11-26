@@ -34,7 +34,15 @@ export default async function ContactPage() {
         <div className={styles.info}>
           <span className="kicker">{content.kicker}</span>
           <h1 id="contact-title" className={styles.title}>
-            {content.heading}
+            {(() => {
+              const words = content.heading.trim().split(/\s+/);
+              const last = words.pop();
+              return (
+                <>
+                  {words.join(" ")} <span className={styles.titleOutline}>{last}</span>
+                </>
+              );
+            })()}
           </h1>
           <p className={styles.intro}>{content.intro}</p>
 

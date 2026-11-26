@@ -105,7 +105,18 @@
   gap: 6px 24px;
   margin-bottom: 20px;
   padding-bottom: 14px;
-  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, rgb(0 168 107 / 0.7), rgb(227 194 122 / 0.35) 40%, rgb(255 255 255 / 0.04)) 1;
+}
+
+.groupNo {
+  font-family: var(--font-display);
+  font-size: 0.8em;
+  font-weight: 600;
+  background: linear-gradient(180deg, #fbecc4, #b38d45);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .groupTitle {
@@ -195,4 +206,30 @@
 .inviteBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 30px rgb(0 168 107 / 0.35);
+}
+
+/* The last word of the title, outlined (as on the homepage). */
+.titleOutline {
+  color: transparent;
+  -webkit-text-stroke: 2px rgb(255 255 255 / 0.92);
+  background: linear-gradient(100deg, transparent 40%, rgb(0 168 107 / 0.35) 50%, transparent 60%) 0 0 / 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: titleSweep 6s ease-in-out 1s infinite;
+}
+
+@keyframes titleSweep {
+  0%,
+  60% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .titleOutline {
+    animation: none;
+  }
 }

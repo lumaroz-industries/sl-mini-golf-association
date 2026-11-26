@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ImageAsset } from "@/content/schema";
 import type { Metadata } from "next";
 import { findNavItem } from "@/config/navigation";
 import { PLATFORMS, deriveHandle } from "@/config/social-platforms";
@@ -31,6 +32,9 @@ type Card = { group: "organisation" | "person" | "channel" } & (
       tags: string[];
       detail?: string;
       brand?: boolean;
+      spotlight?: "gold" | "diamond" | "silver" | "tricolor" | "maroon" | "orange";
+      portrait?: ImageAsset;
+      wholePhoto?: boolean;
     }
   | {
       kind: "channel";
@@ -105,7 +109,11 @@ export default async function SocialMediaPage() {
   ];
 
   const platforms = [...new Set(cards.map((c) => (c.kind === "channel" ? "youtube" : c.platform)))].map((p) => PLATFORMS[p].label);
-  const orbitMembers = cards.map((c) => ({ id: c.id, name: c.name }));
+  const orbitMembers = cards.map((c) =>
+    c.kind === "channel"
+      ? { id: c.id, name: c.name, youtube: true }
+      : { id: c.id, name: c.name, finish: c.spotlight, portrait: c.spotlight === "gold" || c.spotlight === "diamond" ? c.portrait : undefined },
+  );
 
   return (
     <div className={styles.page}>
@@ -115,7 +123,15 @@ export default async function SocialMediaPage() {
         <div className={styles.heroText}>
           <span className="kicker">{content.kicker}</span>
           <h1 id="social-title" className={styles.title}>
-            {content.heading}
+            {(() => {
+              const words = content.heading.trim().split(/\s+/);
+              const last = words.pop();
+              return (
+                <>
+                  {words.join(" ")} <span className={styles.titleOutline}>{last}</span>
+                </>
+              );
+            })()}
           </h1>
           <p className={styles.intro}>{content.intro}</p>
           {cards.length > 0 && (
@@ -132,13 +148,16 @@ export default async function SocialMediaPage() {
 
       <div className={`container ${styles.cards}`}>
         {cards.length > 0 ? (
-          GROUPS.map((g) => {
+          GROUPS.filter((g) => cards.some((c) => c.group === g.id)).map((g, gi) => {
             const list = cards.filter((c) => c.group === g.id);
             if (!list.length) return null;
             return (
               <section key={g.id} className={styles.group} aria-labelledby={`group-${g.id}`}>
                 <header className={styles.groupHead}>
                   <h2 id={`group-${g.id}`} className={styles.groupTitle}>
+                    <span className={styles.groupNo} aria-hidden="true">
+                      {String(gi + 1).padStart(2, "0")}
+                    </span>
                     {g.title}
                     <span className={styles.groupCount}>{list.length}</span>
                   </h2>

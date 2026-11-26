@@ -274,3 +274,29 @@
     order: 4;
   }
 }
+
+/* The last word of the title, outlined (as on the homepage). */
+.titleOutline {
+  color: transparent;
+  -webkit-text-stroke: 2px rgb(255 255 255 / 0.92);
+  background: linear-gradient(100deg, transparent 40%, rgb(0 168 107 / 0.35) 50%, transparent 60%) 0 0 / 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: titleSweep 6s ease-in-out 1s infinite;
+}
+
+@keyframes titleSweep {
+  0%,
+  60% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .titleOutline {
+    animation: none;
+  }
+}

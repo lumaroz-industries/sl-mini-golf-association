@@ -1500,3 +1500,105 @@
 .texture[data-kind="diamond"]::before {
   opacity: 0.07;
 }
+
+/* ============================================================ orbit nodes
+   Each account as a bubble in its card's colours (photos for the people). */
+.node {
+  --edge: linear-gradient(135deg, #2fd49a, #00a86b 50%, #0b3d2a);
+  --glow: 0 168 107;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  padding: 2px;
+  border-radius: 50%;
+  background: var(--edge);
+  box-shadow:
+    0 0 0 3px #050807,
+    0 0 22px rgb(var(--glow) / 0.45);
+}
+
+.node > * {
+  grid-area: 1 / 1;
+}
+
+.node img,
+.node b {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.node img {
+  object-fit: cover;
+  object-position: 50% 15%;
+  background: #050807;
+}
+
+.node b {
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 35% 30%, #16201c, #050807 75%);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.node[data-finish="gold"] {
+  --edge: linear-gradient(135deg, #fbecc4, #e3c27a 45%, #8c6a2e);
+  --glow: 227 194 122;
+}
+
+.node[data-finish="diamond"] {
+  --edge: var(--dmd-ring);
+  --glow: 185 225 255;
+}
+
+.node[data-finish="tricolor"] {
+  --edge: linear-gradient(180deg, #ff9933 0 33%, #ffffff 33% 66%, #138808 66%);
+  --glow: 255 153 51;
+}
+
+.node[data-finish="maroon"] {
+  --edge: linear-gradient(135deg, #f1a1a8, #a3263a 50%, #4a0d18);
+  --glow: 190 50 70;
+}
+
+.node[data-finish="orange"] {
+  --edge: linear-gradient(135deg, #ffd3a1, #f08a24 50%, #8a3c08);
+  --glow: 240 138 36;
+}
+
+.node[data-finish="youtube"] {
+  --edge: linear-gradient(135deg, #ff6b6b, #ff0000 50%, #8a0000);
+  --glow: 255 40 40;
+  background: linear-gradient(135deg, #ff3b3b, #c40000);
+}
+
+/* The SL core: a slowly turning gold-and-emerald ring. */
+.coreRing {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  padding: 2px;
+  background: conic-gradient(from 0deg, #e3c27a, transparent 25%, #00a86b 50%, transparent 75%, #e3c27a);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: spin 8s linear infinite;
+}
+
+@media (max-width: 900px) {
+  .node {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coreRing {
+    animation: none;
+  }
+}

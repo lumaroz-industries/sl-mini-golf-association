@@ -218,7 +218,15 @@ export function ContactForm({ heading, enabled, unavailableMessage, successHeadi
 
   return (
     <div className={styles.card} data-disabled={(!enabled && !viaGmail) || undefined}>
-      <h2 className={styles.heading}>{heading}</h2>
+      <span className={styles.contours} aria-hidden="true" />
+      <h2 className={styles.heading}>
+        <svg className={styles.flag} viewBox="0 0 16 22" width="16" height="22" aria-hidden="true">
+          <path d="M3 21V2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M3.5 2.5l10 3.6-10 3.6z" fill="currentColor" />
+          <ellipse cx="3" cy="21" rx="2.6" ry="0.9" fill="currentColor" opacity="0.5" />
+        </svg>
+        {heading}
+      </h2>
 
       {viaGmail ? (
         <p className={styles.note} role="note">
