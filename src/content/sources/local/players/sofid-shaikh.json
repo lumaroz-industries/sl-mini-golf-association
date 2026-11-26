@@ -3,6 +3,12 @@
   "name": "Sofid Shaikh",
   "gender": "male",
   "card": "international",
+  "photo": {
+    "src": "/players/sofid-shaikh/confident-portrait-in-navy-suit-04si.webp",
+    "alt": "Sofid Shaikh",
+    "width": 1086,
+    "height": 1448
+  },
   "intlPhoto": {
     "src": "/players/sofid-shaikh/confident-portrait-in-navy-suit-c46t.webp",
     "alt": "Sofid Shaikh",
