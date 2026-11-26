@@ -22,7 +22,7 @@ interface ContactFormProps {
   email?: string;
 }
 
-type Status = "idle" | "sending" | "success" | "error";
+type Status = "idle" | "sending" | "success" | "error" | "handed";
 
 const EMPTY = { name: "", email: "", subject: "", message: "" };
 const ORDER: ContactField[] = ["name", "email", "subject", "message"];
@@ -66,8 +66,27 @@ export function ContactForm({ heading, enabled, unavailableMessage, successHeadi
     if (values[field].trim() !== "") setErrors(validate(values));
   };
 
+  // Without email delivery set up, the form still works: it opens the message in Gmail, ready to send.
+  const viaGmail = !enabled && !!email;
+  const compose = () => {
+    const body = `${values.message.trim()}\n\n— ${values.name.trim()} (${values.email.trim()})`;
+    const gmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email!)}&su=${encodeURIComponent(values.subject.trim())}&body=${encodeURIComponent(body)}`;
+    const mailto = `mailto:${email}?subject=${encodeURIComponent(values.subject.trim())}&body=${encodeURIComponent(body)}`;
+    return { gmail, mailto };
+  };
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (viaGmail) {
+      setSubmitted(true);
+      const found = validate(values);
+      setErrors(found);
+      const first = ORDER.find((f) => found[f]);
+      if (first) return void fieldRefs.current[first]?.focus();
+      window.open(compose().gmail, "_blank", "noopener,noreferrer");
+      setStatus("handed");
+      return;
+    }
     if (!enabled || status === "sending") return;
     setSubmitted(true);
     const found = validate(values);
@@ -114,6 +133,35 @@ export function ContactForm({ heading, enabled, unavailableMessage, successHeadi
     setStatus("idle");
     startedAt.current = Date.now();
   };
+
+  if (status === "handed") {
+    const { gmail, mailto } = compose();
+    return (
+      <div className={styles.card}>
+        <div className={styles.success} role="status">
+          <div className={styles.putt} aria-hidden="true">
+            <span className={styles.cup} />
+            <span className={styles.ball} />
+          </div>
+          <h2 ref={successRef} tabIndex={-1} className={styles.heading}>
+            Almost there
+          </h2>
+          <p className={styles.successBody}>Your message is open in Gmail with everything filled in — just press Send there. Didn&apos;t open?</p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
+            <a className={styles.submit} href={gmail} target="_blank" rel="noopener noreferrer">
+              Open in Gmail <span aria-hidden="true">↗</span>
+            </a>
+            <a className={styles.secondary} href={mailto}>
+              Use another mail app
+            </a>
+          </div>
+          <button type="button" className={styles.secondary} onClick={reset}>
+            Write another message
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (status === "success") {
     return (
@@ -169,14 +217,20 @@ export function ContactForm({ heading, enabled, unavailableMessage, successHeadi
     ) : null;
 
   return (
-    <div className={styles.card} data-disabled={!enabled || undefined}>
+    <div className={styles.card} data-disabled={(!enabled && !viaGmail) || undefined}>
       <h2 className={styles.heading}>{heading}</h2>
 
-      {!enabled && (
-        <p className={styles.notice} role="note">
-          <span className={styles.noticeDot} aria-hidden="true" />
-          {unavailableMessage}
+      {viaGmail ? (
+        <p className={styles.note} role="note">
+          <span aria-hidden="true">✉</span> Fill this in and it opens in Gmail, ready to send from your own account.
         </p>
+      ) : (
+        !enabled && (
+          <p className={styles.notice} role="note">
+            <span className={styles.noticeDot} aria-hidden="true" />
+            {unavailableMessage}
+          </p>
+        )
       )}
 
       {submitted && errorCount > 0 && (
@@ -197,7 +251,7 @@ export function ContactForm({ heading, enabled, unavailableMessage, successHeadi
       )}
 
       <form className={styles.form} onSubmit={onSubmit} noValidate aria-busy={sending}>
-        <fieldset className={styles.fieldset} disabled={!enabled || sending}>
+        <fieldset className={styles.fieldset} disabled={(!enabled && !viaGmail) || sending}>
           <legend className="visually-hidden">{heading}</legend>
           <div className={styles.row}>
             <div className={styles.field}>
@@ -239,10 +293,14 @@ export function ContactForm({ heading, enabled, unavailableMessage, successHeadi
             <p className={styles.hint}>
               <span aria-hidden="true">*</span> All fields are required.
             </p>
-            <button type="submit" className={styles.submit} disabled={!enabled || sending}>
+            <button type="submit" className={styles.submit} disabled={(!enabled && !viaGmail) || sending}>
               {sending ? (
                 <>
                   <span className={styles.spinner} aria-hidden="true" /> Sending…
+                </>
+              ) : viaGmail ? (
+                <>
+                  Continue in Gmail <span aria-hidden="true">↗</span>
                 </>
               ) : (
                 <>

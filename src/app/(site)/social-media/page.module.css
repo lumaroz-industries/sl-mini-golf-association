@@ -91,3 +91,108 @@
   font-size: var(--fs-xs);
   color: var(--fg-subtle);
 }
+
+/* ================================================================ groups */
+.group + .group {
+  margin-top: clamp(48px, 6vw, 80px);
+}
+
+.groupHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 24px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.groupTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.groupCount {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid rgb(0 168 107 / 0.4);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.groupNote {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+}
+
+/* ================================================================ invite */
+.invite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 28px;
+  margin-top: clamp(48px, 6vw, 80px);
+  padding: clamp(22px, 3vw, 34px);
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  background:
+    radial-gradient(60% 120% at 0% 0%, rgb(0 168 107 / 0.14), transparent 60%) padding-box,
+    linear-gradient(160deg, #0d1411, #060908) padding-box,
+    linear-gradient(135deg, rgb(0 168 107 / 0.6), rgb(255 255 255 / 0.06) 45%, rgb(227 194 122 / 0.45)) border-box;
+}
+
+.inviteKicker {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.inviteTitle {
+  margin: 6px 0 4px;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.inviteBody {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+}
+
+.inviteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #03140d;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: transform var(--dur-fast), box-shadow var(--dur-fast);
+}
+
+.inviteBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgb(0 168 107 / 0.35);
+}

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { findNavItem } from "@/config/navigation";
 import { PLATFORMS, deriveHandle } from "@/config/social-platforms";
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/social-media" },
 };
 
-type Card =
+type Card = { group: "organisation" | "person" | "channel" } & (
   | {
       kind: "profile";
       id: string;
@@ -40,9 +41,17 @@ type Card =
       handle?: string;
       owner?: { name: string };
       description?: string;
-    };
+    }
+);
 
 const TYPE_TAG = { organisation: "Organisation", person: "Person", channel: "Channel" } as const;
+
+/** The page is grouped: organisations, then people, then channels. */
+const GROUPS = [
+  { id: "organisation", title: "Federation & associations", note: "The bodies running mini golf in India and Maharashtra." },
+  { id: "person", title: "The people", note: "The founder, and the designer behind this website." },
+  { id: "channel", title: "Watch", note: "Mini golf on video." },
+] as const;
 
 export default async function SocialMediaPage() {
   const [content, site, official, people] = await Promise.all([getSocialPageContent(), getSiteSettings(), getActiveSocialLinks(), getPeople()]);
@@ -59,6 +68,7 @@ export default async function SocialMediaPage() {
   const cards: Card[] = [
     ...official.map<Card>((link) => ({
       kind: "profile",
+      group: "organisation",
       id: `official-${link.platform}`,
       span: "wide",
       platform: link.platform,
@@ -74,10 +84,11 @@ export default async function SocialMediaPage() {
       const name = a.name ?? p!.name;
       const handle = a.handle ?? deriveHandle(a.platform, a.url);
       if (a.type === "channel" && a.platform === "youtube") {
-        return { kind: "channel", id: a.id, span: "full", url: a.url, name, handle, owner: p && { name: p.name }, description: a.description };
+        return { kind: "channel", group: "channel", id: a.id, span: "full", url: a.url, name, handle, owner: p && { name: p.name }, description: a.description };
       }
       return {
         kind: "profile",
+        group: a.type,
         id: a.id,
         span: a.span ?? (a.featured ? "wide" : "normal"),
         spotlight: a.spotlight,
@@ -121,20 +132,45 @@ export default async function SocialMediaPage() {
 
       <div className={`container ${styles.cards}`}>
         {cards.length > 0 ? (
-          <Spotlight className={social.bento}>
-            {cards.map((c, i) => (
-              <li key={c.id} className={social.cell} data-span={c.span} style={{ "--i": i } as React.CSSProperties}>
-                {c.kind === "channel" ? (
-                  <ChannelFeature url={c.url} name={c.name} handle={c.handle} owner={c.owner} description={c.description} />
-                ) : (
-                  <ProfileCard {...c} wide={c.span !== "normal"} full={c.span === "full"} />
-                )}
-              </li>
-            ))}
-          </Spotlight>
+          GROUPS.map((g) => {
+            const list = cards.filter((c) => c.group === g.id);
+            if (!list.length) return null;
+            return (
+              <section key={g.id} className={styles.group} aria-labelledby={`group-${g.id}`}>
+                <header className={styles.groupHead}>
+                  <h2 id={`group-${g.id}`} className={styles.groupTitle}>
+                    {g.title}
+                    <span className={styles.groupCount}>{list.length}</span>
+                  </h2>
+                  <p className={styles.groupNote}>{g.note}</p>
+                </header>
+                <Spotlight className={social.bento}>
+                  {list.map((c, i) => (
+                    <li key={c.id} className={social.cell} data-span={c.span} style={{ "--i": i } as React.CSSProperties}>
+                      {c.kind === "channel" ? (
+                        <ChannelFeature url={c.url} name={c.name} handle={c.handle} owner={c.owner} description={c.description} />
+                      ) : (
+                        <ProfileCard {...c} wide={c.span !== "normal"} full={c.span === "full"} />
+                      )}
+                    </li>
+                  ))}
+                </Spotlight>
+              </section>
+            );
+          })
         ) : (
           <p className={styles.empty}>{content.emptyState}</p>
         )}
+        <aside className={styles.invite}>
+          <div>
+            <span className={styles.inviteKicker}>Get listed</span>
+            <p className={styles.inviteTitle}>Run a mini-golf page or channel in India?</p>
+            <p className={styles.inviteBody}>Associations, clubs and players can be added here. Send us the link.</p>
+          </div>
+          <Link href="/contact" className={styles.inviteBtn}>
+            Contact us <span aria-hidden="true">→</span>
+          </Link>
+        </aside>
         <p className={styles.note}>{content.note}</p>
       </div>
     </div>

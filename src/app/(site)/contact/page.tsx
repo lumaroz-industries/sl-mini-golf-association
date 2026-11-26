@@ -6,6 +6,7 @@ import { InstagramHandle } from "@/components/ui/InstagramHandle";
 import { isContactDeliveryConfigured } from "@/lib/contact/delivery";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { SocialLinks } from "@/components/ui/SocialLinks";
+import Link from "next/link";
 import styles from "./page.module.css";
 
 const item = findNavItem("/contact");
@@ -72,6 +73,13 @@ export default async function ContactPage() {
             )}
           </div>
 
+          <div className={styles.channel}>
+            <span className={styles.channelLabel}>Community</span>
+            <Link href="/social-media" className={styles.community}>
+              Follow the federation, associations and players <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+
           {social.length > 0 && (
             <div className={styles.channel}>
               <span className={styles.channelLabel}>Follow</span>
@@ -82,6 +90,7 @@ export default async function ContactPage() {
           <p className={styles.independent}>{site.name} is an independent mini-golf community platform.</p>
         </div>
 
+        <div className={styles.formCol}>
         <ContactForm
           heading={content.formHeading}
           enabled={await isContactDeliveryConfigured()}
@@ -90,6 +99,7 @@ export default async function ContactPage() {
           successBody={content.successBody}
           email={email}
         />
+        </div>
       </div>
     </section>
   );

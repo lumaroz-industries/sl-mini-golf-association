@@ -334,3 +334,28 @@
     animation-duration: 2s;
   }
 }
+
+/* "Opens in Gmail" note (no email service set up). */
+.note {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgb(0 168 107 / 0.3);
+  background: rgb(0 168 107 / 0.07);
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+}
+
+.note > span {
+  color: var(--accent);
+}
+
+a.submit,
+a.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}

@@ -222,3 +222,55 @@
     flex-direction: column;
   }
 }
+
+.community {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgb(0 168 107 / 0.35);
+  background: rgb(0 168 107 / 0.06);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: background var(--dur-fast), border-color var(--dur-fast);
+}
+
+.community:hover {
+  background: rgb(0 168 107 / 0.14);
+  border-color: rgb(0 168 107 / 0.6);
+}
+
+.community span {
+  color: var(--accent);
+  transition: transform var(--dur-fast);
+}
+
+.community:hover span {
+  transform: translateX(3px);
+}
+
+/* Phones and tablets: the association's contact and the form first, then the designer's card. */
+@media (max-width: 960px) {
+  .layout {
+    gap: 22px;
+  }
+  .info {
+    display: contents;
+  }
+  .info > * {
+    order: 1;
+  }
+  .formCol {
+    order: 2;
+    margin-top: 6px;
+  }
+  .dev {
+    order: 3;
+    margin-top: 18px;
+  }
+  .independent {
+    order: 4;
+  }
+}
