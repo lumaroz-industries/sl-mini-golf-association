@@ -196,7 +196,8 @@
   width: 2px;
   height: 58px;
   border-radius: 2px;
-  background: linear-gradient(180deg, #fbecc4, #b38d45);
+  background: linear-gradient(180deg, #ffffff, #7f9fb3);
+  box-shadow: 0 0 8px rgb(185 225 255 / 0.5);
 }
 
 /* The flag on the pin. */
@@ -207,7 +208,7 @@
   top: 0;
   width: 18px;
   height: 12px;
-  background: linear-gradient(135deg, #fbecc4, #e3c27a 50%, #b38d45);
+  background: linear-gradient(135deg, #ffffff, #ffd6ef 35%, #b9e6ff 65%, #7f9fb3);
   clip-path: polygon(0 0, 100% 50%, 0 100%);
   transform-origin: left center;
   animation: wave 2.6s ease-in-out infinite;
@@ -229,7 +230,7 @@
 .builtText b {
   font-weight: 800;
   word-spacing: 0.15em;
-  background: linear-gradient(90deg, #e3c27a, #fff6dc, #e3c27a);
+  background: var(--dmd-text);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -237,11 +238,11 @@
 
 .builtHandle {
   font-weight: 700;
-  color: #e3c27a;
+  color: var(--dmd-ice);
 }
 
 .builtBy:hover .builtHandle {
-  color: #fff6dc;
+  color: #ffffff;
 }
 
 .builtBy:focus-visible {

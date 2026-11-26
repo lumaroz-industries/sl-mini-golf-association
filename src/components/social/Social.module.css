@@ -744,9 +744,9 @@
 .profile[data-spotlight="diamond"] {
   border: 1.5px solid transparent;
   background:
-    radial-gradient(110% 90% at 100% 0%, rgb(220 236 255 / 0.12), transparent 55%),
-    radial-gradient(80% 70% at 0% 100%, rgb(190 170 255 / 0.07), transparent 60%),
-    linear-gradient(160deg, #111518, #07090b) padding-box,
+    radial-gradient(110% 90% at 100% 0%, rgb(220 236 255 / 0.1), transparent 55%),
+    radial-gradient(80% 70% at 0% 100%, rgb(190 170 255 / 0.05), transparent 60%),
+    var(--dmd-base) padding-box,
     conic-gradient(from var(--prism), #ffffff, #bfe6ff, #e9d8ff, #ffffff, #b9fff0, #d4e4ff, #ffffff) border-box;
   box-shadow: 0 30px 70px -36px rgb(200 225 255 / 0.35), 0 24px 50px -28px rgb(0 0 0 / 0.9);
   animation: prism 8s linear infinite;
@@ -941,7 +941,8 @@
 }
 
 .profile[data-spotlight="diamond"] .profileName {
-  background: linear-gradient(100deg, #ffffff 0%, #dff1ff 30%, #f1e6ff 50%, #e2fff7 70%, #ffffff 100%);
+  background: var(--dmd-text);
+  filter: drop-shadow(0 0 14px rgb(185 225 255 / 0.25));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -1168,9 +1169,9 @@
 /* ---- Diamond (the designer): cut facets, prismatic fire, flashes of light */
 .texture[data-kind="diamond"] {
   background:
-    radial-gradient(60% 80% at 80% 20%, rgb(210 235 255 / 0.18), transparent 60%),
-    radial-gradient(50% 70% at 10% 90%, rgb(205 180 255 / 0.14), transparent 65%),
-    linear-gradient(160deg, #141a20 0%, #0b0e13 55%, #07090c 100%);
+    radial-gradient(50% 70% at 80% 25%, rgb(185 225 255 / 0.1), transparent 60%),
+    radial-gradient(40% 60% at 8% 95%, rgb(255 180 230 / 0.05), transparent 65%),
+    linear-gradient(175deg, #0a0d10 0%, #030405 60%, #010101 100%);
 }
 
 /* facet lines, like the cuts of a diamond */

@@ -72,3 +72,21 @@
     --dur-slow: 1ms;
   }
 }
+
+/* Diamond — the website designer's finish (his card, credits, social row).
+   Black obsidian, a faceted lattice with faint prism light, a platinum edge
+   with prism colours and cut-crystal lettering. Use as
+   background: var(--dmd-facets), var(--dmd-base) padding-box, var(--dmd-edge) border-box. */
+:root {
+  --dmd-facets:
+    repeating-linear-gradient(60deg, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 26px) padding-box,
+    repeating-linear-gradient(-60deg, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 26px) padding-box,
+    radial-gradient(60% 70% at 8% 0%, rgb(255 180 230 / 0.09), transparent 70%) padding-box,
+    radial-gradient(60% 70% at 96% 0%, rgb(150 220 255 / 0.11), transparent 70%) padding-box;
+  --dmd-base: linear-gradient(175deg, #0b0f13, #040506 60%, #010101);
+  --dmd-edge: linear-gradient(145deg, #fff 0%, #d9eefb 12%, #ffd6ef 22%, #7f9fb3 34%, #1b2830 46%, #b9e6ff 60%, #fff 70%, #e6d9ff 80%, #6f8fa3 90%, #1b2830 100%);
+  --dmd-ring: linear-gradient(145deg, #fff, #b9e6ff 30%, #7f9fb3 55%, #ffd6ef 80%, #fff);
+  --dmd-shadow: 0 24px 60px -24px #000, 0 0 60px -26px rgb(185 225 255 / 0.45);
+  --dmd-text: linear-gradient(180deg, #fff 0%, #f1f9ff 38%, #a9cfe6 58%, #7fa9c2 70%, #e8f6ff 100%);
+  --dmd-ice: #cfe6f5;
+}

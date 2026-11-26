@@ -54,7 +54,7 @@ export async function SiteFooter() {
 
       <div className={`container ${styles.credits}`}>
         {[owner, developer].map((person) => (
-          <div key={person.id} className={styles.credit}>
+          <div key={person.id} className={styles.credit} data-finish={person.id === developer.id ? "diamond" : undefined}>
             <span className={styles.creditRole}>{person.role}</span>
             <span className={styles.creditName}>{person.name}</span>
             {instagram[person.id] && <InstagramHandle {...instagram[person.id]} name={person.name} size="sm" />}

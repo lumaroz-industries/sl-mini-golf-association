@@ -791,3 +791,55 @@
 .holeFlag {
   fill: rgb(var(--m) / 0.1);
 }
+
+/* ================================================================ level tab
+   The level joins the badge as one plaque: [ TOP 7 | ⚑ STATE ]. The tab is
+   filled with the card's metal; nothing hangs over the photo. */
+.badge {
+  display: inline-flex;
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+}
+
+.badge > span {
+  padding: 5px 9px 4px 10px;
+}
+
+.level {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px 3px 8px;
+  font-style: normal;
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #120c04;
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.1) 0 1px, transparent 1px 3px),
+    linear-gradient(135deg, var(--gold-hi), var(--gold) 50%, var(--gold-lo));
+  box-shadow: inset 1px 0 0 rgb(0 0 0 / 0.5);
+}
+
+.card[data-large] .level,
+.card[data-large] .badge > span {
+  font-size: 0.75rem;
+}
+
+.card[data-card="national"] .level {
+  background:
+    linear-gradient(90deg, #ff9933 0 3px, #f4f4f4 3px 5px, #138808 5px 7px, transparent 7px),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.1) 0 1px, transparent 1px 3px),
+    linear-gradient(135deg, var(--gold-hi), var(--gold) 50%, var(--gold-lo));
+  padding-left: 13px;
+}
+
+.card[data-card="international"] .level {
+  color: #0b1620;
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.12) 0 1px, transparent 1px 3px),
+    linear-gradient(135deg, #ffffff, #d9eefb 30%, #ffd6ef 55%, #b9e6ff 75%, #8fb0c4);
+}

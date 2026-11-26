@@ -188,6 +188,24 @@
   word-spacing: 0.18em;
 }
 
+/* The designer's credit in his diamond finish. */
+.credit[data-finish="diamond"] .creditName {
+  font-weight: 600;
+  background: var(--dmd-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 10px rgb(185 225 255 / 0.3));
+}
+
+.credit[data-finish="diamond"] .creditRole {
+  color: var(--dmd-ice);
+}
+
+.credit[data-finish="diamond"] .creditRole::before {
+  content: "◆ ";
+}
+
 .bottom {
   display: flex;
   flex-wrap: wrap;
