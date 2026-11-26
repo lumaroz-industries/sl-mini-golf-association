@@ -269,6 +269,8 @@ export class BallScene {
   private visible = true;
   private bg = new Color(0, 0, 0);
   private lastP = 0;
+  /** 0 → 1: the particle logo fading out under the crisp logo. */
+  private gone = 0;
   private ringY: number[] = [];
 
   constructor(private readonly opts: BallSceneOptions) {
@@ -486,7 +488,7 @@ export class BallScene {
       transparent: true,
       depthWrite: false,
       blending: AdditiveBlending,
-      uniforms: { uTime: { value: 0 }, uClock: { value: 0 }, uBallScale: { value: 1 }, uLogoW: { value: 8 }, uPixel: { value: pixel }, uWind: { value: 0 } },
+      uniforms: { uTime: { value: 0 }, uClock: { value: 0 }, uBallScale: { value: 1 }, uLogoW: { value: 8 }, uPixel: { value: pixel }, uWind: { value: 0 }, uGone: { value: 0 } },
       vertexShader: /* glsl */ `
         uniform float uTime;
         uniform float uClock;
@@ -494,6 +496,7 @@ export class BallScene {
         uniform float uLogoW;
         uniform float uPixel;
         uniform float uWind;
+        uniform float uGone;
         attribute float aOrder;
         attribute vec4 aRand;
         attribute vec3 aTarget;
@@ -524,7 +527,9 @@ export class BallScene {
           vColor = mix(ember * (1.6 - 0.6 * min(age, 1.0)), aColor * 1.15, k);
           float twinkle = 0.75 + 0.25 * sin(uClock * 3.0 + aRand.x * 40.0);
           vAlpha = broken * mix(0.7 + 0.3 * exp(-age * 0.8), twinkle, k);
-          vAlpha *= mix(1.0, 0.1, smoothstep(${T.formEnd.toFixed(2)}, ${(T.formEnd + 1.2).toFixed(2)}, uTime));
+          // Once formed, the particles fade out completely under the crisp logo,
+          // so no dust is left glowing around the letters.
+          vAlpha *= 1.0 - uGone;
         }
       `,
       fragmentShader: /* glsl */ `
@@ -742,6 +747,12 @@ export class BallScene {
     this.sparkMat.uniforms.uTime.value = t;
     this.sparkMat.uniforms.uClock.value = c;
     this.sparkMat.uniforms.uWind.value = speed * falling;
+    // Crossfade to the crisp logo: the particle logo fades out over about
+    // half a second once formed (and comes back if you scroll up again).
+    const goneTarget = p >= P.formEnd - 0.02 ? 1 : 0;
+    this.gone += (goneTarget - this.gone) * 0.06;
+    if (Math.abs(goneTarget - this.gone) < 0.002) this.gone = goneTarget;
+    this.sparkMat.uniforms.uGone.value = this.gone;
     this.emberMat.uniforms.uClock.value = c;
     this.emberMat.uniforms.uHeat.value = heat * (1 - smooth(P.dissolveStart, P.dissolveStart + 0.08, p));
     this.emberMat.uniforms.uSpeed.value = speed;
