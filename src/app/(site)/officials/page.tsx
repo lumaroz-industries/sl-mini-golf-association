@@ -78,7 +78,8 @@ export default async function OfficialsPage() {
                       <OfficialCard official={o} revealLabel={content.revealLabel} levelName={lv.title} orgShort={o.organisation && o.organisation === lv.organisation?.name ? lv.organisation.short : undefined} />
                     </li>
                   ))
-                : Array.from({ length: lv.placeholders }, (_, i) => (
+                : // One full-width "to be announced" card is enough to hold the place.
+                  Array.from({ length: Math.min(1, lv.placeholders) }, (_, i) => (
                     <li key={i} style={{ "--i": i } as React.CSSProperties} aria-hidden={i > 0 || undefined}>
                       <OfficialCard revealLabel={content.revealLabel} role="Official" levelName={lv.title} orgShort={lv.organisation?.short} />
                     </li>

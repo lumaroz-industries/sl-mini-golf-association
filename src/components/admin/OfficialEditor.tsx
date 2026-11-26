@@ -80,7 +80,7 @@ export function OfficialEditor({ initial, isNew: startsNew, levels }: { initial:
         <Choice label="Level" value={level} onChange={setLevel} options={levels.map((l) => ({ value: l.id, label: `${l.title} · ${l.subtitle}` }))} />
       </Section>
 
-      <Section title="Photo" hint="A portrait photo (about 4:5), head and shoulders. Without one, the card shows their initials.">
+      <Section title="Photo" hint="Shown large beside their details, like the people's cards on the Social Media page. A portrait (head and shoulders, about 3:4) works best; a cut-out with a transparent background looks best of all. Without one, the card shows their initials.">
         <ImageField label="Photo" value={photo} onChange={setPhoto} onUploaded={(u) => setUploads((x) => [...x, u])} collection="officials" slug={effectiveId} withCredit={false} />
       </Section>
 

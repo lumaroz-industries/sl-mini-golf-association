@@ -559,3 +559,17 @@ a.orgBadge:hover {
     width: calc(50% - 6px);
   }
 }
+
+/* Officials' cards are full width, like the people's cards on the Social
+   Media page: one per row on every screen. */
+.level .grid,
+.grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(18px, 2.4vw, 28px);
+}
+
+.grid > li:last-child:nth-child(odd) {
+  grid-column: auto;
+  justify-self: stretch;
+  width: auto;
+}
