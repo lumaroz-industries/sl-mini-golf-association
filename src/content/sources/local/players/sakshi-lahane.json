@@ -1,0 +1,18 @@
+{
+  "slug": "sakshi-lahane",
+  "name": "Sakshi Lahane",
+  "gender": "female",
+  "photo": {
+    "src": "/players/sakshi-lahane/confident-portrait-in-green-light-vvpj.webp",
+    "alt": "Sakshi Lahane in an India team blazer.",
+    "width": 1086,
+    "height": 1448
+  },
+  "medals": {
+    "gold": 4,
+    "silver": 3,
+    "bronze": 4
+  },
+  "results": [],
+  "draft": false
+}
