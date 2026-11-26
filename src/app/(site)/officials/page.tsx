@@ -28,8 +28,8 @@ function Flag() {
 export default async function OfficialsPage() {
   const content = await getOfficialsPageContent();
   const levels = content.levels.map((lv) => {
-    const groups = lv.groups.map((g) => ({ ...g, list: content.officials.filter((o) => o.level === lv.id && o.group === g.id) }));
-    return { ...lv, groups, count: groups.reduce((n, g) => n + g.list.length, 0) };
+    const list = content.officials.filter((o) => o.level === lv.id);
+    return { ...lv, list, count: list.length };
   });
   const total = content.officials.length;
 
@@ -64,12 +64,19 @@ export default async function OfficialsPage() {
             <div key={lv.id} className={s.boardLevel} data-accent={lv.accent}>
               <span className={s.boardLevelName}>{lv.title}</span>
               <ol className={s.boardList}>
-                {lv.groups.map((g) => (
-                  <li key={g.id}>
-                    <b>{g.title}</b>
-                    <i>{g.list.length || "—"}</i>
+                {lv.list.length > 0 ? (
+                  lv.list.map((o) => (
+                    <li key={o.id}>
+                      <b>{o.name}</b>
+                      <i>{o.role}</i>
+                    </li>
+                  ))
+                ) : (
+                  <li>
+                    <b>{content.revealLabel}</b>
+                    <i>—</i>
                   </li>
-                ))}
+                )}
               </ol>
             </div>
           ))}
@@ -108,27 +115,19 @@ export default async function OfficialsPage() {
               <span className={s.levelBand} aria-hidden="true" />
             </header>
 
-            {lv.groups.map((g) => (
-              <div key={g.id} className={s.group}>
-                <header className={s.groupHead}>
-                  <h3 className={s.groupTitle}>{g.title}</h3>
-                  {g.note && <p className={s.groupNote}>{g.note}</p>}
-                </header>
-                <ul className={s.grid} data-lead={g.id === "leadership" || undefined}>
-                  {g.list.length > 0
-                    ? g.list.map((o, i) => (
-                        <li key={o.id} style={{ "--i": i } as React.CSSProperties}>
-                          <OfficialCard official={o} revealLabel={content.revealLabel} />
-                        </li>
-                      ))
-                    : Array.from({ length: g.placeholders }, (_, i) => (
-                        <li key={i} style={{ "--i": i } as React.CSSProperties} aria-hidden={i > 0 || undefined}>
-                          <OfficialCard revealLabel={content.revealLabel} role={g.title} />
-                        </li>
-                      ))}
-                </ul>
-              </div>
-            ))}
+            <ul className={s.grid}>
+              {lv.list.length > 0
+                ? lv.list.map((o, i) => (
+                    <li key={o.id} style={{ "--i": i } as React.CSSProperties}>
+                      <OfficialCard official={o} revealLabel={content.revealLabel} />
+                    </li>
+                  ))
+                : Array.from({ length: lv.placeholders }, (_, i) => (
+                    <li key={i} style={{ "--i": i } as React.CSSProperties} aria-hidden={i > 0 || undefined}>
+                      <OfficialCard revealLabel={content.revealLabel} role="Official" />
+                    </li>
+                  ))}
+            </ul>
           </div>
         </section>
       ))}

@@ -9,31 +9,12 @@
       "subtitle": "National officials",
       "note": "The officials of the Minigolf Federation of India, leading the sport across the country.",
       "accent": "tricolour",
-      "groups": [
-        {
-          "id": "leadership",
-          "title": "Leadership",
-          "note": "Leading the sport.",
-          "placeholders": 4
-        },
-        {
-          "id": "committee",
-          "title": "Committee",
-          "note": "Running the game behind the scenes.",
-          "placeholders": 4
-        },
-        {
-          "id": "tournament",
-          "title": "Tournament officials",
-          "note": "On the course at every event.",
-          "placeholders": 4
-        }
-      ],
       "organisation": {
         "name": "Minigolf Federation of India",
         "short": "MGFI",
         "url": "https://www.instagram.com/minigolf_federation_of_india/"
-      }
+      },
+      "placeholders": 3
     },
     {
       "id": "maharashtra",
@@ -41,26 +22,7 @@
       "subtitle": "State officials",
       "note": "The officials leading mini golf in Maharashtra.",
       "accent": "saffron",
-      "groups": [
-        {
-          "id": "leadership",
-          "title": "Leadership",
-          "note": "Leading the sport.",
-          "placeholders": 4
-        },
-        {
-          "id": "committee",
-          "title": "Committee",
-          "note": "Running the game behind the scenes.",
-          "placeholders": 4
-        },
-        {
-          "id": "tournament",
-          "title": "Tournament officials",
-          "note": "On the course at every event.",
-          "placeholders": 4
-        }
-      ]
+      "placeholders": 3
     }
   ],
   "officials": [
@@ -69,7 +31,6 @@
       "name": "Sudhakar Kohale",
       "role": "President",
       "level": "india",
-      "group": "leadership",
       "organisation": "Minigolf Federation of India",
       "bio": "Leads national minigolf events and championships in India."
     },
@@ -78,7 +39,6 @@
       "name": "Dr. Suraj Singh Yeotikar",
       "role": "Secretary General",
       "level": "india",
-      "group": "leadership",
       "organisation": "Minigolf Federation of India",
       "bio": "Manages federation operations and also competes as an international player."
     },
@@ -87,7 +47,6 @@
       "name": "Rajesh Shendekar",
       "role": "Technical Committee Chairman",
       "level": "india",
-      "group": "committee",
       "organisation": "Minigolf Federation of India",
       "bio": "Oversees technical standards and rules for the federation."
     }

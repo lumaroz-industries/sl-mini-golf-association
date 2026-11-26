@@ -483,8 +483,7 @@ export const Official = z.object({
   role: z.string().trim().min(1).max(60),
   /** "india" (national) or "maharashtra" (state) — see `levels`. */
   level: z.string().min(1),
-  /** Which group of that level they are listed under, e.g. "leadership". */
-  group: z.string().min(1),
+
   /** The body they serve, e.g. the national or state federation. */
   organisation: optionalText,
   photo: ImageAsset.optional(),
@@ -499,7 +498,6 @@ export const Official = z.object({
 });
 export type Official = z.infer<typeof Official>;
 
-const OfficialsGroup = z.object({ id: z.string().min(1), title: z.string().min(1), note: optionalText, placeholders: z.number().int().min(0).max(12).default(4) });
 
 export const OfficialsPageContent = z.object({
   kicker: z.string().min(1),
@@ -517,7 +515,8 @@ export const OfficialsPageContent = z.object({
         accent: z.enum(["tricolour", "saffron"]),
         /** The governing body of this level, shown as a badge in its heading. */
         organisation: z.object({ name: z.string().min(1), short: optionalText, url: z.string().url().optional() }).optional(),
-        groups: z.array(OfficialsGroup).min(1),
+        /** Empty "to be announced" slots shown while the level has no officials yet. */
+        placeholders: z.number().int().min(0).max(6).default(3),
       }),
     )
     .min(1),

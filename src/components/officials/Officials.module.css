@@ -702,12 +702,40 @@ a.orgBadge:hover {
   font-size: clamp(1.05rem, 0.95rem + 0.45vw, 1.3rem);
 }
 
-/* Leadership: bigger cards. */
+/* One row of the main officials per level: large cards. */
 @media (min-width: 641px) {
-  .grid[data-lead] {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 340px));
+  .level .grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 340px));
   }
-  .grid[data-lead] .monogram {
+  .level .monogram {
     width: 54%;
+  }
+}
+
+/* Honours board: name and role per line. */
+.boardList li b {
+  letter-spacing: 0.04em;
+}
+
+.boardList li i {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: right;
+  color: rgb(251 236 196 / 0.7);
+}
+
+/* Less space between the two levels now there are no sub-groups. */
+.level {
+  padding-block: clamp(40px, 5vw, 72px);
+}
+
+/* Phones: an odd last card sits centred on its own row. */
+@media (max-width: 640px) {
+  .grid > li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 6px);
   }
 }
