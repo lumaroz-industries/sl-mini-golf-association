@@ -1,0 +1,23 @@
+{
+  "slug": "swayam-khadke",
+  "name": "Swayam Khadke",
+  "card": "international",
+  "photo": {
+    "src": "/players/swayam-khadke/confident-portrait-in-green-studio-light-ohvq.webp",
+    "alt": "Swayam Khadke",
+    "width": 1086,
+    "height": 1448
+  },
+  "intlPhoto": {
+    "src": "/players/swayam-khadke/confident-portrait-in-green-studio-light-do7i.webp",
+    "alt": "Swayam Khadke",
+    "width": 1086,
+    "height": 1448
+  },
+  "medals": {
+    "gold": 3,
+    "silver": 1
+  },
+  "results": [],
+  "draft": false
+}
