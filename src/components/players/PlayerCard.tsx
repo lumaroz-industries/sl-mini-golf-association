@@ -102,7 +102,6 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
         {tier === "national" && <span className={styles.tricolour} aria-hidden="true" />}
         {tier === "international" && <span className={styles.facets} aria-hidden="true" />}
         <span className={styles.shine} aria-hidden="true" />
-        <span className={styles.holo} aria-hidden="true" />
         <span className={styles.glints} aria-hidden="true">
           <i />
           <i />
