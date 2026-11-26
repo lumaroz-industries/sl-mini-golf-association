@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/social-media" },
 };
 
-type Card = { group: "organisation" | "person" | "channel" } & (
+type Card = { group: "official" | "organisation" | "person" | "channel" } & (
   | {
       kind: "profile";
       id: string;
@@ -32,7 +32,7 @@ type Card = { group: "organisation" | "person" | "channel" } & (
       tags: string[];
       detail?: string;
       brand?: boolean;
-      spotlight?: "gold" | "diamond" | "silver" | "tricolor" | "maroon" | "orange";
+      spotlight?: "gold" | "diamond" | "silver" | "tricolor" | "maroon" | "orange" | "emerald";
       portrait?: ImageAsset;
       wholePhoto?: boolean;
     }
@@ -48,12 +48,16 @@ type Card = { group: "organisation" | "person" | "channel" } & (
     }
 );
 
+/** The association's profile picture (the same one as on its Instagram). */
+const OFFICIAL_PICTURE: ImageAsset = { src: "/social/slmga-profile.webp", alt: "SL Mini Golf Association", width: 640, height: 640 };
+
 const TYPE_TAG = { organisation: "Organisation", person: "Person", channel: "Channel" } as const;
 
-/** The page is grouped: organisations, then people, then channels. */
+/** The page is grouped: organisations, people, our own official page, then channels. */
 const GROUPS = [
   { id: "organisation", title: "Federation & associations", note: "The bodies running mini golf in India and Maharashtra." },
   { id: "person", title: "The people", note: "The founder, and the designer behind this website." },
+  { id: "official", title: "Our official page", note: "Follow SL Mini Golf Association on Instagram." },
   { id: "channel", title: "Watch", note: "Mini golf on video." },
 ] as const;
 
@@ -68,20 +72,23 @@ export default async function SocialMediaPage() {
 
   // Cards use initials rather than photos (a deliberate, uniform look) — except
   // spotlight people (designer: diamond, founder: gold), who show their photo.
-  // The association's own accounts lead the grid, then everything else in content order.
+  // The association's own accounts have their own group (before the videos),
+  // as full-width cards with the association's profile picture.
   const cards: Card[] = [
     ...official.map<Card>((link) => ({
       kind: "profile",
-      group: "organisation",
+      group: "official",
       id: `official-${link.platform}`,
-      span: "wide",
+      span: "full",
       platform: link.platform,
       url: link.url,
       name: site.name,
       handle: link.handle ?? deriveHandle(link.platform, link.url),
       tags: ["Official"],
       detail: link.description,
-      brand: true,
+      spotlight: "emerald",
+      portrait: OFFICIAL_PICTURE,
+      wholePhoto: true,
     })),
     ...content.accounts.map<Card>((a) => {
       const p = person(a.personId);
@@ -112,7 +119,7 @@ export default async function SocialMediaPage() {
   const orbitMembers = cards.map((c) =>
     c.kind === "channel"
       ? { id: c.id, name: c.name, youtube: true }
-      : { id: c.id, name: c.name, finish: c.spotlight, portrait: c.spotlight === "gold" || c.spotlight === "diamond" ? c.portrait : undefined },
+      : { id: c.id, name: c.name, finish: c.spotlight, portrait: c.spotlight === "gold" || c.spotlight === "diamond" || c.spotlight === "emerald" ? c.portrait : undefined },
   );
 
   return (

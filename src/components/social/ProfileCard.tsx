@@ -21,7 +21,7 @@ export interface ProfileCardProps {
   /** The portrait is a ready-made profile picture: show it whole. */
   wholePhoto?: boolean;
   /** Highlighted finish: "diamond", "gold", "silver" or "tricolor". */
-  spotlight?: "gold" | "diamond" | "silver" | "tricolor" | "maroon" | "orange";
+  spotlight?: "gold" | "diamond" | "silver" | "tricolor" | "maroon" | "orange" | "emerald";
   /** Full-row card: details on the left, a large photo or monogram on the right. */
   full?: boolean;
 }
