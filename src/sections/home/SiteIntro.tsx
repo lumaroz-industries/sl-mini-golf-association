@@ -21,7 +21,7 @@ export interface IntroPerson {
 }
 
 /** Full sequence: logo → founder → designer (see the CSS timeline). */
-const SEQUENCE_MS = 7400;
+const SEQUENCE_MS = 5600;
 /** With reduced motion only the logo shows, briefly. */
 const REDUCED_MS = 1300;
 /** After the sequence, wait at most this long for the 3D course, then open anyway. */
@@ -46,7 +46,7 @@ const letters = (word: string, from: number) =>
  *   1. the SL logo on black, with a light sweep and the tagline,
  *   2. the founder (gold) and the designer (diamond) side by side, the
  *      screen split down the middle by the logo's slash,
- *   3. the website's designer alone, full screen, in diamond (the longest act),
+ *   3. the website's designer alone, full screen, in diamond,
  * then it opens up straight into the 3D course — on its own, no tap needed.
  *
  * Plays every time the homepage is opened (also coming back from another

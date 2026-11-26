@@ -12,7 +12,9 @@
  */
 
 /** When each sound plays, in seconds from the start of the intro (matches the CSS timeline). */
-export const CUES: Array<{ at: number; play: (a: IntroAudio, t: number) => void }> = [
+export type Cue = { at: number; play: (a: IntroAudio, t: number) => void };
+
+export const CUES: Cue[] = [
   // Act 1 — logo: a warm swell blooming as the logo appears, a soft bell on the light sweep.
   { at: 0.0, play: (a, t) => a.swell(t, [110, 164.81, 220], 1.6, 0.22) },
   { at: 0.35, play: (a, t) => a.bell(t, [880, 1318.5], 0.16) },
@@ -23,11 +25,11 @@ export const CUES: Array<{ at: number; play: (a: IntroAudio, t: number) => void 
   { at: 3.0, play: (a, t) => a.whoosh(t, 0.9, 0.34) },
   { at: 3.4, play: (a, t) => a.thud(t, 0.36) },
   // Act 3 — the designer: crystal bells, a shimmering pad and a glittering rise.
-  { at: 3.45, play: (a, t) => a.swell(t, [261.63, 392, 523.25, 659.25], 3.6, 0.13) },
+  { at: 3.45, play: (a, t) => a.swell(t, [261.63, 392, 523.25, 659.25], 2.4, 0.13) },
   { at: 3.55, play: (a, t) => a.arpeggio(t, [1318.5, 1567.98, 1975.53, 2637.02, 3135.96], 0.09, 0.15) },
-  { at: 3.8, play: (a, t) => a.shimmer(t, 2.2, 0.32) },
-  { at: 5.7, play: (a, t) => a.bell(t, [2093, 3135.96], 0.12) },
-  { at: 6.4, play: (a, t) => a.swell(t, [523.25, 783.99, 1046.5], 1.6, 0.08) },
+  { at: 3.8, play: (a, t) => a.shimmer(t, 1.4, 0.32) },
+  { at: 4.7, play: (a, t) => a.bell(t, [2093, 3135.96], 0.12) },
+  { at: 5.3, play: (a, t) => a.swell(t, [523.25, 783.99, 1046.5], 1.4, 0.08) },
 ];
 
 export class IntroAudio {
@@ -73,11 +75,11 @@ export class IntroAudio {
   }
 
   /** Plays every cue still ahead, given how far into the intro we are (seconds). Once only. */
-  schedule(elapsed: number) {
+  schedule(elapsed: number, cues: Cue[] = CUES) {
     if (this.scheduled || this.ctx.state !== "running") return;
     this.scheduled = true;
     const now = this.ctx.currentTime + 0.03;
-    for (const c of CUES) if (c.at >= elapsed - 0.1) c.play(this, now + Math.max(0, c.at - elapsed));
+    for (const c of cues) if (c.at >= elapsed - 0.1) c.play(this, now + Math.max(0, c.at - elapsed));
   }
 
   /** Lets everything ring out softly with the picture. */

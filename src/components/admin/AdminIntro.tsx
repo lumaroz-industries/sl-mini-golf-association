@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { IntroAudio } from "@/sections/home/introSound";
+import { isSoundOn, setSoundOn } from "@/components/sound/soundPref";
+import { ADMIN_CUES } from "./introSound";
 import s from "./intro.module.css";
 
 export interface IntroPerson {
@@ -31,11 +34,20 @@ const REOPEN_AFTER_MS = 60_000;
  * app always starts at /admin, so it plays every time the app opens; it also
  * plays when the app is reopened after a minute in the background. Tap
  * anywhere to skip.
+ *
+ * With sound (synthesised, see ./introSound.ts) whenever the browser allows
+ * it. Browsers block sound until the page has been tapped, so when it is
+ * blocked a small "Tap for sound" button shows: it turns the sound on
+ * without skipping. The choice is shared with the homepage's sound button.
  */
 export function AdminIntro({ people }: { people: IntroPerson[] }) {
   const [gone, setGone] = useState(false);
   const [skip, setSkip] = useState(false);
   const [run, setRun] = useState(0);
+  // "playing", "blocked" (browser waits for a tap) or "off" (turned off).
+  const [sound, setSound] = useState<"playing" | "blocked" | "off">("off");
+  const audio = useRef<IntroAudio | null>(null);
+  const started = useRef(0);
 
   useEffect(() => {
     if (document.documentElement.dataset.adminIntro === "skip") setGone(true);
@@ -53,6 +65,67 @@ export function AdminIntro({ people }: { people: IntroPerson[] }) {
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, []);
+
+  // Sound: starts with the animation where the browser allows it.
+  useEffect(() => {
+    if (gone || skip) return;
+    if (document.documentElement.dataset.adminIntro === "skip") return;
+    started.current = performance.now();
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!isSoundOn()) {
+      setSound("off");
+      return;
+    }
+    let a: IntroAudio;
+    try {
+      a = new IntroAudio();
+    } catch {
+      return;
+    }
+    audio.current = a;
+    setSound("blocked");
+    a.ctx
+      .resume()
+      .then(() => {
+        if (audio.current !== a || !a.running) return;
+        a.schedule((performance.now() - started.current) / 1000, ADMIN_CUES);
+        setSound("playing");
+      })
+      .catch(() => undefined);
+    return () => {
+      a.fadeOut(0.35);
+      if (audio.current === a) audio.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per run
+  }, [run]);
+
+  // Skipped or finished: let the sound fade with the picture.
+  useEffect(() => {
+    if (!skip && !gone) return;
+    audio.current?.fadeOut(skip ? 0.4 : 0.8);
+    audio.current = null;
+  }, [skip, gone]);
+
+  /** The sound button: on (from the tap, so the browser allows it) or off. */
+  function toggleSound(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (sound === "playing") {
+      setSoundOn(false);
+      audio.current?.fadeOut(0.3);
+      audio.current = null;
+      setSound("off");
+      return;
+    }
+    setSoundOn(true);
+    try {
+      const a = audio.current ?? new IntroAudio();
+      audio.current = a;
+      void a.ctx.resume().then(() => {
+        a.schedule((performance.now() - started.current) / 1000, ADMIN_CUES);
+        setSound("playing");
+      });
+    } catch {}
+  }
 
   if (gone) return null;
   const [left, right] = people;
@@ -122,6 +195,17 @@ export function AdminIntro({ people }: { people: IntroPerson[] }) {
           <span>Access granted</span>
         </p>
         <span className={s.grain} />
+        <button type="button" className={s.soundBtn} data-state={sound} onClick={toggleSound} aria-label={sound === "playing" ? "Turn the sound off" : "Turn the sound on"}>
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+            <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
+            {sound === "playing" ? (
+              <path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            ) : (
+              <path d="m16.5 9.5 5 5m0-5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            )}
+          </svg>
+          {sound === "playing" ? "Sound on" : "Tap for sound"}
+        </button>
         <span className={s.skip}>Tap to skip</span>
       </div>
     </>
