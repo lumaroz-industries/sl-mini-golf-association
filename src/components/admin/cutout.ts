@@ -231,95 +231,139 @@ function seeded(seed: number) {
 }
 
 interface StudioLook {
-  base: [string, string, string]; // centre, middle, edge
-  smoke: string; // rgb triplet of the smoke
-  smokeAlpha: number;
-  light: string; // rgb triplet of the light behind the head
-  lightAlpha: number;
-  rim: string; // rim-light colour around the person
-  rimBlur: number;
+  /** Darkest and lightest colours of the smoke backdrop (r, g, b). */
+  dark: [number, number, number];
+  light: [number, number, number];
+  /** Contrast of the smoke (higher = more patchy). */
+  gamma: number;
+  /** Thin rim light along the hair and shoulders (r, g, b) and its strength. */
+  rim: [number, number, number];
+  rimStrength: number;
+  /** Soft spot of light behind the head (from above for gold). */
+  glow: [number, number, number];
+  glowAlpha: number;
+  seed: number;
 }
 
 const LOOKS: Record<Exclude<Backdrop, "original">, StudioLook> = {
-  // Deep forest-green photo-studio backdrop with drifting smoke and a green rim light.
-  green: { base: ["#05301b", "#021a0e", "#000502"], smoke: "30 125 68", smokeAlpha: 0.34, light: "40 150 85", lightAlpha: 0.08, rim: "rgb(60 210 115 / 0.45)", rimBlur: 22 },
-  // Classic black studio with a soft grey light and a cool white rim.
-  black: { base: ["#26292a", "#111314", "#030303"], smoke: "150 160 165", smokeAlpha: 0.06, light: "200 210 215", lightAlpha: 0.12, rim: "rgb(220 235 245 / 0.35)", rimBlur: 28 },
-  // Black with a warm golden spotlight from above and a gold rim.
-  gold: { base: ["#3a2a10", "#160f05", "#030201"], smoke: "220 170 80", smokeAlpha: 0.09, light: "255 200 110", lightAlpha: 0.22, rim: "rgb(255 205 120 / 0.5)", rimBlur: 30 },
+  // The photographer's green: near-black forest green with patchy lighter smoke and a crisp green rim.
+  green: { dark: [1, 10, 6], light: [30, 118, 64], gamma: 1.45, rim: [90, 255, 150], rimStrength: 1, glow: [30, 120, 65], glowAlpha: 0.1, seed: 11 },
+  black: { dark: [4, 4, 5], light: [52, 56, 58], gamma: 1.8, rim: [215, 232, 245], rimStrength: 0.55, glow: [160, 170, 175], glowAlpha: 0.08, seed: 23 },
+  gold: { dark: [5, 3, 1], light: [92, 64, 22], gamma: 1.7, rim: [255, 205, 120], rimStrength: 0.75, glow: [255, 200, 110], glowAlpha: 0.16, seed: 37 },
 };
 
-/** Paints a studio backdrop: base light, drifting smoke, the light behind the head and a vignette. */
-function paintStudio(ctx: CanvasRenderingContext2D, W: number, H: number, look: StudioLook, gold: boolean) {
-  // Base: brightest behind the subject, falling off to the edges.
-  const g = ctx.createRadialGradient(W * 0.5, H * 0.38, 0, W * 0.5, H * 0.45, H * 0.85);
-  g.addColorStop(0, look.base[0]);
-  g.addColorStop(0.45, look.base[1]);
-  g.addColorStop(1, look.base[2]);
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, W, H);
-
-  // Smoke: many soft blobs on a small canvas, scaled up so they melt into clouds.
-  // Heavier on the right and lower left, like a photographer's smoke backdrop.
-  const sw = 160;
-  const sh = 200;
-  const smoke = canvas(sw, sh);
-  const s = smoke.getContext("2d")!;
-  const rnd = seeded(gold ? 7 : 42);
-  for (let i = 0; i < 110; i++) {
-    const big = i < 36;
-    const side = rnd() < 0.55 ? 0.62 + rnd() * 0.45 : rnd() * 0.45;
-    const x = (big ? side : rnd()) * sw;
-    const y = (0.1 + rnd() * 0.9) * sh;
-    const r = big ? 16 + rnd() * 38 : 4 + rnd() * 10; // clouds, then mottling
-    const a = look.smokeAlpha * (big ? 0.15 + rnd() ** 2 * 0.85 : 0.1 + rnd() * 0.35);
-    const b = s.createRadialGradient(x, y, 0, x, y, r);
-    b.addColorStop(0, `rgb(${look.smoke} / ${a})`);
-    b.addColorStop(1, `rgb(${look.smoke} / 0)`);
-    s.fillStyle = b;
-    s.fillRect(0, 0, sw, sh);
+/** Fractal value noise (several octaves) — the look of photographic smoke. */
+function smokeField(w: number, h: number, seed: number) {
+  const rnd = seeded(seed);
+  const out = new Float32Array(w * h);
+  let amp = 1;
+  let total = 0;
+  for (let o = 0; o < 6; o++) {
+    const cells = 3 * 2 ** o;
+    const gw = cells + 2;
+    const gh = Math.ceil((cells * h) / w) + 2;
+    const grid = new Float32Array(gw * gh).map(() => rnd());
+    for (let y = 0; y < h; y++) {
+      const fy = (y / h) * (gh - 2);
+      const y0 = Math.floor(fy);
+      const ty = fy - y0;
+      const sy = ty * ty * (3 - 2 * ty);
+      for (let x = 0; x < w; x++) {
+        const fx = (x / w) * (gw - 2);
+        const x0 = Math.floor(fx);
+        const tx = fx - x0;
+        const sx = tx * tx * (3 - 2 * tx);
+        const a = grid[y0 * gw + x0] + (grid[y0 * gw + x0 + 1] - grid[y0 * gw + x0]) * sx;
+        const b = grid[(y0 + 1) * gw + x0] + (grid[(y0 + 1) * gw + x0 + 1] - grid[(y0 + 1) * gw + x0]) * sx;
+        out[y * w + x] += (a + (b - a) * sy) * amp;
+      }
+    }
+    total += amp;
+    amp *= 0.55;
   }
-  ctx.save();
-  ctx.imageSmoothingQuality = "high";
-  ctx.globalCompositeOperation = "screen";
-  ctx.drawImage(smoke, 0, 0, W, H);
-  ctx.restore();
+  for (let i = 0; i < out.length; i++) out[i] /= total;
+  return out;
+}
 
-  // The light behind the head (a spotlight from above for gold).
-  const ly = gold ? -H * 0.05 : H * 0.3;
-  const l = ctx.createRadialGradient(W * 0.5, ly, 0, W * 0.5, ly, gold ? H * 0.75 : W * 0.55);
-  l.addColorStop(0, `rgb(${look.light} / ${look.lightAlpha})`);
-  l.addColorStop(1, `rgb(${look.light} / 0)`);
-  ctx.save();
+const backdropCache = new Map<string, HTMLCanvasElement>(); // v2
+
+/** The studio backdrop: patchy smoke, brighter towards the sides and top, dark edges, light behind the head, grain. */
+function studioBackdrop(W: number, H: number, look: StudioLook, gold: boolean) {
+  const key = `${W}x${H}:${look.seed}`;
+  const hit = backdropCache.get(key);
+  if (hit) return hit;
+  const sw = 240;
+  const sh = Math.round((sw * H) / W);
+  const n = smokeField(sw, sh, look.seed);
+  const small = canvas(sw, sh);
+  const sc = small.getContext("2d")!;
+  const img = sc.createImageData(sw, sh);
+  for (let y = 0; y < sh; y++)
+    for (let x = 0; x < sw; x++) {
+      const u = x / sw - 0.5;
+      const v = y / sh - 0.42;
+      // Smoke shows more towards the sides (behind the shoulders) and fades into the corners.
+      const side = Math.min(1, Math.abs(u) * 2.2) * 0.4 + 0.6;
+      const vign = Math.max(0, 1 - (u * u * 1.3 + v * v * 0.9) * 1.6);
+      let s = Math.max(0, (n[y * sw + x] - 0.28) / 0.48);
+      s = Math.min(1, s) ** look.gamma * side * (0.25 + 0.75 * vign);
+      const i = (y * sw + x) * 4;
+      img.data[i] = look.dark[0] + (look.light[0] - look.dark[0]) * s;
+      img.data[i + 1] = look.dark[1] + (look.light[1] - look.dark[1]) * s;
+      img.data[i + 2] = look.dark[2] + (look.light[2] - look.dark[2]) * s;
+      img.data[i + 3] = 255;
+    }
+  sc.putImageData(img, 0, 0);
+  const out = canvas(W, H);
+  const ctx = out.getContext("2d")!;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(small, 0, 0, W, H);
+  // Light behind the head (a spotlight from above for gold).
+  const ly = gold ? -H * 0.05 : H * 0.28;
+  const l = ctx.createRadialGradient(W * 0.5, ly, 0, W * 0.5, ly, gold ? H * 0.75 : W * 0.5);
+  l.addColorStop(0, `rgb(${look.glow.join(" ")} / ${look.glowAlpha})`);
+  l.addColorStop(1, `rgb(${look.glow.join(" ")} / 0)`);
   ctx.globalCompositeOperation = "screen";
   ctx.fillStyle = l;
   ctx.fillRect(0, 0, W, H);
-  ctx.restore();
-
-  // Vignette: darker corners and edges.
-  const v = ctx.createRadialGradient(W * 0.5, H * 0.45, H * 0.3, W * 0.5, H * 0.45, H * 0.82);
-  v.addColorStop(0, "rgb(0 0 0 / 0)");
-  v.addColorStop(0.55, "rgb(0 0 0 / 0.25)");
-  v.addColorStop(1, "rgb(0 0 0 / 0.78)");
-  ctx.fillStyle = v;
-  ctx.fillRect(0, 0, W, H);
-
-  // Fine grain, so the backdrop reads as a photograph rather than a gradient.
+  ctx.globalCompositeOperation = "source-over";
+  // A darker floor, so anything fading out at the bottom sinks into shadow.
+  const floor = ctx.createLinearGradient(0, H * 0.7, 0, H);
+  floor.addColorStop(0, "rgb(0 0 0 / 0)");
+  floor.addColorStop(1, "rgb(0 0 0 / 0.75)");
+  ctx.fillStyle = floor;
+  ctx.fillRect(0, H * 0.7, W, H * 0.3);
+  // Fine grain, so it reads as a photograph.
   const grain = canvas(256, 256);
   const gc = grain.getContext("2d")!;
-  const img = gc.createImageData(256, 256);
-  const r2 = seeded(9);
-  for (let i = 0; i < img.data.length; i += 4) {
-    const n = 128 + (r2() - 0.5) * 40;
-    img.data[i] = img.data[i + 1] = img.data[i + 2] = n;
-    img.data[i + 3] = 18;
+  const gi = gc.createImageData(256, 256);
+  const r2 = seeded(look.seed + 99);
+  for (let i = 0; i < gi.data.length; i += 4) {
+    const v = 128 + (r2() - 0.5) * 50;
+    gi.data[i] = gi.data[i + 1] = gi.data[i + 2] = v;
+    gi.data[i + 3] = 22;
   }
-  gc.putImageData(img, 0, 0);
-  ctx.save();
+  gc.putImageData(gi, 0, 0);
   ctx.globalCompositeOperation = "overlay";
   ctx.fillStyle = ctx.createPattern(grain, "repeat")!;
   ctx.fillRect(0, 0, W, H);
-  ctx.restore();
+  backdropCache.set(key, out);
+  return out;
+}
+
+/** A blurred copy of a canvas, made by scaling down and up (works in every browser). */
+function softened(src: HTMLCanvasElement, factor: number) {
+  const w = Math.max(1, Math.round(src.width / factor));
+  const h = Math.max(1, Math.round(src.height / factor));
+  const s = canvas(w, h);
+  const sc = s.getContext("2d")!;
+  sc.imageSmoothingQuality = "high";
+  sc.drawImage(src, 0, 0, w, h);
+  const out = canvas(src.width, src.height);
+  const oc = out.getContext("2d")!;
+  oc.imageSmoothingQuality = "high";
+  oc.drawImage(s, 0, 0, src.width, src.height);
+  return out;
 }
 
 /** Paints the card photo (960×1200). `adjust` nudges the automatic framing. */
@@ -340,48 +384,75 @@ export function compose(
   const dw = cut.photo.width * scale;
   const dh = cut.photo.height * scale;
 
-  ctx.save();
   if (backdrop === "original") {
     ctx.fillStyle = "#0b0d0c";
     ctx.fillRect(0, 0, W, H);
     ctx.imageSmoothingQuality = "high";
     ctx.drawImage(cut.photo, dx, dy, dw, dh);
-    ctx.restore();
     return;
   }
   const look = LOOKS[backdrop];
-  paintStudio(ctx, W, H, look, backdrop === "gold");
+  ctx.drawImage(studioBackdrop(W, H, look, backdrop === "gold"), 0, 0);
 
-  // The person: photo masked by the matte, drawn on its own layer.
+  // The matte at card size.
+  const matte = canvas(W, H);
+  const mc = matte.getContext("2d")!;
+  mc.imageSmoothingQuality = "high";
+  mc.drawImage(cut.matte, dx, dy, dw, dh);
+  const fullMatte = canvas(W, H);
+  fullMatte.getContext("2d")!.drawImage(matte, 0, 0);
+  // If the photo ends above the bottom of the frame, fade the person out there (the backdrop carries on).
+  const bottom = dy + dh;
+  if (bottom < H + 1) {
+    mc.globalCompositeOperation = "destination-out";
+    const fade = mc.createLinearGradient(0, bottom - H * 0.14, 0, bottom);
+    fade.addColorStop(0, "rgb(0 0 0 / 0)");
+    fade.addColorStop(1, "rgb(0 0 0 / 1)");
+    mc.fillStyle = fade;
+    mc.fillRect(0, bottom - H * 0.14, W, H);
+    mc.globalCompositeOperation = "source-over";
+  }
+
+  // The person on their own layer.
   const layer = canvas(W, H);
   const l = layer.getContext("2d")!;
   l.imageSmoothingQuality = "high";
   l.drawImage(cut.photo, dx, dy, dw, dh);
   l.globalCompositeOperation = "destination-in";
-  l.drawImage(cut.matte, dx, dy, dw, dh);
+  l.drawImage(matte, 0, 0);
 
-  // Rim light: a coloured glow around the hair and shoulders (drawn behind the person)…
-  ctx.shadowColor = look.rim;
-  ctx.shadowBlur = look.rimBlur;
-  ctx.drawImage(layer, 0, 0);
-  // …and a soft grounding shadow, then the person on top.
-  ctx.shadowColor = "rgb(0 0 0 / 0.5)";
-  ctx.shadowBlur = 40;
-  ctx.shadowOffsetY = 14;
+  // Grounding: a soft dark shadow behind the person.
+  ctx.save();
+  ctx.shadowColor = "rgb(0 0 0 / 0.55)";
+  ctx.shadowBlur = 50;
+  ctx.shadowOffsetY = 16;
   ctx.drawImage(layer, 0, 0);
   ctx.restore();
+  ctx.drawImage(layer, 0, 0);
 
-  // If the photo ends above the bottom of the frame, fade that edge away.
-  const bottom = dy + dh;
-  if (bottom < H) {
-    const fade = ctx.createLinearGradient(0, bottom - H * 0.12, 0, bottom);
-    fade.addColorStop(0, "rgb(3 5 4 / 0)");
-    fade.addColorStop(1, "rgb(3 5 4 / 1)");
-    ctx.fillStyle = fade;
-    ctx.fillRect(0, bottom - H * 0.12, W, H * 0.12);
-    ctx.fillStyle = "#030504";
-    ctx.fillRect(0, bottom, W, H - bottom);
-  }
+  // Rim light: a thin bright band just inside the outline (matte minus a softened matte),
+  // strongest on the hair and shoulders, tinted, then a faint glow just outside it.
+  const inner = softened(fullMatte, 3);
+  const rim = canvas(W, H);
+  const rc = rim.getContext("2d")!;
+  rc.drawImage(fullMatte, 0, 0);
+  rc.globalCompositeOperation = "destination-out";
+  rc.drawImage(inner, 0, 0);
+  rc.globalCompositeOperation = "source-in";
+  // Rim from the top of the head down to the shoulders, gone by mid-chest.
+  const top = dy + f.top * scale;
+  const tint = rc.createLinearGradient(0, top, 0, top + H * 0.55);
+  tint.addColorStop(0, `rgb(${look.rim.join(" ")} / ${look.rimStrength})`);
+  tint.addColorStop(0.55, `rgb(${look.rim.join(" ")} / ${look.rimStrength * 0.55})`);
+  tint.addColorStop(1, `rgb(${look.rim.join(" ")} / 0)`);
+  rc.fillStyle = tint;
+  rc.fillRect(0, 0, W, H);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.drawImage(rim, 0, 0);
+  ctx.globalAlpha = 0.45;
+  ctx.drawImage(softened(rim, 5), 0, 0); // a faint glow just around the edge
+  ctx.restore();
 }
 
 export const toWebp = (c: HTMLCanvasElement) =>
