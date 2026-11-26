@@ -3,6 +3,12 @@
   "name": "Kaushik  Sonwane",
   "gender": "male",
   "card": "international",
+  "photo": {
+    "src": "/players/kaushik-sonwane/whatsapp-image-2026-11-26-at-92411-pm-6k2a.webp",
+    "alt": "Kaushik  Sonwane",
+    "width": 1086,
+    "height": 1448
+  },
   "intlPhoto": {
     "src": "/players/kaushik-sonwane/whatsapp-image-2026-11-26-at-92411-pm-70ky.webp",
     "alt": "Kaushik  Sonwane",
