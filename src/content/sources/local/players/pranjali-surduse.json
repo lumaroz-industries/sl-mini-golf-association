@@ -2,6 +2,7 @@
   "slug": "pranjali-surduse",
   "name": "Pranjali Surduse",
   "gender": "female",
+  "card": "international",
   "photo": {
     "src": "/players/pranjali-surduse.webp",
     "alt": "Pranjali Surduse in an India team blazer, holding up a medal",
@@ -13,5 +14,6 @@
     "silver": 1,
     "bronze": 2
   },
-  "results": []
+  "results": [],
+  "draft": false
 }
