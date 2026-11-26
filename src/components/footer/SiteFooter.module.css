@@ -6,13 +6,14 @@
     radial-gradient(120% 80% at 50% 0%, rgb(0 168 107 / 0.09), transparent 60%),
     var(--bg);
   overflow: hidden;
+  isolation: isolate;
 }
 
 .rule {
   position: absolute;
   inset: 0 0 auto;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--line-accent), transparent);
+  background: linear-gradient(90deg, transparent, rgb(0 168 107 / 0.8) 30%, rgb(227 194 122 / 0.7) 70%, transparent);
 }
 
 .top {
@@ -133,42 +134,63 @@
 
 /* Credits — compact, editorial. */
 .credits {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 0;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
   padding-block: 22px;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
 
+/* Each credit as a small card in the person's finish (gold founder, diamond designer). */
 .credit {
-  display: inline-flex;
+  --edge: linear-gradient(140deg, #fbecc4, #e3c27a 35%, rgb(255 255 255 / 0.05) 60%, #8c6a2e);
+  --glow: 227 194 122;
+  display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px 14px;
-  padding-right: 28px;
-  margin-right: 28px;
-  border-right: 1px solid var(--line);
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  background:
+    radial-gradient(70% 120% at 0% 0%, rgb(var(--glow) / 0.1), transparent 60%) padding-box,
+    linear-gradient(170deg, #0c0e0d, #050606) padding-box,
+    var(--edge) border-box;
+  box-shadow: 0 20px 50px -30px #000;
 }
 
-.credit:last-child {
-  border-right: 0;
-  margin-right: 0;
-  padding-right: 0;
+.credit[data-finish="diamond"] {
+  --edge: var(--dmd-edge);
+  --glow: 185 225 255;
+  background:
+    var(--dmd-facets),
+    var(--dmd-base) padding-box,
+    var(--dmd-edge) border-box;
 }
 
-@media (max-width: 640px) {
+.credit[data-finish="gold"] .creditName {
+  background: linear-gradient(180deg, #fbecc4, #e3c27a 55%, #b38d45);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 600;
+}
+
+.credit[data-finish="gold"] .creditRole {
+  color: #e3c27a;
+}
+
+@media (max-width: 760px) {
   .credits {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .credit {
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
-    border-right: 0;
-    margin-right: 0;
-    padding-right: 0;
   }
 }
 
@@ -222,6 +244,9 @@
 }
 
 .toTop {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -231,4 +256,165 @@
 
 .toTop:hover {
   color: var(--accent);
+}
+
+/* ================================================================== cta */
+.cta {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px 36px;
+  margin-bottom: clamp(48px, 6vw, 80px);
+  padding: clamp(26px, 4vw, 48px);
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  background:
+    radial-gradient(60% 140% at 0% 0%, rgb(0 168 107 / 0.16), transparent 60%) padding-box,
+    radial-gradient(40% 100% at 100% 100%, rgb(227 194 122 / 0.08), transparent 70%) padding-box,
+    linear-gradient(170deg, #0d1411, #060908) padding-box,
+    linear-gradient(140deg, rgb(0 168 107 / 0.75), rgb(255 255 255 / 0.06) 40%, rgb(227 194 122 / 0.6)) border-box;
+  box-shadow: 0 40px 90px -50px #000;
+  overflow: hidden;
+}
+
+.cta::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+}
+
+/* Putting-green contour rings in the corner. */
+.cta::after {
+  content: "";
+  position: absolute;
+  right: -120px;
+  top: -120px;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, transparent 0 22px, rgb(0 168 107 / 0.1) 22px 23px);
+  -webkit-mask-image: radial-gradient(closest-side, #000 30%, transparent);
+  mask-image: radial-gradient(closest-side, #000 30%, transparent);
+  pointer-events: none;
+}
+
+.cta > * {
+  position: relative;
+}
+
+.ctaKicker {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.ctaTitle {
+  margin: 10px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.1rem + 2.6vw, 3.4rem);
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.ctaTitle span {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.9);
+}
+
+.ctaActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ctaPrimary,
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: transform var(--dur-fast), box-shadow var(--dur-fast), background var(--dur-fast);
+}
+
+.ctaPrimary {
+  background: var(--accent);
+  color: #03140d;
+}
+
+.ctaPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgb(0 168 107 / 0.4);
+}
+
+.ctaSecondary {
+  border: 1px solid rgb(255 255 255 / 0.18);
+  color: var(--fg);
+}
+
+.ctaSecondary:hover {
+  background: rgb(255 255 255 / 0.06);
+}
+
+/* ============================================================ watermark */
+.watermark {
+  position: absolute;
+  z-index: -1;
+  right: -2%;
+  bottom: -6%;
+  font-family: var(--font-display);
+  font-size: clamp(14rem, 36vw, 34rem);
+  font-weight: 700;
+  font-style: italic;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(0 168 107 / 0.12);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* =========================================================== back to top */
+.ball {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.16) 0 1px, transparent 1.5px) 0 0 / 5px 5px,
+    radial-gradient(circle at 35% 28%, #fff, #dfe4e1 50%, #8e9692);
+  box-shadow:
+    0 0 0 3px rgb(0 168 107 / 0.2),
+    0 6px 14px rgb(0 0 0 / 0.5);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
+}
+
+.ball::after {
+  content: "↑";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #0a3a28;
+}
+
+.toTop:hover .ball {
+  transform: translateY(-4px) rotate(-20deg);
+  box-shadow:
+    0 0 0 3px rgb(0 168 107 / 0.5),
+    0 10px 22px rgb(0 168 107 / 0.35);
 }
