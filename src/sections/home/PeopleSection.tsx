@@ -12,16 +12,19 @@ interface PeopleSectionProps {
   instagram?: Record<string, { url: string; handle: string }>;
   /** Each person's finish and cut-out photo (from their Social Media card). */
   style?: Record<string, { finish?: PersonFinish; cutout?: ImageAsset }>;
+  /** Founder and website designer ids, for their card's emblem and signature line. */
+  credits?: { ownerId: string; developerId: string };
 }
 
 /**
- * 05 — The people behind the platform, as collectible-style cards that match
- * the homepage opening: each person in their own finish (gold, diamond …),
- * their cut-out portrait standing in a pool of light, their name in a
- * metallic finish. Same size for everyone. A person without a real photo gets
- * a reserved branded frame — never a generated face.
+ * 05 — The people behind the platform: black premium collectible cards in
+ * each person's finish (gold for the founder, diamond for the designer) —
+ * an obsidian body with a metal edge, their cut-out rising into light with
+ * their name drawn large behind them, and the name in a metal finish.
+ * A person without a real photo gets a reserved branded frame — never a
+ * generated face.
  */
-export function PeopleSection({ content, people, instagram = {}, style = {} }: PeopleSectionProps) {
+export function PeopleSection({ content, people, instagram = {}, style = {}, credits }: PeopleSectionProps) {
   return (
     <section className={styles.section} aria-labelledby="people-title">
       <div className="container">
@@ -37,25 +40,29 @@ export function PeopleSection({ content, people, instagram = {}, style = {} }: P
             const look = style[person.id] ?? {};
             const photo = look.cutout ?? person.portrait;
             const [first, ...rest] = person.name.split(" ");
+            const isDev = credits?.developerId === person.id;
+            const isOwner = credits?.ownerId === person.id;
+            const emblem = isDev ? "Designer" : isOwner ? "Founder" : person.role.split(/[\s&]+/)[0];
+            const signature = isDev ? "Designed & built this website" : isOwner ? "Founder of SL Mini Golf Association" : undefined;
+            const roles = person.role.split(/\s*&\s*/);
             return (
-              <Reveal as="li" key={person.id} index={i} className={styles.card} data-finish={look.finish ?? "silver"}>
-                <figure className={styles.figure}>
-                  <div className={styles.stage}>
+              <Reveal as="li" key={person.id} index={i} className={styles.item}>
+                <figure className={styles.card} data-finish={look.finish ?? "silver"}>
+                  <span className={styles.edge} aria-hidden="true" />
+                  <div className={styles.body}>
+                    <span className={styles.facets} aria-hidden="true" />
+                    <span className={styles.rays} aria-hidden="true" />
+                    <span className={styles.halo} aria-hidden="true" />
                     <span className={styles.ghost} aria-hidden="true">
                       {person.nickname ?? first}
                     </span>
-                    <span className={styles.number} aria-hidden="true">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/brand/slmga-icon-dark.svg" alt="" width={56} height={20} className={styles.mark} aria-hidden="true" />
                     {photo ? (
                       <Image
                         src={photo.src}
                         alt={person.portrait?.alt ?? person.name}
                         width={photo.width}
                         height={photo.height}
-                        sizes="(max-width: 720px) 92vw, 520px"
+                        sizes="(max-width: 720px) 80vw, 460px"
                         quality={92}
                         className={look.cutout ? styles.cutout : styles.photo}
                       />
@@ -67,19 +74,38 @@ export function PeopleSection({ content, people, instagram = {}, style = {} }: P
                       </div>
                     )}
                     <span className={styles.fade} aria-hidden="true" />
+                    <span className={styles.shine} aria-hidden="true" />
+                    <span className={styles.frame} aria-hidden="true" />
+                    <span className={styles.corners} aria-hidden="true" />
+
+                    <div className={styles.top} aria-hidden="true">
+                      <span className={styles.number}>{String(i + 1).padStart(2, "0")}</span>
+                      <span className={styles.emblem}>
+                        <i>◆</i>
+                        {emblem}
+                      </span>
+                    </div>
+
+                    <figcaption className={styles.plate}>
+                      <span className={styles.name}>
+                        <span className={styles.first}>{first}</span>
+                        {rest.length > 0 && <span className={styles.last}>{rest.join(" ")}</span>}
+                      </span>
+                      <span className={styles.rule} aria-hidden="true" />
+                      <span className={styles.chips}>
+                        {roles.map((r) => (
+                          <span key={r} className={styles.chip}>
+                            {r}
+                          </span>
+                        ))}
+                      </span>
+                      <span className={styles.foot}>
+                        {instagram[person.id] && <InstagramHandle {...instagram[person.id]} name={person.name} />}
+                        {signature && <span className={styles.signature}>{signature}</span>}
+                      </span>
+                    </figcaption>
                   </div>
-                  <figcaption className={styles.caption}>
-                    <span className={styles.role}>
-                      <i aria-hidden="true" />
-                      {person.role}
-                    </span>
-                    <span className={styles.name}>
-                      <span>{first}</span> <span>{rest.join(" ")}</span>
-                    </span>
-                    {instagram[person.id] && <InstagramHandle {...instagram[person.id]} name={person.name} />}
-                  </figcaption>
                 </figure>
-                <span className={styles.sheen} aria-hidden="true" />
               </Reveal>
             );
           })}

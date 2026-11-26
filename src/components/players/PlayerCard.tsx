@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { MedalIcon, type MedalKind } from "./MedalDefs";
 import type { CardPlayer } from "./types";
-import { mhFont } from "./fonts";
 import people from "@/content/sources/local/people.json";
 import site from "@/content/sources/local/site.json";
 import styles from "./PlayerCard.module.css";
@@ -27,11 +26,7 @@ interface PlayerCardProps {
 }
 
 /** The three card designs, chosen per player in the admin. */
-const TIERS = {
-  state: { label: "Maharashtra", level: "State" },
-  national: { label: "India", level: "National" },
-  international: { label: "International", level: "World stage" },
-} as const;
+const TIERS = { state: "State", national: "National", international: "International" } as const;
 
 const MEDALS: Array<{ kind: MedalKind; label: string }> = [
   { kind: "gold", label: "Gold" },
@@ -41,11 +36,12 @@ const MEDALS: Array<{ kind: MedalKind; label: string }> = [
 
 /**
  * Collectible-style player card: photo, name and medal counts. Three designs
- * (set per player in the admin): State (Maharashtra — saffron and deep red
- * with gold, the MH monogram and the Sahyadri ridge), National (India — gold
- * with a tricolour band) and International (diamond — platinum, a faceted
- * lattice and prismatic light). All share a black premium body with golf
- * details: a ball-dimple texture and putting-green contour lines.
+ * (set per player in the admin): State (saffron and deep red with gold),
+ * National (gold with a tricolour band) and International (diamond —
+ * platinum, a faceted lattice and prismatic light). All share a black
+ * premium body with golf details: the level flown on a golf flag, a
+ * ball-dimple texture, putting-green contours, a hole with its flag and a
+ * golf ball set in the rule.
  * Cards without an announced player show the SL mark and "Reveal soon".
  */
 export function PlayerCard({ player, revealLabel, large = false, priority = false, overlay, arrowHidden = false, active = true, badge = "Top 7" }: PlayerCardProps) {
@@ -84,6 +80,13 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
             <ellipse key={i} cx="62" cy="64" rx={18 + i * 11} ry={9 + i * 6} />
           ))}
         </svg>
+        {/* A putting green's hole and flag, in fine line art behind the medals. */}
+        <svg className={styles.hole} viewBox="0 0 60 50" aria-hidden="true">
+          <ellipse cx="30" cy="44" rx="26" ry="5" />
+          <ellipse cx="30" cy="44" rx="6" ry="1.6" className={styles.cup} />
+          <path d="M30 44V8" />
+          <path d="M30 9l15 5-15 5" className={styles.holeFlag} />
+        </svg>
         {tier === "state" && (
           <svg className={styles.ridge} viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true">
             <path d="M0 20 L0 14 L8 9 L13 12 L21 5 L27 10 L33 7 L40 12 L47 4 L53 9 L58 6 L66 11 L72 3 L79 9 L85 7 L92 12 L100 8 L100 20 Z" />
@@ -97,33 +100,14 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
 
         <div className={styles.top} aria-hidden="true">
           <span className={styles.badge}><span>{badge}</span></span>
-          {tier === "state" && (
-            <span className={`${styles.state} ${mhFont.className}`} title="Maharashtra">
-              MH
-            </span>
-          )}
-          {tier === "national" && (
-            <span className={styles.emblem} title="India">
-              <i className={styles.flagBars} />
-              IND
-            </span>
-          )}
-          {tier === "international" && (
-            <span className={styles.emblem} title="International">
-              <i className={styles.gem}>◆</i>
-              INTL
-            </span>
-          )}
+          {/* The level, flown on a golf flag. */}
+          <span className={styles.flag}>
+            <i className={styles.pin} />
+            <span className={styles.pennant}>{TIERS[tier]}</span>
+          </span>
         </div>
 
         <div className={styles.plate}>
-          <span className={styles.tier}>
-            <svg viewBox="0 0 12 16" width="9" height="12" aria-hidden="true">
-              <path d="M2 16V1M2 1.5l8 3-8 3" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-            </svg>
-            {TIERS[tier].label}
-            <b>{TIERS[tier].level}</b>
-          </span>
           {player ? (
             <h3 className={styles.name}>
               <span className={styles.first}>{first}</span>

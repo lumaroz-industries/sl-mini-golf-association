@@ -23,7 +23,7 @@ const JOURNEY_MODE = `try{if(document.createElement('canvas').getContext('webgl2
 export default async function HomePage() {
   const home = await getHomeContent();
   const [people, instagram, site, style] = await Promise.all([getPeopleByIds(home.people.memberIds), getPeopleInstagram(), getSiteSettings(), getPeopleStyle()]);
-  const peopleSection = <PeopleSection content={home.people} people={people} instagram={instagram} style={style} />;
+  const peopleSection = <PeopleSection content={home.people} people={people} instagram={instagram} style={style} credits={site.credits} />;
 
   if (HOME_EXPERIENCE === "ball") {
     return (
