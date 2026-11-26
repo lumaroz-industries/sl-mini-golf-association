@@ -2,10 +2,11 @@
 /**
  * Icons for the "SL Mini Golf" Android app (the public website): the SL mark
  * with its emerald slash on black — the admin app has the gold ADMIN label
- * instead, so the two are never confused. The splash shows the full logo.
+ * instead, so the two are never confused. (No splash image: the app goes
+ * straight to the website.)
  * Run: node scripts/brand/build-site-app-icons.mjs
  */
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import sharp from "sharp";
 
 const MARK =
@@ -38,11 +39,4 @@ for (const [d, px] of Object.entries({ mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 14
 }
 await out(icon({ rounded: false, background: false, scale: 0.55 }), 432, `${RES}/drawable/ic_launcher_foreground.png`);
 
-// Splash: the full logo (SL + MINI GOLF ASSOCIATION), white on transparent.
-const logo = await readFile("public/brand/slmga-logo-dark.svg");
-const logoPng = await sharp(logo, { density: 300 }).resize({ width: 820 }).png().toBuffer();
-await sharp({ create: { width: 1024, height: 1024, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
-  .composite([{ input: logoPng, gravity: "center" }])
-  .png({ compressionLevel: 9 })
-  .toFile(`${RES}/drawable/splash.png`);
 console.log("✓ SL Mini Golf app icons written");
