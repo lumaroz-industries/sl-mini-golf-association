@@ -5,6 +5,8 @@ export interface CardPlayer {
   name: string;
   photo?: ImageAsset;
   medals: { gold?: number; silver?: number; bronze?: number };
+  /** Card design: Maharashtra (state, default), India (national) or diamond (international). */
+  card?: "state" | "national" | "international";
 }
 
 export interface Slot {

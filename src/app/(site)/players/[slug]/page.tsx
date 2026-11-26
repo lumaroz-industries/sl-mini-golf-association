@@ -69,7 +69,7 @@ export default async function PlayerPage({ params }: Params) {
       <div className={`container ${styles.layout}`}>
         <div className={styles.cardCol}>
           <Tilt className={styles.tilt}>
-            <PlayerCard player={{ slug: player.slug, name: player.name, photo: player.photo, medals }} revealLabel={content.revealLabel} large priority badge={inTop ? "Top 7" : "Player"} />
+            <PlayerCard player={{ slug: player.slug, name: player.name, photo: player.photo, medals, card: player.card }} revealLabel={content.revealLabel} large priority badge={inTop ? "Top 7" : "Player"} />
           </Tilt>
         </div>
 

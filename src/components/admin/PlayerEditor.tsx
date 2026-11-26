@@ -24,6 +24,7 @@ export interface PlayerInitial {
   name?: string;
   gender?: "female" | "male";
   district?: string;
+  card?: "state" | "national" | "international";
   photo?: ImageValue;
   medals?: { gold?: number; silver?: number; bronze?: number };
   results?: Array<{ event: string; year: number; level: string; category?: string; place?: string; medal?: "gold" | "silver" | "bronze"; position?: number }>;
@@ -59,6 +60,7 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
   const [slugTouched, setSlugTouched] = useState(!startsNew);
   const [gender, setGender] = useState<string>(initial.gender ?? "");
   const [district, setDistrict] = useState(initial.district ?? "");
+  const [card, setCard] = useState<"state" | "national" | "international">(initial.card ?? "state");
   const [photo, setPhoto] = useState<ImageValue | undefined>(initial.photo);
   const [manual, setManual] = useState(!!initial.medals);
   const [medals, setMedals] = useState({
@@ -108,6 +110,7 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
         name,
         gender: gender || undefined,
         district,
+        card: card === "state" ? undefined : card,
         photo: photo ? { src: photo.src, alt: photo.alt, width: photo.width, height: photo.height } : undefined,
         medals: manual ? { gold: num(medals.gold), silver: num(medals.silver), bronze: num(medals.bronze) } : undefined,
         results: rows.map((r) => ({
@@ -143,6 +146,19 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
           />
           <TextInput label="District" optional value={district} onChange={setDistrict} placeholder="e.g. Nagpur" help="District in Maharashtra — used by the District filter." />
         </div>
+      </Section>
+
+      <Section title="Card" hint="Which player card they get on the website. The admins decide — e.g. International for players who have played abroad, National for India-level players.">
+        <Choice
+          label="Card type"
+          value={card}
+          onChange={setCard}
+          options={[
+            { value: "state", label: "State · Maharashtra" },
+            { value: "national", label: "National · India" },
+            { value: "international", label: "International · Diamond" },
+          ]}
+        />
       </Section>
 
       <Section title="Photo" hint="A portrait photo (about 4:5) works best. Without one, the card shows the player's initials.">

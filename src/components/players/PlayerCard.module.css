@@ -1,7 +1,10 @@
 /*
- * Collectible player card — "obsidian and gold".
- * A near-black lacquered body, a brushed champagne-gold bevel, double gold
- * hairlines with corner ornaments, and real-metal medals. No glow, no sheen.
+ * Collectible player card — a black premium body in one of three metals:
+ *   state (Maharashtra)   saffron → deep red with gold, MH monogram, Sahyadri ridge
+ *   national (India)      champagne gold with a tricolour band
+ *   international         platinum / diamond with a faceted lattice and prism light
+ * Golf details on all three: a ball-dimple texture and putting-green contours.
+ * The metal and accents come from the variables set per data-card below.
  *
  * Driven by CSS variables set on the card (or an ancestor):
  *   --tx, --ty  tilt angles, default 0
@@ -11,9 +14,15 @@
 .card {
   --w: 280px;
   --radius: 22px;
+  /* metal (defaults: national gold) */
   --gold: #e3c27a;
   --gold-hi: #fbecc4;
   --gold-lo: #8c6a2e;
+  --gold-deep: #3b2c12;
+  --m: 227 194 122;
+  --acc: 227 194 122;
+  --ink-top: #1a1c1d;
+  --ink-bot: #0e0c08;
   --ink: #050606;
   position: relative;
   width: var(--w);
@@ -30,6 +39,30 @@
     0 2px 0 rgb(255 255 255 / 0.03),
     0 18px 30px -14px rgb(0 0 0 / 0.9),
     0 50px 90px -30px rgb(0 0 0 / 0.95);
+}
+
+/* State — Maharashtra: saffron (bhagwa) to deep red, with gold light. */
+.card[data-card="state"] {
+  --gold: #f4a23c;
+  --gold-hi: #ffe3b3;
+  --gold-lo: #a33a12;
+  --gold-deep: #3d1106;
+  --m: 244 162 60;
+  --acc: 232 96 34;
+  --ink-top: #1f120b;
+  --ink-bot: #170805;
+}
+
+/* International — diamond: platinum and ice with prismatic light. */
+.card[data-card="international"] {
+  --gold: #cfe6f5;
+  --gold-hi: #ffffff;
+  --gold-lo: #6f8fa3;
+  --gold-deep: #1b2830;
+  --m: 207 230 245;
+  --acc: 185 225 255;
+  --ink-top: #0f171d;
+  --ink-bot: #070b10;
 }
 
 .card[data-large] {
@@ -57,11 +90,11 @@
       var(--gold-hi) 0%,
       var(--gold) 14%,
       var(--gold-lo) 32%,
-      #4a3818 46%,
+      var(--gold-deep) 46%,
       var(--gold) 62%,
       var(--gold-hi) 72%,
       var(--gold-lo) 88%,
-      #3b2c12 100%
+      var(--gold-deep) 100%
     );
 }
 
@@ -71,8 +104,8 @@
   border-radius: calc(var(--radius) - 2px);
   overflow: hidden;
   background:
-    radial-gradient(130% 60% at 50% -10%, #1a1c1d 0%, transparent 60%),
-    radial-gradient(90% 50% at 50% 110%, #0e0c08 0%, transparent 70%),
+    radial-gradient(130% 60% at 50% -10%, var(--ink-top) 0%, transparent 60%),
+    radial-gradient(90% 50% at 50% 110%, var(--ink-bot) 0%, transparent 70%),
     linear-gradient(175deg, #0c0d0e 0%, #070808 50%, #030303 100%);
   isolation: isolate;
 }
@@ -84,7 +117,7 @@
   inset: 0;
   z-index: 0;
   background:
-    repeating-radial-gradient(circle at 50% 120%, rgb(227 194 122 / 0.035) 0 1px, transparent 1px 6px);
+    repeating-radial-gradient(circle at 50% 120%, rgb(var(--m) / 0.035) 0 1px, transparent 1px 6px);
   pointer-events: none;
 }
 
@@ -95,10 +128,10 @@
   inset: 8px;
   z-index: 4;
   border-radius: calc(var(--radius) - 9px);
-  border: 1px solid rgb(227 194 122 / 0.42);
+  border: 1px solid rgb(var(--m) / 0.42);
   box-shadow:
     inset 0 0 0 3px transparent,
-    inset 0 0 0 4px rgb(227 194 122 / 0.14);
+    inset 0 0 0 4px rgb(var(--m) / 0.14);
   pointer-events: none;
 }
 
@@ -108,7 +141,7 @@
   inset: 14px;
   z-index: 4;
   pointer-events: none;
-  --c: rgb(240 214 150 / 0.85);
+  --c: rgb(var(--m) / 0.85);
   --l: 16px;
   background:
     linear-gradient(var(--c), var(--c)) top left / var(--l) 1.5px,
@@ -144,6 +177,7 @@
   inset: 0;
   background:
     linear-gradient(to bottom, rgb(5 6 6 / 0.6) 0%, transparent 20%, transparent 50%, rgb(7 8 8 / 0.85) 82%, #070808 100%),
+    linear-gradient(to top, rgb(var(--acc) / 0.12), transparent 45%),
     radial-gradient(100% 70% at 50% 35%, transparent 55%, rgb(3 3 3 / 0.55));
 }
 
@@ -155,8 +189,8 @@
   justify-items: center;
   gap: 16px;
   background:
-    radial-gradient(60% 45% at 50% 45%, rgb(227 194 122 / 0.06), transparent 70%),
-    repeating-radial-gradient(circle at 50% 45%, rgb(227 194 122 / 0.05) 0 1px, transparent 1px 12px);
+    radial-gradient(60% 45% at 50% 45%, rgb(var(--m) / 0.06), transparent 70%),
+    repeating-radial-gradient(circle at 50% 45%, rgb(var(--m) / 0.05) 0 1px, transparent 1px 12px);
 }
 
 .mysteryMark {
@@ -168,7 +202,7 @@
 .mysteryLabel {
   padding: 6px 14px;
   border-radius: 999px;
-  border: 1px solid rgb(227 194 122 / 0.35);
+  border: 1px solid rgb(var(--m) / 0.35);
   background: rgb(0 0 0 / 0.4);
   font-size: 0.5625rem;
   font-weight: 800;
@@ -205,7 +239,7 @@
 }
 
 .badge > span {
-  background: linear-gradient(180deg, var(--gold-hi), var(--gold) 55%, #b38d45);
+  background: linear-gradient(180deg, var(--gold-hi), var(--gold) 55%, var(--gold-lo));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -297,7 +331,7 @@
   font-size: calc(var(--w) * 0.043);
   font-weight: 700;
   letter-spacing: 0.34em;
-  background: linear-gradient(180deg, var(--gold-hi), var(--gold) 60%, #b38d45);
+  background: linear-gradient(180deg, var(--gold-hi), var(--gold) 60%, var(--gold-lo));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -317,7 +351,7 @@
 .rule {
   position: relative;
   height: 9px;
-  background: linear-gradient(90deg, transparent, rgb(227 194 122 / 0.55) 22%, rgb(227 194 122 / 0.55) 78%, transparent) center / 100% 1px no-repeat;
+  background: linear-gradient(90deg, transparent, rgb(var(--m) / 0.55) 22%, rgb(var(--m) / 0.55) 78%, transparent) center / 100% 1px no-repeat;
 }
 
 .rule::after {
@@ -350,7 +384,7 @@
 
 /* Thin gold separators between the three medals. */
 .medal + .medal {
-  border-left: 1px solid rgb(227 194 122 / 0.2);
+  border-left: 1px solid rgb(var(--m) / 0.2);
 }
 
 .medal svg {
@@ -381,7 +415,7 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   white-space: nowrap;
-  background: linear-gradient(100deg, #8c6a2e 0%, #e3c27a 35%, #fff6dc 50%, #e3c27a 65%, #8c6a2e 100%) 0 0 / 250% 100%;
+  background: linear-gradient(100deg, var(--gold-lo) 0%, var(--gold) 35%, var(--gold-hi) 50%, var(--gold) 65%, var(--gold-lo) 100%) 0 0 / 250% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -466,4 +500,186 @@
   .card {
     transform: none;
   }
+}
+
+/* ================================================================ golf details */
+
+/* Golf-ball dimples, very faint, strongest at the top. */
+.dimples {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, rgb(255 255 255 / 0.07) 0 1.1px, transparent 1.7px) 0 0 / 10px 10px,
+    radial-gradient(circle, rgb(255 255 255 / 0.07) 0 1.1px, transparent 1.7px) 5px 5px / 10px 10px;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%);
+  mask-image: linear-gradient(to bottom, #000, transparent 70%);
+  opacity: 0.6;
+}
+
+/* Putting-green contour lines behind the name plate. */
+.contours {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 42%;
+  width: 100%;
+  pointer-events: none;
+  fill: none;
+  stroke: rgb(var(--m) / 0.13);
+  stroke-width: 0.35;
+  vector-effect: non-scaling-stroke;
+}
+
+/* State: the Sahyadri ridge at the foot of the photo. */
+.ridge {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 31%;
+  width: 100%;
+  height: 9%;
+  pointer-events: none;
+  fill: rgb(var(--acc) / 0.07);
+  filter: drop-shadow(0 -0.5px 0 rgb(var(--m) / 0.35));
+  opacity: 0.9;
+}
+
+/* National: a tricolour band down the left edge. */
+.tricolour {
+  position: absolute;
+  z-index: 4;
+  left: 9px;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(#ff9933 0 33.3%, #f4f4f4 33.3% 66.6%, #138808 66.6%);
+  box-shadow: 0 0 10px rgb(255 153 51 / 0.25);
+  pointer-events: none;
+}
+
+/* International: a faceted diamond lattice and soft prism light. */
+.facets {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(60deg, rgb(255 255 255 / 0.045) 0 1px, transparent 1px 26px),
+    repeating-linear-gradient(-60deg, rgb(255 255 255 / 0.045) 0 1px, transparent 1px 26px),
+    radial-gradient(50% 35% at 18% 12%, rgb(255 180 230 / 0.09), transparent 70%),
+    radial-gradient(50% 35% at 85% 20%, rgb(150 220 255 / 0.1), transparent 70%);
+}
+
+/* A band of light that sweeps across the card on the front / hovered card. */
+.shine {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.shine::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -60%;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgb(var(--m) / 0.1) 35%, rgb(255 255 255 / 0.22) 50%, rgb(var(--m) / 0.1) 65%, transparent);
+  transform: translateX(0) skewX(-14deg);
+  transition: transform 1.2s cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.card[data-active]:hover .shine::before,
+.card[data-large]:hover .shine::before,
+.card:focus-within .shine::before {
+  transform: translateX(420%) skewX(-14deg);
+}
+
+.card[data-card="international"] .shine::before {
+  background: linear-gradient(100deg, transparent, rgb(255 190 235 / 0.12) 30%, rgb(255 255 255 / 0.3) 50%, rgb(160 225 255 / 0.14) 70%, transparent);
+}
+
+/* Emblem for national / international (the state card uses the MH script). */
+.emblem {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px 4px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#0a0a0a, #0a0a0a) padding-box,
+    linear-gradient(135deg, var(--gold-hi), var(--gold) 40%, var(--gold-lo) 75%, var(--gold)) border-box;
+  font-family: var(--font-display);
+  font-size: calc(var(--w) * 0.042);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--gold-hi);
+}
+
+.flagBars {
+  width: 12px;
+  height: 9px;
+  border-radius: 1.5px;
+  background: linear-gradient(#ff9933 0 33.3%, #f4f4f4 33.3% 66.6%, #138808 66.6%);
+}
+
+.gem {
+  font-style: normal;
+  font-size: 1.1em;
+  background: linear-gradient(135deg, #fff, #ffd1f0 40%, #b9e6ff 70%, #fff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 6px rgb(185 225 255 / 0.6));
+}
+
+/* Level line above the name: flag-pin icon, place, level. */
+.tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: max(0.5rem, calc(var(--w) * 0.032));
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.tier b {
+  font-weight: 700;
+  color: rgb(255 255 255 / 0.5);
+  letter-spacing: 0.2em;
+}
+
+.tier b::before {
+  content: "·";
+  margin-right: 7px;
+  color: rgb(var(--m) / 0.6);
+}
+
+/* National: the rule under the name in the tricolour. */
+.card[data-card="national"] .rule {
+  background: linear-gradient(90deg, transparent, #ff9933 22%, #f4f4f4 50%, #138808 78%, transparent) center / 100% 1px no-repeat;
+}
+
+/* State: MH monogram in saffron-gold metal instead of champagne. */
+.card[data-card="state"] .state {
+  background-image: linear-gradient(105deg, #ffe7bf 0%, #f4a23c 12%, #b8461a 22%, #ffd08a 30%, #f08a24 36%, #fff3dc 46%, #ffffff 48%, #fff3dc 51%, #ffd08a 62%, #e0701e 71%, #ffe7bf 81%, #b8461a 91%, #ffc97a 100%);
+  -webkit-text-stroke-color: #e8862e;
+}
+
+/* Diamond edge: platinum with faint prism colours running through it. */
+.card[data-card="international"] .foil {
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.06) 0 1px, transparent 1px 3px),
+    linear-gradient(145deg, #ffffff 0%, #d9eefb 12%, #ffd6ef 22%, #7f9fb3 34%, #1b2830 46%, #b9e6ff 60%, #ffffff 70%, #e6d9ff 80%, #6f8fa3 90%, #1b2830 100%);
 }

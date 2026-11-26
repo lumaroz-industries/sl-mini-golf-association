@@ -403,6 +403,11 @@ export const Player = z.object({
   gender: z.enum(["female", "male"]).optional(),
   /** District in Maharashtra, e.g. "Nagpur" */
   district: optionalText,
+  /**
+   * Which card the player gets (chosen by the admins): "state" (Maharashtra),
+   * "national" (India) or "international" (diamond). Default: state.
+   */
+  card: z.enum(["state", "national", "international"]).optional(),
   /** Real photograph only (portrait works best). Without one, cards show initials. */
   photo: ImageAsset.optional(),
   /**

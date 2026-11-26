@@ -23,7 +23,7 @@ function arrange(entries: Entry[]): Array<Entry | undefined> {
 
 export function buildSlots(entries: Entry[]): Slot[] {
   const side = (s: FeaturedSlot["side"]) => entries.filter((p) => p.side === s);
-  const toCard = (e?: Entry) => e && { slug: e.player.slug, name: e.player.name, photo: e.player.photo, medals: medalTotals(e.player) };
+  const toCard = (e?: Entry) => e && { slug: e.player.slug, name: e.player.name, photo: e.player.photo, medals: medalTotals(e.player), card: e.player.card };
   const left = arrange(side("left")); // index 0 = next to the centre
   const right = arrange(side("right"));
   return [

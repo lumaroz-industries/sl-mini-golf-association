@@ -26,6 +26,13 @@ interface PlayerCardProps {
   active?: boolean;
 }
 
+/** The three card designs, chosen per player in the admin. */
+const TIERS = {
+  state: { label: "Maharashtra", level: "State" },
+  national: { label: "India", level: "National" },
+  international: { label: "International", level: "World stage" },
+} as const;
+
 const MEDALS: Array<{ kind: MedalKind; label: string }> = [
   { kind: "gold", label: "Gold" },
   { kind: "silver", label: "Silver" },
@@ -33,13 +40,19 @@ const MEDALS: Array<{ kind: MedalKind; label: string }> = [
 ];
 
 /**
- * Collectible-style player card: photo, name and medal counts — nothing
- * else. Cards without an announced player show the SL mark and "Reveal soon".
+ * Collectible-style player card: photo, name and medal counts. Three designs
+ * (set per player in the admin): State (Maharashtra — saffron and deep red
+ * with gold, the MH monogram and the Sahyadri ridge), National (India — gold
+ * with a tricolour band) and International (diamond — platinum, a faceted
+ * lattice and prismatic light). All share a black premium body with golf
+ * details: a ball-dimple texture and putting-green contour lines.
+ * Cards without an announced player show the SL mark and "Reveal soon".
  */
 export function PlayerCard({ player, revealLabel, large = false, priority = false, overlay, arrowHidden = false, active = true, badge = "Top 7" }: PlayerCardProps) {
   const [first, ...rest] = (player?.name ?? "").split(/\s+/);
+  const tier = player?.card ?? "state";
   return (
-    <div className={styles.card} data-large={large || undefined} data-empty={!player || undefined} data-arrow-hidden={arrowHidden || undefined} data-active={active || undefined}>
+    <div className={styles.card} data-card={tier} data-large={large || undefined} data-empty={!player || undefined} data-arrow-hidden={arrowHidden || undefined} data-active={active || undefined}>
       <div className={styles.foil} aria-hidden="true" />
       <div className={styles.body}>
         <div className={styles.photo}>
@@ -64,16 +77,53 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
           <span className={styles.photoFade} aria-hidden="true" />
         </div>
 
+        {/* Golf details and the design's own motif. */}
+        <span className={styles.dimples} aria-hidden="true" />
+        <svg className={styles.contours} viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden="true">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <ellipse key={i} cx="62" cy="64" rx={18 + i * 11} ry={9 + i * 6} />
+          ))}
+        </svg>
+        {tier === "state" && (
+          <svg className={styles.ridge} viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 20 L0 14 L8 9 L13 12 L21 5 L27 10 L33 7 L40 12 L47 4 L53 9 L58 6 L66 11 L72 3 L79 9 L85 7 L92 12 L100 8 L100 20 Z" />
+          </svg>
+        )}
+        {tier === "national" && <span className={styles.tricolour} aria-hidden="true" />}
+        {tier === "international" && <span className={styles.facets} aria-hidden="true" />}
+        <span className={styles.shine} aria-hidden="true" />
+
         <span className={styles.corners} aria-hidden="true" />
 
         <div className={styles.top} aria-hidden="true">
           <span className={styles.badge}><span>{badge}</span></span>
-          <span className={`${styles.state} ${mhFont.className}`} title="Maharashtra">
-            MH
-          </span>
+          {tier === "state" && (
+            <span className={`${styles.state} ${mhFont.className}`} title="Maharashtra">
+              MH
+            </span>
+          )}
+          {tier === "national" && (
+            <span className={styles.emblem} title="India">
+              <i className={styles.flagBars} />
+              IND
+            </span>
+          )}
+          {tier === "international" && (
+            <span className={styles.emblem} title="International">
+              <i className={styles.gem}>◆</i>
+              INTL
+            </span>
+          )}
         </div>
 
         <div className={styles.plate}>
+          <span className={styles.tier}>
+            <svg viewBox="0 0 12 16" width="9" height="12" aria-hidden="true">
+              <path d="M2 16V1M2 1.5l8 3-8 3" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+            </svg>
+            {TIERS[tier].label}
+            <b>{TIERS[tier].level}</b>
+          </span>
           {player ? (
             <h3 className={styles.name}>
               <span className={styles.first}>{first}</span>
