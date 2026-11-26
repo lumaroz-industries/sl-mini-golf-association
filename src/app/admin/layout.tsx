@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { AdminIntro } from "@/components/admin/AdminIntro";
-import { getPeople } from "@/content/repository";
+import { getPeopleByIds, getPeopleStyle, getSiteSettings } from "@/content/repository";
 import s from "@/components/admin/admin.module.css";
 
 export const metadata: Metadata = {
@@ -16,10 +16,16 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#050807", viewportFit: "cover" };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const people = await getPeople();
+  // The founder (gold) and the website's designer (diamond), full cut-outs as on the website.
+  const site = await getSiteSettings();
+  const [[owner, dev], style] = await Promise.all([getPeopleByIds([site.credits.ownerId, site.credits.developerId]), getPeopleStyle()]);
+  const people = [
+    { name: owner.name, role: owner.role, photo: style[owner.id]?.cutout?.src ?? owner.portrait?.src, finish: "gold" as const },
+    { name: dev.name, role: dev.role, photo: style[dev.id]?.cutout?.src ?? dev.portrait?.src, finish: "diamond" as const },
+  ];
   return (
     <div className={s.shell}>
-      <AdminIntro people={people.map((p) => ({ name: p.name, role: p.role, portrait: p.portrait?.src }))} />
+      <AdminIntro people={people} />
       {children}
     </div>
   );
