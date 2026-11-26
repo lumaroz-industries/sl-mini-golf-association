@@ -25,11 +25,11 @@ export const CUES: Cue[] = [
   { at: 3.0, play: (a, t) => a.whoosh(t, 0.9, 0.34) },
   { at: 3.4, play: (a, t) => a.thud(t, 0.36) },
   // Act 3 — the designer: crystal bells, a shimmering pad and a glittering rise.
-  { at: 3.45, play: (a, t) => a.swell(t, [261.63, 392, 523.25, 659.25], 2.4, 0.13) },
+  { at: 3.45, play: (a, t) => a.swell(t, [261.63, 392, 523.25, 659.25], 1.8, 0.13) },
   { at: 3.55, play: (a, t) => a.arpeggio(t, [1318.5, 1567.98, 1975.53, 2637.02, 3135.96], 0.09, 0.15) },
-  { at: 3.8, play: (a, t) => a.shimmer(t, 1.4, 0.32) },
-  { at: 4.7, play: (a, t) => a.bell(t, [2093, 3135.96], 0.12) },
-  { at: 5.3, play: (a, t) => a.swell(t, [523.25, 783.99, 1046.5], 1.4, 0.08) },
+  { at: 3.8, play: (a, t) => a.shimmer(t, 1.0, 0.32) },
+  { at: 4.3, play: (a, t) => a.bell(t, [2093, 3135.96], 0.12) },
+  { at: 4.6, play: (a, t) => a.swell(t, [523.25, 783.99, 1046.5], 1.3, 0.08) },
 ];
 
 export class IntroAudio {

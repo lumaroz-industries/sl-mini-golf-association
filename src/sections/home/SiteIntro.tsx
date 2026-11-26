@@ -21,7 +21,7 @@ export interface IntroPerson {
 }
 
 /** Full sequence: logo → founder → designer (see the CSS timeline). */
-const SEQUENCE_MS = 5600;
+const SEQUENCE_MS = 4900;
 /** With reduced motion only the logo shows, briefly. */
 const REDUCED_MS = 1300;
 /** After the sequence, wait at most this long for the 3D course, then open anyway. */
