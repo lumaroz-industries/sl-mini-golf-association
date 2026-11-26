@@ -1,10 +1,26 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.slminigolfassociation.admin",
-      "sha256_cert_fingerprints": ["F9:7C:58:71:30:62:26:50:D2:86:7E:0C:61:18:59:A3:30:EF:01:44:2F:0E:65:43:90:4D:6F:A2:31:19:ED:89"]
+      "sha256_cert_fingerprints": [
+        "F9:7C:58:71:30:62:26:50:D2:86:7E:0C:61:18:59:A3:30:EF:01:44:2F:0E:65:43:90:4D:6F:A2:31:19:ED:89"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.slminigolfassociation.app",
+      "sha256_cert_fingerprints": [
+        "F9:7C:58:71:30:62:26:50:D2:86:7E:0C:61:18:59:A3:30:EF:01:44:2F:0E:65:43:90:4D:6F:A2:31:19:ED:89"
+      ]
     }
   }
 ]

@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "SLAdmin"
-include ":app"
+include ":app", ":site"

@@ -380,6 +380,25 @@ file manager. A newer APK installs over the old one.
 on iPhone, open it in Safari → Share → *Add to Home Screen*. Both give the same
 “SL Admin” app icon.
 
+## SL Mini Golf app (Android APK)
+
+The public website is also an Android app, **SL Mini Golf**, built exactly like
+SL Admin: it opens the live website full-screen (a *Trusted Web Activity*), so
+**every change to the site appears in the app without reinstalling**.
+
+- Project: `android/site/` (package `com.slminigolfassociation.app`), next to
+  the admin app in `android/app/`. The address is `siteHost` in
+  `android/site/build.gradle`.
+- Built by GitHub Actions (`.github/workflows/sl-site-apk.yml`) whenever
+  `android/site/` changes, or manually: GitHub → Actions → **SL Mini Golf
+  APK** → Run workflow. Each build is a GitHub **Release** with
+  `SL-Mini-Golf.apk` attached.
+- Signed with the same key as SL Admin (the same repository secrets), and
+  listed in `public/.well-known/assetlinks.json` next to it.
+- It does not take over links to the site (they keep opening in the browser,
+  and admin links in SL Admin), so the two apps never compete.
+- Icons: `node scripts/brand/build-site-app-icons.mjs`.
+
 ## Brand assets
 
 The logo was redrawn as clean vector geometry from the approved traced logo.

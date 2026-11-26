@@ -1,0 +1,60 @@
+/*
+ * SL Mini Golf — Android app that opens the live website (Trusted Web
+ * Activity), the same way the SL Admin app opens the admin. The app holds no
+ * copy of the website: every change to the site reaches the app without an
+ * update. Rebuild only if the website address, name or icon changes.
+ * Signed with the same key as SL Admin.
+ */
+plugins {
+    id "com.android.application"
+}
+
+// The website the app opens. Change this (and rebuild) only if the site moves to a new domain.
+def siteHost = "sl-mini-golf-association.vercel.app"
+
+android {
+    namespace "com.slminigolfassociation.app"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.slminigolfassociation.app"
+        minSdk 21
+        targetSdk 34
+        // Every build gets a higher number, so a new APK installs over the old one.
+        versionCode Integer.parseInt(System.getenv("VERSION_CODE") ?: "1")
+        versionName "1.0." + (System.getenv("VERSION_CODE") ?: "0")
+
+        manifestPlaceholders = [
+            hostName  : siteHost,
+            defaultUrl: "https://" + siteHost + "/",
+        ]
+        resValue "string", "asset_statements",
+            "[{ \\\"relation\\\": [\\\"delegate_permission/common.handle_all_urls\\\"], \\\"target\\\": { \\\"namespace\\\": \\\"web\\\", \\\"site\\\": \\\"https://" + siteHost + "\\\" } }]"
+    }
+
+    signingConfigs {
+        release {
+            // Provided by the GitHub Actions workflow from the repository's secrets (the SL Admin key).
+            storeFile file(System.getenv("SL_ADMIN_KEYSTORE_PATH") ?: "release.jks")
+            storePassword System.getenv("SL_ADMIN_KEYSTORE_PASSWORD")
+            keyAlias System.getenv("SL_ADMIN_KEY_ALIAS") ?: "sladmin"
+            keyPassword System.getenv("SL_ADMIN_KEYSTORE_PASSWORD")
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation "com.google.androidbrowserhelper:androidbrowserhelper:2.5.0"
+}

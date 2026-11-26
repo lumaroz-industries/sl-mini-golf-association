@@ -1,0 +1,86 @@
+# Builds the "SL Mini Golf" Android app (APK) — the public website — and
+# publishes it as a GitHub release.
+#
+# The app only opens the live website, so it does NOT need rebuilding when
+# the site changes. Run this again only if the app's name, icon or website
+# address changes: GitHub → Actions → "SL Mini Golf APK" → Run workflow.
+#
+# Needs these repository secrets (Settings → Secrets and variables → Actions):
+#   SL_ADMIN_KEYSTORE_BASE64   the signing key, base64-encoded
+#   SL_ADMIN_KEYSTORE_PASSWORD its password
+# (the same key as SL Admin). Keep a backup of the key: every future version
+# must be signed with it.
+name: SL Mini Golf APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "android/site/**"
+      - ".github/workflows/sl-site-apk.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Check the signing key is set up
+        id: key
+        env:
+          KEYSTORE: ${{ secrets.SL_ADMIN_KEYSTORE_BASE64 }}
+          PASSWORD: ${{ secrets.SL_ADMIN_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE" ] || [ -z "$PASSWORD" ]; then
+            echo "::warning::Signing key secrets are not set — doing a test build only (no APK released). See README, 'SL Mini Golf app'."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Test build (no signing key yet)
+        if: steps.key.outputs.ready != 'true'
+        working-directory: android
+        run: gradle :site:assembleDebug --no-daemon
+
+      - name: Build the signed APK
+        if: steps.key.outputs.ready == 'true'
+        working-directory: android
+        env:
+          SL_ADMIN_KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          SL_ADMIN_KEYSTORE_PASSWORD: ${{ secrets.SL_ADMIN_KEYSTORE_PASSWORD }}
+          SL_ADMIN_KEY_ALIAS: sladmin
+          VERSION_CODE: ${{ github.run_number }}
+        run: |
+          gradle :site:assembleRelease --no-daemon
+          cp site/build/outputs/apk/release/site-release.apk "$RUNNER_TEMP/SL-Mini-Golf.apk"
+
+      - uses: actions/upload-artifact@v4
+        if: steps.key.outputs.ready == 'true'
+        with:
+          name: SL-Mini-Golf-apk
+          path: ${{ runner.temp }}/SL-Mini-Golf.apk
+
+      - name: Publish as a release
+        if: steps.key.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="sl-app-v${{ github.run_number }}"
+          gh release create "$TAG" "$RUNNER_TEMP/SL-Mini-Golf.apk" \
+            --title "SL Mini Golf app (version ${{ github.run_number }})" \
+            --notes "Android app for the SL Mini Golf Association website. Download SL-Mini-Golf.apk on the phone, open it and allow installing. It opens the live website, so changes to the site appear without reinstalling."

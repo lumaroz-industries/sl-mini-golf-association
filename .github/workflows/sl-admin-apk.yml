@@ -15,7 +15,9 @@ on:
   push:
     branches: [main]
     paths:
-      - "android/**"
+      - "android/app/**"
+      - "android/*.gradle"
+      - "android/gradle.properties"
       - ".github/workflows/sl-admin-apk.yml"
 
 permissions:
@@ -53,7 +55,7 @@ jobs:
       - name: Test build (no signing key yet)
         if: steps.key.outputs.ready != 'true'
         working-directory: android
-        run: gradle assembleDebug --no-daemon
+        run: gradle :app:assembleDebug --no-daemon
 
       - name: Build the signed APK
         if: steps.key.outputs.ready == 'true'
@@ -64,7 +66,7 @@ jobs:
           SL_ADMIN_KEY_ALIAS: sladmin
           VERSION_CODE: ${{ github.run_number }}
         run: |
-          gradle assembleRelease --no-daemon
+          gradle :app:assembleRelease --no-daemon
           cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/SL-Admin.apk"
 
       - uses: actions/upload-artifact@v4
