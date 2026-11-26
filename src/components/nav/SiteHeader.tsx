@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SocialLink } from "@/content/schema";
 import { MenuOverlay } from "./MenuOverlay";
+import { isActive, navigation } from "@/config/navigation";
 import styles from "./SiteHeader.module.css";
 
 interface SiteHeaderProps {
@@ -74,6 +75,17 @@ export function SiteHeader({ siteName, tagline, email, social }: SiteHeaderProps
               Association
             </span>
           </Link>
+
+          {/* Quick links on wide screens; the full menu stays one tap away. */}
+          <nav className={styles.links} aria-label="Quick links">
+            {navigation
+              .filter((n) => n.href !== "/")
+              .map((n) => (
+                <Link key={n.href} href={n.href} className={styles.quick} aria-current={isActive(pathname, n.href) ? "page" : undefined}>
+                  {n.label}
+                </Link>
+              ))}
+          </nav>
 
           <button
             ref={toggleRef}

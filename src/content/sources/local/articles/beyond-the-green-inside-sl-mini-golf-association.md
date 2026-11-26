@@ -1,7 +1,7 @@
 ---
 title: "Beyond the Green: Inside SL Mini Golf Association"
 slug: beyond-the-green-inside-sl-mini-golf-association
-excerpt: A first look at SL Mini Golf Association — a 3D course you scroll through, collectible player cards, stories and updates, and the two people who built it.
+excerpt: A first look at SL Mini Golf Association — a golf ball you follow in free fall, collectible player cards, stories and updates, and the two people who built it.
 category: community
 author:
   name: SL Mini Golf Association
@@ -31,21 +31,25 @@ Mini golf in India is played on local courses, in state competitions and on inte
 
 > Beyond the green. Beyond boundaries.
 
-## A course you play by scrolling
+## A fall you play by scrolling
 
-Open the homepage and you are not looking at a banner — you are standing on a course. As you scroll, a putter swings, the ball rolls up a ramp, across a raised deck, through an illuminated tunnel, around banked curves, over a bridge, past a rotating gate and under a stone arch, until it drops into the cup.
+Open the homepage and you are not looking at a banner — you are in free fall. As you scroll, a golf ball dives through the dark: streaks of air rush past, clouds tear by and rings of light rise up for the ball to smash through, while the story of the association appears beside it.
 
-![The ball approaching the glowing tunnel on the homepage course](/articles/beyond-the-green-inside-sl-mini-golf-association/tunnel.webp "The illuminated tunnel — one of the stops on the homepage journey.")
+![The golf ball diving through the dark with the Vision beside it](/articles/beyond-the-green-inside-sl-mini-golf-association/fall-dive.webp "The dive — the story of the association appears beside the ball as it falls.")
 
-It is one continuous course, built entirely in code: the turf, the stone, the lights and even the dimples on the ball. Scroll back and the ball rolls back with you; stop, and the shot holds perfectly still. And when the ball drops, the camera rises to reveal the whole course lit up at night.
+The faster it falls, the hotter it gets. The SL mark carved into the ball turns to face you, the underside glows like a meteor — and then it breaks apart into thousands of embers.
 
-![The cup lit from above on the final green](/articles/beyond-the-green-inside-sl-mini-golf-association/cup.webp) ![The whole course from above, lit up at night](/articles/beyond-the-green-inside-sl-mini-golf-association/course.webp)
+![The ball glowing like a meteor](/articles/beyond-the-green-inside-sl-mini-golf-association/fall-meteor.webp) ![The ball burning apart into embers](/articles/beyond-the-green-inside-sl-mini-golf-association/fall-burn.webp)
+
+The embers drift, then gather into the SL Mini Golf Association logo. It is all built in code and driven by your scroll: scroll back and the ball reassembles and climbs back up, with wind, fire and the boom of every ring in sound.
+
+![The embers forming the SL Mini Golf Association logo](/articles/beyond-the-green-inside-sl-mini-golf-association/fall-logo.webp "Where the fall ends: the logo.")
 
 ## Maharashtra's Top 7
 
-The Players page opens with **Maharashtra's Top 7** — seven players taking Indian mini golf to the international stage, presented as collectible cards in black and gold. Each card shows only what matters: the player, and their gold, silver and bronze medals. Hover or tap a card to bring it forward; the arrow opens the player's own page.
+The Players page opens with **Maharashtra's Top 7** — seven players taking Indian mini golf to the international stage, presented as collectible cards on a black premium body, each in the metal of the player's level: State, National or International. Each card shows only what matters: the player, and their gold, silver and bronze medals. Hover or tap a card to bring it forward; the arrow opens the player's own page.
 
-![Maharashtra's Top 7 line-up of black-and-gold player cards](/articles/beyond-the-green-inside-sl-mini-golf-association/top-7-v2.webp "Maharashtra's Top 7 — more players will be revealed soon.")
+![Maharashtra's Top 7 line-up of player cards](/articles/beyond-the-green-inside-sl-mini-golf-association/top-7-v3.webp "Maharashtra's Top 7 — more players will be revealed soon.")
 
 The line-up is a selection by SL Mini Golf Association, not a ranking. More players will be revealed as their details are confirmed.
 
@@ -59,13 +63,13 @@ The line-up is a selection by SL Mini Golf Association, not a ranking. More play
 
 The **Social Media** page brings the community's channels into one place — associations from across India, the people behind this platform, and *The Mini Golf Journey* on YouTube. And if you want to reach us, the **Contact** page has the official email and a message form.
 
-![The Social Media page: Follow the journey](/articles/beyond-the-green-inside-sl-mini-golf-association/social-media.webp)
+![The Social Media page: Follow the journey](/articles/beyond-the-green-inside-sl-mini-golf-association/social.webp)
 
 ## The people behind the platform
 
 **Suyash Lahane — Founder & Owner.** Suyash founded SL Mini Golf Association to put Indian mini golf and its players in the spotlight. He also runs the YouTube channel *The Mini Golf Journey*. Follow him on Instagram: [@suyashx01](https://www.instagram.com/suyashx01/).
 
-**Chaitanya Payghan — Website Designer & Full-Stack Developer.** Chaitanya designed and built the platform from the ground up — the 3D course, the player cards, the pages you are reading and the tools behind them. Follow him on Instagram: [@chaitux2859](https://www.instagram.com/chaitux2859/).
+**Chaitanya Payghan — Website Designer & Full-Stack Developer.** Chaitanya designed and built the platform from the ground up — the falling ball, the player cards, the pages you are reading and the tools behind them. Follow him on Instagram: [@chaitux2859](https://www.instagram.com/chaitux2859/).
 
 ## What's next
 

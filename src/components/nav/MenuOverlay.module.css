@@ -253,3 +253,87 @@
 .social {
   margin-top: 4px;
 }
+
+/* ================================================================ polish */
+
+/* On hover the word turns outlined and an emerald copy fills in from the left. */
+.label::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  color: var(--accent);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .link:hover .label {
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.85);
+  }
+  .link:hover .label::before {
+    clip-path: inset(0 0 0 0);
+    -webkit-text-stroke: 0;
+  }
+  .link[aria-current="page"]:hover .label {
+    -webkit-text-stroke-color: var(--accent);
+  }
+}
+
+/* What each page is, shown beside it on hover (wide screens). */
+.summary {
+  display: none;
+}
+
+@media (hover: hover) and (min-width: 1000px) {
+  .summary {
+    display: block;
+    max-width: 26ch;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: normal;
+    color: var(--fg-muted);
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+  }
+  .link:hover .summary {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The side panel as a premium card. */
+.aside {
+  position: relative;
+  padding: clamp(22px, 2.6vw, 34px);
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  background:
+    radial-gradient(70% 90% at 0% 0%, rgb(0 168 107 / 0.12), transparent 60%) padding-box,
+    linear-gradient(170deg, rgb(13 20 17 / 0.9), rgb(6 9 8 / 0.9)) padding-box,
+    linear-gradient(140deg, rgb(0 168 107 / 0.7), rgb(255 255 255 / 0.06) 40%, rgb(227 194 122 / 0.55)) border-box;
+  box-shadow: 0 30px 70px -40px #000;
+}
+
+.aside::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.5), transparent);
+}
+
+.tagline span {
+  background: linear-gradient(90deg, #00a86b, #e3c27a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

@@ -53,7 +53,10 @@ export function MenuOverlay({ id, open, pathname, onNavigate, tagline, email, so
                       </span>
                       {item.status === "coming-soon" && <span className={styles.soon}>Soon</span>}
                     </span>
-                    <span className={styles.label}>{item.label}</span>
+                    <span className={styles.label} data-text={item.label}>
+                      {item.label}
+                    </span>
+                    <span className={styles.summary}>{item.summary}</span>
                   </Link>
                 </li>
               );
