@@ -92,6 +92,18 @@ export default async function OfficialsPage() {
                   {lv.title}
                 </h2>
                 {lv.note && <p className={s.levelNote}>{lv.note}</p>}
+                {lv.organisation &&
+                  (lv.organisation.url ? (
+                    <a className={s.orgBadge} href={lv.organisation.url} target="_blank" rel="noopener noreferrer">
+                      {lv.organisation.short && <b>{lv.organisation.short}</b>}
+                      {lv.organisation.name} <span aria-hidden="true">↗</span>
+                    </a>
+                  ) : (
+                    <span className={s.orgBadge}>
+                      {lv.organisation.short && <b>{lv.organisation.short}</b>}
+                      {lv.organisation.name}
+                    </span>
+                  ))}
               </div>
               <span className={s.levelBand} aria-hidden="true" />
             </header>
@@ -102,7 +114,7 @@ export default async function OfficialsPage() {
                   <h3 className={s.groupTitle}>{g.title}</h3>
                   {g.note && <p className={s.groupNote}>{g.note}</p>}
                 </header>
-                <ul className={s.grid}>
+                <ul className={s.grid} data-lead={g.id === "leadership" || undefined}>
                   {g.list.length > 0
                     ? g.list.map((o, i) => (
                         <li key={o.id} style={{ "--i": i } as React.CSSProperties}>

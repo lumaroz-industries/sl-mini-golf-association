@@ -515,6 +515,8 @@ export const OfficialsPageContent = z.object({
         note: optionalText,
         /** Accent of the chapter: tricolour for India, saffron for Maharashtra. */
         accent: z.enum(["tricolour", "saffron"]),
+        /** The governing body of this level, shown as a badge in its heading. */
+        organisation: z.object({ name: z.string().min(1), short: optionalText, url: z.string().url().optional() }).optional(),
         groups: z.array(OfficialsGroup).min(1),
       }),
     )

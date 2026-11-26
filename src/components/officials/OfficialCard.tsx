@@ -21,24 +21,29 @@ export function OfficialCard({ official, revealLabel, role }: { official?: Offic
       </article>
     );
   }
-  const initials = official.name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2);
+  // Initials of the name, skipping titles like "Dr.".
+  const words = official.name.split(/\s+/).filter((w) => !/^(dr|mr|mrs|ms|shri|smt)\.?$/i.test(w));
+  const initials = ((words[0]?.[0] ?? "") + (words.length > 1 ? words[words.length - 1][0] : "")).toUpperCase();
   return (
     <article className={s.card} aria-label={`${official.name}, ${official.role}`}>
       <div className={s.photo}>
         {official.photo ? (
           <Image src={official.photo.src} alt={official.photo.alt} width={official.photo.width} height={official.photo.height} sizes="(max-width: 640px) 46vw, 280px" />
         ) : (
-          <span className={s.initials}>{initials}</span>
+          <span className={s.monogram}>
+            <span className={s.initials}>{initials}</span>
+          </span>
         )}
       </div>
       <div className={s.body}>
         <span className={s.role}>{official.role}</span>
         <h3 className={s.name}>{official.name}</h3>
-        {official.organisation && <span className={s.org}>{official.organisation}</span>}
+        {official.organisation && (
+          <span className={s.org}>
+            <i aria-hidden="true" />
+            {official.organisation}
+          </span>
+        )}
         {(official.district || official.since) && (
           <span className={s.meta}>{[official.district, official.since && `Since ${official.since}`].filter(Boolean).join(" · ")}</span>
         )}

@@ -604,3 +604,110 @@
     font-size: clamp(1.9rem, 9.5vw, 2.6rem);
   }
 }
+
+/* ============================================================ real officials */
+
+/* Without a photo: initials in a monogram ring in the chapter's colours. */
+.monogram {
+  display: grid;
+  place-items: center;
+  width: 62%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  padding: 3px;
+  background: conic-gradient(from 200deg, var(--a1, #e3c27a), var(--a2, #fbecc4), var(--a3, #8c6a2e), var(--a1, #e3c27a));
+  box-shadow: 0 0 40px rgb(var(--glowc, 227 194 122) / 0.25);
+}
+
+.monogram .initials {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #18201c, #050706 75%);
+  font-size: clamp(1.8rem, 1.2rem + 2.4vw, 3rem);
+  letter-spacing: 0.04em;
+  -webkit-text-fill-color: transparent;
+  background-clip: border-box;
+}
+
+/* (gradient text on the letters, drawn by a separate layer) */
+.monogram .initials {
+  color: #fbecc4;
+  -webkit-text-fill-color: #fbecc4;
+  text-shadow: 0 0 18px rgb(227 194 122 / 0.35);
+}
+
+.org {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 2px;
+}
+
+.org i {
+  width: 14px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 1.5px;
+  background: linear-gradient(#ff9933 0 33.3%, #f4f4f4 33.3% 66.6%, #138808 66.6%);
+}
+
+.level[data-accent="saffron"] .org i {
+  background: linear-gradient(135deg, #ff9a3c, #e8601f 55%, #8f2a0c);
+}
+
+/* The governing body, as a badge under the level's heading. */
+.orgBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 8px 16px 8px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#0a0d0c, #0a0d0c) padding-box,
+    linear-gradient(90deg, var(--a1), var(--a2), var(--a3)) border-box;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: transform var(--dur-fast);
+}
+
+a.orgBadge:hover {
+  transform: translateY(-2px);
+}
+
+.orgBadge b {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--a1), var(--a2) 50%, var(--a3));
+  color: #0a0d0c;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+}
+
+.level[data-accent="tricolour"] .orgBadge b {
+  background: linear-gradient(90deg, #ff9933, #ffd9b0 45%, #e6f3e6 55%, #138808);
+}
+
+/* Real cards: a touch more presence than the empty slots. */
+.card:not([data-empty]) .body {
+  gap: 7px;
+  padding-bottom: 22px;
+}
+
+.card:not([data-empty]) .name {
+  font-size: clamp(1.05rem, 0.95rem + 0.45vw, 1.3rem);
+}
+
+/* Leadership: bigger cards. */
+@media (min-width: 641px) {
+  .grid[data-lead] {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 340px));
+  }
+  .grid[data-lead] .monogram {
+    width: 54%;
+  }
+}

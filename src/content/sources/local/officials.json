@@ -7,7 +7,7 @@
       "id": "india",
       "title": "India",
       "subtitle": "National officials",
-      "note": "The officials leading mini golf across the country.",
+      "note": "The officials of the Minigolf Federation of India, leading the sport across the country.",
       "accent": "tricolour",
       "groups": [
         {
@@ -28,7 +28,12 @@
           "note": "On the course at every event.",
           "placeholders": 4
         }
-      ]
+      ],
+      "organisation": {
+        "name": "Minigolf Federation of India",
+        "short": "MGFI",
+        "url": "https://www.instagram.com/minigolf_federation_of_india/"
+      }
     },
     {
       "id": "maharashtra",
@@ -58,7 +63,35 @@
       ]
     }
   ],
-  "officials": [],
+  "officials": [
+    {
+      "id": "sudhakar-kohale",
+      "name": "Sudhakar Kohale",
+      "role": "President",
+      "level": "india",
+      "group": "leadership",
+      "organisation": "Minigolf Federation of India",
+      "bio": "Leads national minigolf events and championships in India."
+    },
+    {
+      "id": "suraj-singh-yeotikar",
+      "name": "Dr. Suraj Singh Yeotikar",
+      "role": "Secretary General",
+      "level": "india",
+      "group": "leadership",
+      "organisation": "Minigolf Federation of India",
+      "bio": "Manages federation operations and also competes as an international player."
+    },
+    {
+      "id": "rajesh-shendekar",
+      "name": "Rajesh Shendekar",
+      "role": "Technical Committee Chairman",
+      "level": "india",
+      "group": "committee",
+      "organisation": "Minigolf Federation of India",
+      "bio": "Oversees technical standards and rules for the federation."
+    }
+  ],
   "revealLabel": "To be announced",
   "note": "Officials are added here as their details are confirmed."
 }
