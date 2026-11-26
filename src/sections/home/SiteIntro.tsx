@@ -44,8 +44,9 @@ const letters = (word: string, from: number) =>
  * Opening of the homepage. Three acts, cut together with the slash from the
  * SL logo sweeping across the screen:
  *   1. the SL logo on black, with a light sweep and the tagline,
- *   2. the founder, in gold,
- *   3. the website's designer, in diamond (the longest act),
+ *   2. the founder (gold) and the designer (diamond) side by side, the
+ *      screen split down the middle by the logo's slash,
+ *   3. the website's designer alone, full screen, in diamond (the longest act),
  * then it opens up straight into the 3D course — on its own, no tap needed.
  *
  * Plays every time the homepage is opened (also coming back from another
@@ -253,8 +254,35 @@ export function SiteIntro({ tagline, people }: { tagline: string[]; people: Intr
               </div>
             </section>
 
-            {/* Acts 2 and 3 — the people behind it */}
+            {/* Act 2 — the two of them, side by side on a screen split by the logo's slash */}
+            <section className={`${s.act} ${s.duo}`} aria-hidden="true">
+              {people.slice(0, 2).map((p, i) => (
+                <div key={p.name} className={s.half} data-side={i === 0 ? "left" : "right"} data-finish={p.finish}>
+                  <div className={s.halfGlow} />
+                  <span className={s.halfWord}>{i === 0 ? "Founder" : "Designer"}</span>
+                  {p.photo && (
+                    <div className={s.halfFigure}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={p.photo} alt="" fetchPriority="high" loading="eager" decoding="sync" data-intro-img="" />
+                    </div>
+                  )}
+                  <div className={s.halfCaption}>
+                    <span className={s.halfKicker}>
+                      {p.finish === "diamond" && <b>◆</b>}
+                      {i === 0 ? "Founded by" : "Designed & built by"}
+                    </span>
+                    <span className={s.halfName}>{p.name}</span>
+                  </div>
+                </div>
+              ))}
+              <svg className={s.duoLine} viewBox="0 0 100 100" preserveAspectRatio="none">
+                <line x1="58" y1="-2" x2="42" y2="102" />
+              </svg>
+            </section>
+
+            {/* Act 3 — the designer, full screen */}
             {people.slice(0, 2).map((p, i) => {
+              if (i === 0) return null;
               const [first, ...restWords] = p.name.split(" ");
               const rest = restWords.join(" ");
               const diamond = p.finish === "diamond";
