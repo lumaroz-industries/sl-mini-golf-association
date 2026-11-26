@@ -71,7 +71,20 @@
   --lo: #7f9fb3;
   --deep: #141d23;
   --glow: 185 225 255;
-  --edge: linear-gradient(145deg, #fff 0%, #d9eefb 12%, #ffd6ef 22%, #7f9fb3 34%, #141d23 46%, #b9e6ff 60%, #fff 70%, #e6d9ff 80%, #6f8fa3 90%, #141d23 100%);
+  --edge: var(--dmd-edge);
+}
+
+/* Diamond + obsidian body: volcanic glass, sparkle glints, glassy reflection. */
+.card[data-finish="diamond"] .body {
+  background: var(--dmd-facets), var(--dmd-base);
+}
+
+.card[data-finish="diamond"] .halo {
+  background: radial-gradient(closest-side, rgb(185 225 255 / 0.22), rgb(185 225 255 / 0.05) 45%, transparent 70%);
+}
+
+.card[data-finish="diamond"] .first {
+  background-image: var(--dmd-text);
 }
 
 .edge {
@@ -309,9 +322,7 @@
   filter: drop-shadow(0 0 14px rgb(var(--glow) / 0.25));
 }
 
-.card[data-finish="diamond"] .first {
-  background-image: linear-gradient(180deg, #fff 0%, #f1f9ff 38%, #a9cfe6 58%, #7fa9c2 70%, #e8f6ff 100%);
-}
+
 
 .last {
   margin-top: 8px;

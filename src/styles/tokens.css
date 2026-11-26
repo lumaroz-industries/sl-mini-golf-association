@@ -73,20 +73,28 @@
   }
 }
 
-/* Diamond — the website designer's finish (his card, credits, social row).
-   Black obsidian, a faceted lattice with faint prism light, a platinum edge
-   with prism colours and cut-crystal lettering. Use as
-   background: var(--dmd-facets), var(--dmd-base) padding-box, var(--dmd-edge) border-box. */
+/* Diamond + obsidian — the website designer's finish (his card, credits,
+   social row). A near-black volcanic-glass body with a faint glassy
+   reflection, crisp diamond facets with sparkle glints and soft prism light,
+   an obsidian edge that flashes diamond at a few points, cut-crystal text.
+   Use as: background: var(--dmd-facets), var(--dmd-base) padding-box, var(--dmd-edge) border-box. */
 :root {
   --dmd-facets:
-    repeating-linear-gradient(60deg, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 26px) padding-box,
-    repeating-linear-gradient(-60deg, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 26px) padding-box,
-    radial-gradient(60% 70% at 8% 0%, rgb(255 180 230 / 0.09), transparent 70%) padding-box,
-    radial-gradient(60% 70% at 96% 0%, rgb(150 220 255 / 0.11), transparent 70%) padding-box;
-  --dmd-base: linear-gradient(175deg, #0b0f13, #040506 60%, #010101);
-  --dmd-edge: linear-gradient(145deg, #fff 0%, #d9eefb 12%, #ffd6ef 22%, #7f9fb3 34%, #1b2830 46%, #b9e6ff 60%, #fff 70%, #e6d9ff 80%, #6f8fa3 90%, #1b2830 100%);
-  --dmd-ring: linear-gradient(145deg, #fff, #b9e6ff 30%, #7f9fb3 55%, #ffd6ef 80%, #fff);
-  --dmd-shadow: 0 24px 60px -24px #000, 0 0 60px -26px rgb(185 225 255 / 0.45);
-  --dmd-text: linear-gradient(180deg, #fff 0%, #f1f9ff 38%, #a9cfe6 58%, #7fa9c2 70%, #e8f6ff 100%);
+    radial-gradient(circle at 14% 18%, rgb(255 255 255 / 0.55) 0 0.8px, transparent 1.8px) padding-box,
+    radial-gradient(circle at 78% 12%, rgb(255 255 255 / 0.45) 0 0.7px, transparent 1.6px) padding-box,
+    radial-gradient(circle at 91% 64%, rgb(220 240 255 / 0.4) 0 0.7px, transparent 1.6px) padding-box,
+    radial-gradient(circle at 36% 82%, rgb(255 230 245 / 0.35) 0 0.6px, transparent 1.5px) padding-box,
+    linear-gradient(118deg, transparent 38%, rgb(255 255 255 / 0.03) 46%, rgb(185 225 255 / 0.045) 50%, transparent 58%) padding-box,
+    repeating-linear-gradient(60deg, rgb(200 230 255 / 0.03) 0 1px, transparent 1px 24px) padding-box,
+    repeating-linear-gradient(-60deg, rgb(200 230 255 / 0.03) 0 1px, transparent 1px 24px) padding-box,
+    radial-gradient(55% 60% at 6% 0%, rgb(255 180 230 / 0.06), transparent 70%) padding-box,
+    radial-gradient(55% 60% at 98% 0%, rgb(150 220 255 / 0.08), transparent 70%) padding-box;
+  --dmd-base:
+    radial-gradient(120% 80% at 30% -10%, #0c1015 0%, transparent 55%),
+    linear-gradient(160deg, #050607 0%, #020203 45%, #06080a 62%, #010101 100%);
+  --dmd-edge: linear-gradient(145deg, #f2faff 0%, #5d7383 8%, #0b0e12 22%, #161e25 38%, #d9efff 49%, #ffffff 50%, #0b0e12 61%, #1d2730 76%, #ffd6ef 88%, #0b0e12 100%);
+  --dmd-ring: conic-gradient(from 210deg, #ffffff, #0b0e12 18%, #9fc3da 32%, #0b0e12 48%, #ffd6ef 62%, #0b0e12 78%, #ffffff);
+  --dmd-shadow: 0 30px 70px -26px #000, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 70px -30px rgb(185 225 255 / 0.4);
+  --dmd-text: linear-gradient(180deg, #ffffff 0%, #eef8ff 36%, #9ec6de 56%, #5f8aa3 70%, #e8f6ff 100%);
   --dmd-ice: #cfe6f5;
 }

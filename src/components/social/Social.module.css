@@ -746,10 +746,10 @@
   background:
     radial-gradient(110% 90% at 100% 0%, rgb(220 236 255 / 0.1), transparent 55%),
     radial-gradient(80% 70% at 0% 100%, rgb(190 170 255 / 0.05), transparent 60%),
+    var(--dmd-facets),
     var(--dmd-base) padding-box,
-    conic-gradient(from var(--prism), #ffffff, #bfe6ff, #e9d8ff, #ffffff, #b9fff0, #d4e4ff, #ffffff) border-box;
-  box-shadow: 0 30px 70px -36px rgb(200 225 255 / 0.35), 0 24px 50px -28px rgb(0 0 0 / 0.9);
-  animation: prism 8s linear infinite;
+    var(--dmd-edge) border-box;
+  box-shadow: var(--dmd-shadow);
 }
 
 @keyframes prism {
@@ -1171,7 +1171,7 @@
   background:
     radial-gradient(50% 70% at 80% 25%, rgb(185 225 255 / 0.1), transparent 60%),
     radial-gradient(40% 60% at 8% 95%, rgb(255 180 230 / 0.05), transparent 65%),
-    linear-gradient(175deg, #0a0d10 0%, #030405 60%, #010101 100%);
+    linear-gradient(160deg, #050607 0%, #020203 45%, #06080a 62%, #010101 100%);
 }
 
 /* facet lines, like the cuts of a diamond */
@@ -1186,6 +1186,7 @@
 .texture[data-kind="diamond"]::after {
   background: linear-gradient(115deg, transparent 20%, rgb(255 120 160 / 0.16) 32%, rgb(255 220 120 / 0.15) 40%, rgb(120 255 200 / 0.15) 48%, rgb(120 180 255 / 0.18) 56%, rgb(200 140 255 / 0.16) 64%, transparent 76%) 0 0 / 300% 100%;
   mix-blend-mode: screen;
+  opacity: 0.3; /* obsidian first: only a faint flicker of prism fire */
   animation: fire 9s ease-in-out infinite alternate;
 }
 
@@ -1489,4 +1490,13 @@
   .ytRing {
     display: none;
   }
+}
+
+/* Diamond + obsidian: keep the card black — icy hover light, fainter facet cuts. */
+.profile[data-spotlight="diamond"] .spot {
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgb(185 225 255 / 0.08), transparent 60%);
+}
+
+.texture[data-kind="diamond"]::before {
+  opacity: 0.07;
 }
