@@ -34,9 +34,6 @@ const MEDALS: Array<{ kind: MedalKind; label: string }> = [
   { kind: "bronze", label: "Bronze" },
 ];
 
-/** Layers of the card's edge, between the front and the back. */
-const EDGE = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-
 const ordinal = (n: number) => {
   const sx = ["th", "st", "nd", "rd"];
   const v = n % 100;
@@ -216,37 +213,10 @@ function Back({ player }: { player: WallPlayer }) {
   );
 }
 
-/** The card's thickness: metal layers stacked between the two faces. */
-function Edge() {
-  return (
-    <>
-      {EDGE.map((i) => (
-        <span key={i} className={s.edge} style={{ "--e": i } as React.CSSProperties} aria-hidden="true" />
-      ))}
-    </>
-  );
-}
-
-/** Tilts the card towards the mouse and moves the glare with it. */
-function tilt(e: React.PointerEvent<HTMLElement>) {
-  if (e.pointerType !== "mouse") return;
-  const el = e.currentTarget;
-  const r = el.getBoundingClientRect();
-  const px = (e.clientX - r.left) / r.width;
-  const py = (e.clientY - r.top) / r.height;
-  el.style.setProperty("--ry", `${((px - 0.5) * 30).toFixed(2)}deg`);
-  el.style.setProperty("--rx", `${((0.5 - py) * 24).toFixed(2)}deg`);
-  el.style.setProperty("--gx", `${(px * 100).toFixed(1)}%`);
-  el.style.setProperty("--gy", `${(py * 100).toFixed(1)}%`);
-}
-
-function untilt(e: React.PointerEvent<HTMLElement>) {
-  for (const v of ["--ry", "--rx", "--gx", "--gy"]) e.currentTarget.style.removeProperty(v);
-}
 
 /**
- * Wall of fame: Maharashtra's international players as a grid of thick,
- * three-dimensional cards (five across on PC, two side by side on phones).
+ * Wall of fame: Maharashtra's international players as a grid of
+ * cards (five across on PC, two side by side on phones).
  * Tapping a card turns it over to the medals and international events;
  * tapping it again turns it back.
  */
@@ -267,7 +237,6 @@ export function WorldWall({ players, revealLabel }: { players: WallPlayer[]; rev
           <li key={i} className={s.cell} style={{ "--i": i } as React.CSSProperties}>
             <div className={s.card}>
               <div className={s.inner}>
-                <Edge />
                 <div className={`${s.face} ${s.front}`}>
                   <Front revealLabel={revealLabel} />
                 </div>
@@ -287,9 +256,8 @@ export function WorldWall({ players, revealLabel }: { players: WallPlayer[]; rev
         const toggle = () => setOpen(flipped ? undefined : p.slug);
         return (
           <li key={p.slug} className={s.cell} style={{ "--i": i } as React.CSSProperties}>
-            <div className={s.card} data-flipped={flipped || undefined} onPointerMove={tilt} onPointerLeave={untilt}>
+            <div className={s.card} data-flipped={flipped || undefined}>
               <div className={s.inner}>
-                <Edge />
                 <div className={`${s.face} ${s.front}`} inert={flipped}>
                   <Front player={p} revealLabel={revealLabel} />
                   <button type="button" className={s.hit} aria-expanded={false} onClick={toggle}>

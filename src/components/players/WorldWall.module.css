@@ -1,6 +1,5 @@
-/* Wall of fame: the International players' cards, built as real 3D objects.
-   Each card has a front and a back with a stack of platinum layers between
-   them, so it has a visible metal edge when it tilts, turns or sways. Faces:
+/* Wall of fame: the International players' cards. Flat and steady; they
+   only move when tapped (they turn over) or hovered (they lift). Faces:
    platinum and ice (their diamond tier), globe lines, a turning seal, a
    touch of the tricolour and a holographic rim whose light runs round the
    card. Sizes follow the card's own width (cqi): the same card works five
@@ -49,7 +48,6 @@
 .cell {
   width: calc((100% - var(--gap) * (var(--cols) - 1)) / var(--cols));
   max-width: 270px;
-  perspective: 1100px;
 }
 
 @supports (animation-timeline: view()) {
@@ -65,50 +63,30 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(50px) rotateX(18deg);
+    transform: translateY(40px);
   }
 }
 
-/* ------------------------------------------------------------ the object */
+/* --------------------------------------------------------------- the card */
 .card {
-  /* Thickness of the card. */
-  --T: 5.2cqi;
   --lift: 0px;
   --turn: 0deg;
   position: relative;
   aspect-ratio: 5 / 7;
   container-type: inline-size;
-  transform-style: preserve-3d;
-  transform: translateY(var(--lift)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.2, 1);
-}
-
-/* A slow sway, out of step from card to card, so the metal edge catches the light. */
-@media (prefers-reduced-motion: no-preference) {
-  .card {
-    animation: sway 9s ease-in-out calc(var(--i, 0) * -1.3s) infinite;
-  }
-}
-
-@keyframes sway {
-  0%,
-  100% {
-    rotate: 0.15 1 0 -16deg;
-  }
-  50% {
-    rotate: -0.15 1 0 16deg;
-  }
+  perspective: 1100px;
+  transform: translateY(var(--lift));
+  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
 @media (hover: hover) {
   .card:hover {
-    --lift: -12px;
-    animation-play-state: paused;
+    --lift: -8px;
   }
 }
 
 .card[data-flipped] {
-  --lift: -14px;
+  --lift: -8px;
   z-index: 2;
 }
 
@@ -121,7 +99,6 @@
   background: radial-gradient(closest-side, rgb(185 230 255 / 0.32), rgb(0 168 107 / 0.1) 60%, transparent);
   filter: blur(22px);
   opacity: 0.3;
-  transform: translateZ(-60px);
   transition: opacity 0.5s;
   pointer-events: none;
 }
@@ -136,30 +113,11 @@
   inset: 0;
   transform-style: preserve-3d;
   transform: rotateY(var(--turn));
-  transition: transform 1s cubic-bezier(0.25, 1.2, 0.35, 1);
+  transition: transform 0.7s cubic-bezier(0.3, 1.1, 0.4, 1);
 }
 
 .card[data-flipped] .inner {
   --turn: 180deg;
-}
-
-/* --------------------------------------------------------------- the edge
-   Eight platinum layers between the faces; darker towards the middle like
-   a bevelled metal edge. The deepest one casts the card's shadow. */
-.edge {
-  position: absolute;
-  inset: 0.4cqi;
-  border-radius: 6.3cqi;
-  background: linear-gradient(135deg, #ffffff 0%, #b9d4e4 18%, #4d6372 40%, #1b2530 52%, #9fc3da 70%, #ffffff 86%, #8fa9b9 100%);
-  box-shadow: inset 0 0 0 100vmax rgb(0 0 0 / calc(0.05 + (1 - (var(--e) - 5.5) * (var(--e) - 5.5) / 30.25) * 0.42));
-  transform: translateZ(calc(var(--T) / 2 - (var(--e) + 0.5) * var(--T) / 12));
-  pointer-events: none;
-}
-
-.edge:nth-child(12) {
-  box-shadow:
-    inset 0 0 0 100vmax rgb(0 0 0 / 0.1),
-    0 34px 50px -24px rgb(0 0 0 / 0.95);
 }
 
 /* ---------------------------------------------------------------- the faces
@@ -177,21 +135,13 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   isolation: isolate;
-  animation: spin 7s linear infinite;
-}
-
-.front {
-  transform: translateZ(calc(var(--T) / 2));
+  box-shadow:
+    0 30px 50px -26px rgb(0 0 0 / 0.95),
+    0 0 0 1px rgb(0 0 0 / 0.6);
 }
 
 .back {
-  transform: rotateY(180deg) translateZ(calc(var(--T) / 2));
-}
-
-@keyframes spin {
-  to {
-    --spin: 360deg;
-  }
+  transform: rotateY(180deg);
 }
 
 /* Fine inner frame, like a printed card's border. */

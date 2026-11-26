@@ -19,8 +19,8 @@ const MOBILE_STEP = 66;
 const HOVER_INTENT_MS = 70;
 
 /* Spring tuned slightly under critical damping: quick, soft landing, no wobble. */
-const STIFFNESS = 140;
-const DAMPING = 21;
+const STIFFNESS = 230;
+const DAMPING = 28;
 
 type Pose = { x: number; z: number; r: number; s: number; dim: number };
 const KEYS: Array<keyof Pose> = ["x", "z", "r", "s", "dim"];
