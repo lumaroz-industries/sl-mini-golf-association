@@ -277,3 +277,14 @@
     animation: none;
   }
 }
+
+/* Number of players at each level, on the level buttons. */
+.count {
+  margin-left: 7px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.75em;
+  font-weight: 700;
+  background: rgb(255 255 255 / 0.08);
+  opacity: 0.85;
+}

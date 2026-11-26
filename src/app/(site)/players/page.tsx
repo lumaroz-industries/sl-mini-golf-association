@@ -43,6 +43,7 @@ export default async function PlayersPage() {
       photo: p.photo?.src,
       medals,
       total: totalMedals(medals),
+      level: p.card ?? "state",
       results: p.results.map((r) => ({ level: r.level, year: r.year, medal: r.medal })),
       topSeven: topSlugs.has(p.slug),
     };

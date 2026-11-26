@@ -17,6 +17,8 @@ export interface DirectoryPlayer {
   photo?: string;
   medals: { gold?: number; silver?: number; bronze?: number };
   total: number;
+  /** The player's level — their card type, set by the admins (State, National or International). */
+  level: "state" | "national" | "international";
   /** Every result, reduced to what the filters need. */
   results: Array<{ level: string; year: number; medal?: string }>;
   topSeven: boolean;
@@ -55,8 +57,11 @@ export function PlayerDirectory({ players, heading, intro, kicker, emptyHeading,
       if (district !== "all" && p.district !== district) return false;
       if (gender !== "all" && p.gender !== gender) return false;
       if (medalOnly && p.total === 0) return false;
-      if (level !== "all" || year !== "all") {
-        const hit = p.results.some((r) => (level === "all" || r.level === level) && (year === "all" || r.year === Number(year)) && (!medalOnly || !!r.medal));
+      // Level: the player's card level, or any result at that level.
+      if (level !== "all" && p.level !== level && !p.results.some((r) => r.level === level)) return false;
+      // Year: a result in that year (at the chosen level, unless the player's own level is the one chosen).
+      if (year !== "all") {
+        const hit = p.results.some((r) => r.year === Number(year) && (level === "all" || p.level === level || r.level === level) && (!medalOnly || !!r.medal));
         if (!hit) return false;
       }
       return true;
@@ -121,11 +126,15 @@ export function PlayerDirectory({ players, heading, intro, kicker, emptyHeading,
 
       <div className={styles.filters} role="group" aria-label="Filters">
         <div className={styles.levels} role="toolbar" aria-label="Level">
-          {[{ id: "all", label: "All levels" }, ...LEVELS].map((l) => (
-            <button key={l.id} type="button" className={styles.level} data-level={l.id} aria-pressed={level === l.id} onClick={() => setLevel(l.id)}>
-              {l.label}
-            </button>
-          ))}
+          {[{ id: "all", label: "All levels" }, ...LEVELS].map((l) => {
+            const n = l.id === "all" ? players.length : players.filter((p) => p.level === l.id || p.results.some((r) => r.level === l.id)).length;
+            return (
+              <button key={l.id} type="button" className={styles.level} data-level={l.id} aria-pressed={level === l.id} onClick={() => setLevel(l.id)}>
+                {l.label}
+                <span className={styles.count}>{n}</span>
+              </button>
+            );
+          })}
         </div>
         <div className={styles.selects}>
           <label className={b.select}>
@@ -182,7 +191,7 @@ export function PlayerDirectory({ players, heading, intro, kicker, emptyHeading,
       ) : (
         <ul className={styles.grid}>
           {shown.map((p, i) => {
-            const best = LEVELS.find((l) => p.results.some((r) => r.level === l.id));
+            const best = LEVELS.find((l) => l.id === p.level);
             return (
               <li key={p.slug} className={styles.cell} style={{ "--i": i % 12 } as React.CSSProperties}>
                 <Link href={`/players/${p.slug}`} className={styles.card}>
