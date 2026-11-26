@@ -2,7 +2,7 @@ import "server-only";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { z } from "zod";
 import sharp from "sharp";
-import { ArticleFrontmatter, GalleryAlbumFile, GalleryManifest, Player, UpdateFrontmatter } from "@/content/schema";
+import { ArticleFrontmatter, GalleryAlbumFile, GalleryManifest, Player, PlayersPageContent, UpdateFrontmatter } from "@/content/schema";
 import playersPage from "@/content/sources/local/players.json";
 import articleCategories from "@/content/sources/local/article-categories.json";
 import galleryCategories from "@/content/sources/local/gallery-categories.json";
@@ -392,12 +392,82 @@ export interface PlayerListItem {
   topSeven: boolean;
 }
 
-const topSevenSlugs = () => new Set((playersPage.featured as Array<{ slug: string }>).map((f) => f.slug));
+/* ------------------------------------------------------------------ top 7 */
+
+const PLAYERS_PAGE = `${CONTENT}/players.json`;
+
+/** The seven places, in screen order: three on the left (outer → inner), the centre, three on the right (inner → outer). */
+export const TOP_SEVEN_SLOTS = ["left-3", "left-2", "left-1", "center", "right-1", "right-2", "right-3"] as const;
+export type TopSevenSlot = (typeof TOP_SEVEN_SLOTS)[number];
+export type TopSevenLineup = Record<TopSevenSlot, string | null>;
+
+type Featured = { slug: string; side: "left" | "center" | "right"; place?: number };
+
+async function readPlayersPage(): Promise<Record<string, unknown> & { featured: Featured[] }> {
+  const text = await getStorage().readText(PLAYERS_PAGE);
+  if (!text) throw new ContentError("The players page settings are missing.");
+  return JSON.parse(text);
+}
+
+/** Featured entries → the seven places (players without a place fill the free ones nearest the centre, as on the website). */
+function toLineup(featured: Featured[]): TopSevenLineup {
+  const lineup = Object.fromEntries(TOP_SEVEN_SLOTS.map((k) => [k, null])) as TopSevenLineup;
+  for (const side of ["left", "right"] as const) {
+    const own = featured.filter((f) => f.side === side);
+    const places: Array<string | null> = [null, null, null];
+    for (const f of own) if (f.place) places[f.place - 1] = f.slug;
+    for (const f of own) if (!f.place) { const i = places.indexOf(null); if (i !== -1) places[i] = f.slug; }
+    places.forEach((slug, i) => (lineup[`${side}-${i + 1}` as TopSevenSlot] = slug));
+  }
+  lineup.center = featured.find((f) => f.side === "center")?.slug ?? null;
+  return lineup;
+}
+
+export async function readTopSeven(): Promise<TopSevenLineup> {
+  return toLineup((await readPlayersPage()).featured ?? []);
+}
+
+async function topSevenSlugs(): Promise<Set<string>> {
+  try {
+    return new Set((await readPlayersPage()).featured.map((f) => f.slug));
+  } catch {
+    return new Set((playersPage.featured as Array<{ slug: string }>).map((f) => f.slug));
+  }
+}
+
+/** Saves the line-up chosen in the admin: only existing, published players, each once. */
+export async function saveTopSeven(lineup: Partial<Record<string, unknown>>): Promise<{ commit: string }> {
+  const storage = getStorage();
+  const seen = new Set<string>();
+  const featured: Featured[] = [];
+  for (const key of TOP_SEVEN_SLOTS) {
+    const v = lineup[key];
+    if (v === null || v === undefined || v === "") continue;
+    const slug = String(v);
+    if (!SLUG.test(slug)) throw new ContentError("One of the places has an invalid player.");
+    if (seen.has(slug)) throw new ContentError("A player can only be in one place in the Top 7.");
+    seen.add(slug);
+    const p = await readPlayer(slug);
+    if (!p) throw new ContentError(`The player "${slug}" no longer exists.`);
+    if (p.draft === true) throw new ContentError(`${String(p.name ?? slug)} is still a draft — publish them first, then add them to the Top 7.`);
+    if (key === "center") featured.push({ slug, side: "center" });
+    else {
+      const [side, place] = key.split("-") as ["left" | "right", string];
+      featured.push({ slug, side, place: Number(place) });
+    }
+  }
+  const page = await readPlayersPage();
+  const next = { ...page, featured };
+  const parsed = PlayersPageContent.safeParse(next);
+  if (!parsed.success) throw new ContentError("The line-up needs fixing.", issuesOf(parsed.error));
+  const commit = await storage.commit("Admin: Update Maharashtra's Top 7", [{ path: PLAYERS_PAGE, text: JSON.stringify(next, null, 2) + "\n" }]);
+  return { commit };
+}
 
 export async function listPlayers(): Promise<PlayerListItem[]> {
   const storage = getStorage();
   const files = (await storage.list(`${CONTENT}/players`)).filter((f) => f.endsWith(".json"));
-  const top = topSevenSlugs();
+  const top = await topSevenSlugs();
   const items = await Promise.all(
     files.map(async (f): Promise<PlayerListItem | null> => {
       const text = await storage.readText(f);
@@ -429,7 +499,7 @@ export async function savePlayer(input: { mode: "create" | "edit"; data: Record<
   const storage = getStorage();
   const data = clean({ ...input.data });
   const slug = String(data.slug ?? "");
-  if (!SLUG.test(slug) || slug === "new") throw new ContentError("Choose a web address using lowercase letters, numbers and hyphens, e.g. first-last.");
+  if (!SLUG.test(slug) || slug === "new" || slug === "top-7") throw new ContentError("Choose a web address using lowercase letters, numbers and hyphens, e.g. first-last.");
   const file = `${CONTENT}/players/${slug}.json`;
   const existing = await storage.readText(file);
   if (input.mode === "create" && existing !== null) throw new ContentError(`There is already a player at this web address (${slug}). Choose another.`);
@@ -456,7 +526,7 @@ export async function savePlayer(input: { mode: "create" | "edit"; data: Record<
 export async function deletePlayer(slug: string): Promise<string> {
   const p = await readPlayer(slug);
   if (!p) throw new ContentError("This player no longer exists.");
-  if (topSevenSlugs().has(slug)) throw new ContentError("This player is in Maharashtra's Top 7. Ask the developer to take them out of the line-up first.");
+  if ((await topSevenSlugs()).has(slug)) throw new ContentError("This player is in Maharashtra's Top 7. Take them out of the line-up first (Players → Top 7).");
   const storage = getStorage();
   const changes: Change[] = [{ path: `${CONTENT}/players/${slug}.json`, delete: true }, ...(await storage.list(`public/players/${slug}`)).map((x) => ({ path: x, delete: true as const }))];
   return storage.commit(`Admin: Delete player "${String(p.name ?? slug)}"`, changes);

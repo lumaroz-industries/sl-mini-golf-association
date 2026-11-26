@@ -11,6 +11,14 @@ export default async function PlayersList() {
   return (
     <>
       <PageHead kicker="Players" title="Players" lede="Every Maharashtra player in the directory, with their results. Top 7 players are marked." action={{ href: "/admin/players/new", label: "+ New player" }} />
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", margin: "-8px 0 24px" }}>
+        <Link href="/admin/players/top-7" className={`${s.btn}`}>
+          ★ Choose the Top 7
+        </Link>
+        <span className={s.help} style={{ alignSelf: "center" }}>
+          {r.data ? `${r.data.filter((p) => p.topSeven).length} of 7 places filled` : ""}
+        </span>
+      </div>
       {r.error && <SetupNotice>{r.error}</SetupNotice>}
       {r.data && r.data.length === 0 && <div className={s.empty}>No players yet. Click “New player” to add the first one.</div>}
       <ul className={s.list}>

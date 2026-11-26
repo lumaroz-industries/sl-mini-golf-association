@@ -194,6 +194,10 @@ player records:
   images are homepage renders and don't need updating.
 - The heading, intro and note are in the same file.
 
+### Choosing the Top 7 (admin)
+
+Admin → Players → **★ Choose the Top 7** (`/admin/players/top-7`) shows the seven places as on the website (left outer → inner, centre, right inner → outer). Pick a published player for each place, or leave it empty ("Reveal soon"); choosing a player already in another place swaps them. **Publish Top 7** writes `featured` in `players.json`. Every player not in the Top 7 is in the directory below it; a player can't be deleted while in the Top 7.
+
 ## Gallery
 
 `/gallery` has two views: **Albums** (grouped by category — Tournaments,

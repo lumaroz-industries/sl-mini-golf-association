@@ -1,0 +1,113 @@
+/* Top 7 editor: the line-up as on the website (left 3, centre, right 3). */
+.lineup {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.slot {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 14px;
+  background: var(--field);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.slot[data-center] {
+  padding: 16px 14px;
+  border-color: var(--line-accent);
+  background: linear-gradient(180deg, rgb(227 194 122 / 0.08), var(--field));
+  box-shadow: 0 12px 40px rgb(227 194 122 / 0.1);
+}
+
+.slot[data-changed] {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+
+.where {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.slot[data-center] .where {
+  color: var(--gold);
+}
+
+.photo {
+  aspect-ratio: 4 / 5;
+  border-radius: 10px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #050505;
+  border: 1px solid rgb(255 255 255 / 0.06);
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 20%;
+}
+
+.reveal {
+  padding: 8px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(227 194 122 / 0.6);
+}
+
+.slot[data-empty] .photo {
+  border-style: dashed;
+  border-color: rgb(227 194 122 / 0.25);
+}
+
+.name {
+  min-height: 2.4em;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.slot[data-empty] .name {
+  color: var(--fg-muted);
+  font-weight: 500;
+}
+
+.slot select {
+  font-size: 0.85rem;
+  padding-inline: 8px;
+}
+
+/* Tablets: centre on its own row, the sides below. */
+@media (max-width: 1000px) {
+  .lineup {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .slot[data-center] {
+    grid-column: 1 / -1;
+    order: -1;
+    max-width: 280px;
+    justify-self: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .lineup {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
