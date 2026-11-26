@@ -25,6 +25,9 @@ interface PlayerCardProps {
   active?: boolean;
 }
 
+/** Layers of the card's metal edge (its thickness), behind the face. */
+const EDGE = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
 /** The three card designs, chosen per player in the admin. */
 /** Short level tags, shown on the plaque at the top right. */
 const TIERS = {
@@ -55,6 +58,11 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
   const tier = player?.card ?? "state";
   return (
     <div className={styles.card} data-card={tier} data-large={large || undefined} data-empty={!player || undefined} data-arrow-hidden={arrowHidden || undefined} data-active={active || undefined}>
+      {/* The card's thickness: metal layers stacked behind the face. */}
+      {EDGE.map((i) => (
+        <span key={i} className={styles.edge} style={{ "--e": i } as React.CSSProperties} aria-hidden="true" />
+      ))}
+      <div className={styles.face}>
       <div className={styles.foil} aria-hidden="true" />
       <div className={styles.body}>
         <div className={styles.photo}>
@@ -173,6 +181,7 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
           </svg>
         </Link>
       )}
+      </div>
     </div>
   );
 }

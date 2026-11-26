@@ -34,69 +34,26 @@ const MEDALS: Array<{ kind: MedalKind; label: string }> = [
   { kind: "bronze", label: "Bronze" },
 ];
 
+/** Layers of the card's edge, between the front and the back. */
+const EDGE = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+
 const ordinal = (n: number) => {
   const sx = ["th", "st", "nd", "rd"];
   const v = n % 100;
   return n + (sx[(v - 20) % 10] || sx[v] || sx[0]);
 };
 
-/* ------------------------------------------------------------- world map
-   /textures/world-dots.svg is a dotted world map (Natural Earth land,
-   3° grid) centred on India, 240 × 88 units. Routes leave Maharashtra for
-   the rest of the world: decoration, not a list of events. */
-const MAP = { w: 240, h: 88 };
-const HOME = { x: 118.5, y: 37.7 };
-const DESTS = [
-  { x: 74.7, y: 17.3 }, // Europe
-  { x: 160, y: 26.7 }, // East Asia
-  { x: 164.7, y: 70.7 }, // Australia
-  { x: 84.7, y: 70.7 }, // Southern Africa
-  { x: 104.7, y: 34 }, // Gulf
-  { x: 14.7, y: 24 }, // Americas
-  { x: 36.7, y: 60.7 }, // South America
-];
-
-function arc(to: { x: number; y: number }) {
-  const mx = (HOME.x + to.x) / 2;
-  const my = (HOME.y + to.y) / 2;
-  const lift = Math.hypot(to.x - HOME.x, to.y - HOME.y) * 0.38;
-  return `M${HOME.x} ${HOME.y}Q${mx.toFixed(1)} ${(my - lift).toFixed(1)} ${to.x} ${to.y}`;
-}
-
-function WorldMap({ view, className }: { view: "band" | "full"; className: string }) {
-  const id = useId().replace(/:/g, "");
-  const box = view === "band" ? "50 3 140 87.5" : `-2 -2 ${MAP.w + 4} ${MAP.h + 4}`;
-  const dests = view === "band" ? DESTS.slice(0, 5) : DESTS;
+/** Ice lines of a globe: the "world stage" motif on both faces. */
+function Globe({ className }: { className: string }) {
   return (
-    <svg className={className} viewBox={box} preserveAspectRatio={view === "band" ? "xMidYMid slice" : "xMidYMid meet"} aria-hidden="true">
-      <defs>
-        <mask id={`m${id}`} maskUnits="userSpaceOnUse" x="-10" y="-10" width={MAP.w + 20} height={MAP.h + 20}>
-          <image href="/textures/world-dots.svg" width={MAP.w} height={MAP.h} />
-        </mask>
-        <linearGradient id={`g${id}`} x1="0" x2="1" y1="0" y2="0.3">
-          <stop offset="0" stopColor="#4a6d80" />
-          <stop offset="0.42" stopColor="#86aec6" />
-          <stop offset="0.48" stopColor="#ffffff" />
-          <stop offset="0.52" stopColor="#ffd6ef" />
-          <stop offset="0.58" stopColor="#86aec6" />
-          <stop offset="1" stopColor="#4a6d80" />
-        </linearGradient>
-      </defs>
-      {/* The dots, with a band of light sweeping across them. */}
-      <g mask={`url(#m${id})`}>
-        <rect className={s.mapShimmer} x={-MAP.w} y="-10" width={MAP.w * 3} height={MAP.h + 20} fill={`url(#g${id})`} />
-      </g>
-      <g className={s.routes}>
-        {dests.map((d, i) => (
-          <g key={i} style={{ "--r": i } as React.CSSProperties}>
-            <path d={arc(d)} className={s.route} pathLength={100} />
-            <path d={arc(d)} className={s.comet} pathLength={100} />
-            <circle cx={d.x} cy={d.y} r="1.3" className={s.dest} />
-          </g>
-        ))}
-      </g>
-      <circle cx={HOME.x} cy={HOME.y} r="2.2" className={s.pulse} />
-      <circle cx={HOME.x} cy={HOME.y} r="1.7" className={s.home} />
+    <svg className={className} viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="48" />
+      {[14, 28, 40].map((rx) => (
+        <ellipse key={rx} cx="50" cy="50" rx={rx} ry="48" />
+      ))}
+      {[-30, -15, 0, 15, 30].map((y) => (
+        <ellipse key={y} cx="50" cy={50 + y} rx={Math.sqrt(48 * 48 - y * y)} ry={Math.max(2, 8 - Math.abs(y) / 6)} />
+      ))}
     </svg>
   );
 }
@@ -138,27 +95,13 @@ function Seal() {
   );
 }
 
-/** A compass rose: the card's "navigation" mark, top right. */
-function Compass() {
-  return (
-    <svg className={s.compass} viewBox="0 0 40 40" aria-hidden="true">
-      <circle cx="20" cy="20" r="18.5" className={s.compassRing} />
-      <circle cx="20" cy="20" r="13" className={s.compassRing} />
-      <path d="M20 3 23 20 20 37 17 20Z" className={s.compassNS} />
-      <path d="M3 20 20 17 37 20 20 23Z" className={s.compassEW} />
-      <path d="M20 3 23 20H17Z" className={s.compassN} />
-      <circle cx="20" cy="20" r="1.8" className={s.compassPin} />
-    </svg>
-  );
-}
-
 function Front({ player, revealLabel }: { player?: WallPlayer; revealLabel: string }) {
   const [first, ...rest] = (player?.name ?? "").split(/\s+/);
   return (
     <>
       <div className={s.photo}>
         {player?.photo ? (
-          <Image src={player.photo.src} alt={player.photo.alt} width={player.photo.width} height={player.photo.height} sizes="(max-width: 640px) 46vw, 240px" className={s.photoImg} draggable={false} />
+          <Image src={player.photo.src} alt={player.photo.alt} width={player.photo.width} height={player.photo.height} sizes="(max-width: 640px) 46vw, 260px" className={s.photoImg} draggable={false} />
         ) : (
           <div className={s.mystery}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -167,13 +110,10 @@ function Front({ player, revealLabel }: { player?: WallPlayer; revealLabel: stri
           </div>
         )}
       </div>
-      <WorldMap view="band" className={s.band} />
-      <span className={s.holo} aria-hidden="true" />
+      <Globe className={s.globe} />
+      <span className={s.sheen} aria-hidden="true" />
+      <span className={s.glare} aria-hidden="true" />
 
-      <span className={s.coords} aria-hidden="true">
-        19.75°N · 75.71°E
-      </span>
-      <Compass />
       <Seal />
 
       <div className={s.plate}>
@@ -212,9 +152,11 @@ function Back({ player }: { player: WallPlayer }) {
     <>
       {player.photo && (
         <div className={s.backPhoto} aria-hidden="true">
-          <Image src={player.photo.src} alt="" width={player.photo.width} height={player.photo.height} sizes="(max-width: 640px) 46vw, 240px" />
+          <Image src={player.photo.src} alt="" width={player.photo.width} height={player.photo.height} sizes="(max-width: 640px) 46vw, 260px" />
         </div>
       )}
+      <Globe className={s.backGlobe} />
+      <span className={s.glare} aria-hidden="true" />
       <div className={s.backHead}>
         <span className={s.avatar}>
           {player.photo ? <Image src={player.photo.src} alt="" width={120} height={150} sizes="64px" /> : <b>{player.name[0]}</b>}
@@ -224,8 +166,6 @@ function Back({ player }: { player: WallPlayer }) {
           <span>{player.district ? `${player.district} · Maharashtra` : "Maharashtra · India"}</span>
         </span>
       </div>
-
-      <WorldMap view="full" className={s.backMap} />
 
       <div className={s.backMedals}>
         {MEDALS.map(({ kind, label }) => (
@@ -276,11 +216,39 @@ function Back({ player }: { player: WallPlayer }) {
   );
 }
 
+/** The card's thickness: metal layers stacked between the two faces. */
+function Edge() {
+  return (
+    <>
+      {EDGE.map((i) => (
+        <span key={i} className={s.edge} style={{ "--e": i } as React.CSSProperties} aria-hidden="true" />
+      ))}
+    </>
+  );
+}
+
+/** Tilts the card towards the mouse and moves the glare with it. */
+function tilt(e: React.PointerEvent<HTMLElement>) {
+  if (e.pointerType !== "mouse") return;
+  const el = e.currentTarget;
+  const r = el.getBoundingClientRect();
+  const px = (e.clientX - r.left) / r.width;
+  const py = (e.clientY - r.top) / r.height;
+  el.style.setProperty("--ry", `${((px - 0.5) * 30).toFixed(2)}deg`);
+  el.style.setProperty("--rx", `${((0.5 - py) * 24).toFixed(2)}deg`);
+  el.style.setProperty("--gx", `${(px * 100).toFixed(1)}%`);
+  el.style.setProperty("--gy", `${(py * 100).toFixed(1)}%`);
+}
+
+function untilt(e: React.PointerEvent<HTMLElement>) {
+  for (const v of ["--ry", "--rx", "--gx", "--gy"]) e.currentTarget.style.removeProperty(v);
+}
+
 /**
- * Wall of fame: Maharashtra's international players as a grid of cards
- * (five across on PC, two side by side on phones). Tapping a card turns it
- * over to the medals and international events; tapping it again turns it
- * back.
+ * Wall of fame: Maharashtra's international players as a grid of thick,
+ * three-dimensional cards (five across on PC, two side by side on phones).
+ * Tapping a card turns it over to the medals and international events;
+ * tapping it again turns it back.
  */
 export function WorldWall({ players, revealLabel }: { players: WallPlayer[]; revealLabel: string }) {
   const [open, setOpen] = useState<string>();
@@ -296,12 +264,14 @@ export function WorldWall({ players, revealLabel }: { players: WallPlayer[]; rev
     return (
       <ul className={s.wall} data-empty aria-hidden="true">
         {[0, 1, 2, 3].map((i) => (
-          <li key={i} className={s.cell}>
+          <li key={i} className={s.cell} style={{ "--i": i } as React.CSSProperties}>
             <div className={s.card}>
               <div className={s.inner}>
+                <Edge />
                 <div className={`${s.face} ${s.front}`}>
                   <Front revealLabel={revealLabel} />
                 </div>
+                <div className={`${s.face} ${s.back}`} />
               </div>
             </div>
           </li>
@@ -312,13 +282,14 @@ export function WorldWall({ players, revealLabel }: { players: WallPlayer[]; rev
 
   return (
     <ul className={s.wall}>
-      {players.map((p) => {
+      {players.map((p, i) => {
         const flipped = open === p.slug;
         const toggle = () => setOpen(flipped ? undefined : p.slug);
         return (
-          <li key={p.slug} className={s.cell}>
-            <div className={s.card} data-flipped={flipped || undefined}>
+          <li key={p.slug} className={s.cell} style={{ "--i": i } as React.CSSProperties}>
+            <div className={s.card} data-flipped={flipped || undefined} onPointerMove={tilt} onPointerLeave={untilt}>
               <div className={s.inner}>
+                <Edge />
                 <div className={`${s.face} ${s.front}`} inert={flipped}>
                   <Front player={p} revealLabel={revealLabel} />
                   <button type="button" className={s.hit} aria-expanded={false} onClick={toggle}>
