@@ -5,6 +5,7 @@ import { getActiveSocialLinks, getContactContent, getPeopleByIds, getPeopleInsta
 import { InstagramHandle } from "@/components/ui/InstagramHandle";
 import { isContactDeliveryConfigured } from "@/lib/contact/delivery";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { MailOptions } from "@/components/contact/MailOptions";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import Link from "next/link";
 import styles from "./page.module.css";
@@ -72,9 +73,7 @@ export default async function ContactPage() {
                   <span aria-hidden="true">↗</span>
                   <span className="visually-hidden"> — write in Gmail (opens in a new tab)</span>
                 </a>
-                <span className={styles.emailAlt}>
-                  Opens Gmail · <a href={`mailto:${email}`}>use another mail app</a>
-                </span>
+                <MailOptions email={email} lead="Opens Gmail · or:" />
               </>
             ) : (
               <p className={styles.pending}>{content.emailPending}</p>

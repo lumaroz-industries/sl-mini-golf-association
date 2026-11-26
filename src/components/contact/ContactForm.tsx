@@ -10,6 +10,7 @@ import {
   type FieldErrors,
 } from "@/lib/contact/schema";
 import styles from "./ContactForm.module.css";
+import { MailOptions } from "./MailOptions";
 
 interface ContactFormProps {
   heading: string;
@@ -71,8 +72,7 @@ export function ContactForm({ heading, enabled, unavailableMessage, successHeadi
   const compose = () => {
     const body = `${values.message.trim()}\n\n— ${values.name.trim()} (${values.email.trim()})`;
     const gmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email!)}&su=${encodeURIComponent(values.subject.trim())}&body=${encodeURIComponent(body)}`;
-    const mailto = `mailto:${email}?subject=${encodeURIComponent(values.subject.trim())}&body=${encodeURIComponent(body)}`;
-    return { gmail, mailto };
+    return { gmail };
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -135,7 +135,8 @@ export function ContactForm({ heading, enabled, unavailableMessage, successHeadi
   };
 
   if (status === "handed") {
-    const { gmail, mailto } = compose();
+    const { gmail } = compose();
+    const body = `${values.message.trim()}\n\n— ${values.name.trim()} (${values.email.trim()})`;
     return (
       <div className={styles.card}>
         <div className={styles.success} role="status">
@@ -151,10 +152,8 @@ export function ContactForm({ heading, enabled, unavailableMessage, successHeadi
             <a className={styles.submit} href={gmail} target="_blank" rel="noopener noreferrer">
               Open in Gmail <span aria-hidden="true">↗</span>
             </a>
-            <a className={styles.secondary} href={mailto}>
-              Use another mail app
-            </a>
           </div>
+          <MailOptions email={email!} subject={values.subject.trim()} body={body} lead="Or send it with:" />
           <button type="button" className={styles.secondary} onClick={reset}>
             Write another message
           </button>
