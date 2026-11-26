@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
     return [
       // Name corrected from an earlier misspelling; keep old shared links working.
       { source: "/players/pranjali-suraduse", destination: "/players/pranjali-surduse", permanent: true },
+      // The admin's Photo Studio became the Card Maker.
+      { source: "/admin/photo-studio", destination: "/admin/card-maker", permanent: true },
     ];
   },
 };

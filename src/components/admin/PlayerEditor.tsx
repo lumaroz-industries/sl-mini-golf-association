@@ -73,7 +73,7 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [studioPreview, setStudioPreview] = useState<string>();
 
-  // A photo made in the Photo Studio for this player: put it in, ready to publish.
+  // A photo made in the Card Maker for this player: put it in, ready to publish.
   useEffect(() => {
     let h: StudioHandoff | null = null;
     try {
@@ -162,11 +162,11 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
       </Section>
 
       <Section title="Photo" hint="A portrait photo (about 4:5) works best. Without one, the card shows the player's initials.">
-        {studioPreview && photo && <p className={`${s.help} ${s.ok}`}>New photo from the Photo Studio — press Publish (or Save draft) to put it on the card.</p>}
+        {studioPreview && photo && <p className={`${s.help} ${s.ok}`}>New photo from the Card Maker — press Publish (or Save draft) to put it on the card.</p>}
         <ImageField label="Photo" value={photo} onChange={(v) => (v?.src !== photo?.src && setStudioPreview(undefined), setPhoto(v))} onUploaded={(u) => setUploads((x) => [...x, u])} collection="players" slug={effectiveSlug} withCredit={false} previewSrc={studioPreview} />
         {!isNew && (
           <p className={s.help}>
-            No good photo? <Link href={`/admin/photo-studio?player=${effectiveSlug}`} style={{ color: "var(--gold)", textDecoration: "underline" }}>Make a studio portrait in the Photo Studio</Link>.
+            Want a studio-style card photo? <Link href={`/admin/card-maker?player=${effectiveSlug}`} style={{ color: "var(--gold)", textDecoration: "underline" }}>Open the Card Maker</Link>.
           </p>
         )}
       </Section>
