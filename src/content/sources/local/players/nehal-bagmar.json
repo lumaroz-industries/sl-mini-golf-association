@@ -3,10 +3,10 @@
   "name": "Nehal Bagmar",
   "gender": "male",
   "photo": {
-    "src": "/players/nehal-bagmar.webp",
+    "src": "/players/nehal-bagmar/polished-studio-portrait-in-navy-suit-vzx4.webp",
     "alt": "Nehal Bagmar in an India team blazer, holding up a medal",
-    "width": 960,
-    "height": 1200
+    "width": 1086,
+    "height": 1448
   },
   "medals": {
     "gold": 3,
