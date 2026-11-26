@@ -1,0 +1,25 @@
+{
+  "slug": "dhruv-patil",
+  "name": "Dhruv Patil",
+  "gender": "male",
+  "card": "international",
+  "photo": {
+    "src": "/players/dhruv-patil/polished-navy-suit-portrait-6mkz.webp",
+    "alt": "Dhruv Patil",
+    "width": 1086,
+    "height": 1448
+  },
+  "intlPhoto": {
+    "src": "/players/dhruv-patil/polished-navy-suit-portrait-8x1y.webp",
+    "alt": "Dhruv Patil",
+    "width": 1086,
+    "height": 1448
+  },
+  "medals": {
+    "gold": 3,
+    "silver": 2,
+    "bronze": 1
+  },
+  "results": [],
+  "draft": false
+}
