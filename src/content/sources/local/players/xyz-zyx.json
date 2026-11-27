@@ -4,10 +4,10 @@
   "gender": "female",
   "card": "national",
   "photo": {
-    "src": "/players/xyz-zyx/confident-athlete-in-navy-track-jacket-t49b.webp",
-    "alt": "xyz zyx",
-    "width": 1086,
-    "height": 1448
+    "src": "/players/xyz-zyx/xyz-zyx-card-ovkj.webp",
+    "alt": "xyz zyx, studio portrait",
+    "width": 960,
+    "height": 1200
   },
   "results": [],
   "draft": false
