@@ -1,7 +1,7 @@
 {
   "kicker": "Officials",
   "heading": "The officials behind the game",
-  "intro": "The people who lead, organise and officiate mini golf \u2014 across India, and here in Maharashtra.",
+  "intro": "The people who lead, organise and officiate mini golf — across India, and here in Maharashtra.",
   "levels": [
     {
       "id": "india",
@@ -32,7 +32,14 @@
       "role": "President",
       "level": "india",
       "organisation": "Minigolf Federation of India",
-      "bio": "Leads national minigolf events and championships in India."
+      "photo": {
+        "src": "/officials/sudhakar-kohale/sudhakar-kohale-cutout-6psg.webp",
+        "alt": "Sudhakar Kohale",
+        "width": 939,
+        "height": 1448
+      },
+      "bio": "Leads national minigolf events and championships in India.",
+      "draft": false
     },
     {
       "id": "suraj-singh-yeotikar",
