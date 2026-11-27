@@ -55,7 +55,14 @@
       "role": "Technical Committee Chairman",
       "level": "india",
       "organisation": "Minigolf Federation of India",
-      "bio": "Oversees technical standards and rules for the federation."
+      "photo": {
+        "src": "/officials/rajesh-shendekar/rajesh-shendekar-cutout-lyen.webp",
+        "alt": "Rajesh Shendekar",
+        "width": 1086,
+        "height": 1399
+      },
+      "bio": "Oversees technical standards and rules for the federation.",
+      "draft": false
     }
   ],
   "revealLabel": "To be announced",
