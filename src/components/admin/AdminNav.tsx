@@ -15,7 +15,6 @@ const LINKS = [
   { href: "/admin/players", label: "Players" },
   { href: "/admin/officials", label: "Officials" },
   { href: "/admin/card-maker", label: "Card Maker" },
-  { href: "/admin/locks", label: "Locks" },
   { href: "/admin/help", label: "Help" },
 ];
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api, waitUntilLive } from "./client";
+import { LockDialog } from "./LockDialog";
 import s from "./admin.module.css";
 import t from "./topSeven.module.css";
 
@@ -30,8 +31,12 @@ export interface TopSevenPlayer {
  * directory below it. Picking someone who is already in another place swaps
  * the two.
  */
-export function TopSevenEditor({ initial, players }: { initial: Record<Slot, string | null>; players: TopSevenPlayer[] }) {
+export function TopSevenEditor({ initial, players, pins: initialPins }: { initial: Record<Slot, string | null>; players: TopSevenPlayer[]; pins: Record<string, string> }) {
   const [lineup, setLineup] = useState(initial);
+  // Locked places (place → player): they can't be changed without the lock password.
+  const [pins, setPins] = useState(initialPins);
+  const [lockFor, setLockFor] = useState<Slot>();
+  const pinnedSlugs = new Set(Object.values(pins));
   const [saved, setSaved] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ tone: "ok" | "err" | "info"; text: React.ReactNode }>();
@@ -49,6 +54,15 @@ export function TopSevenEditor({ initial, players }: { initial: Record<Slot, str
       return next;
     });
     setMsg(undefined);
+  }
+
+  async function toggleLock(password: string) {
+    const slot = lockFor!;
+    const r = await api("PUT", "/api/admin/locks", { section: "top-seven", key: slot, locked: !(slot in pins), password });
+    if (!r.ok) return r.message ?? "Could not change the lock.";
+    setPins((r.pins as { "top-seven": Record<string, string> })["top-seven"]);
+    setLockFor(undefined);
+    setMsg({ tone: "ok", text: "Lock saved." });
   }
 
   async function publish() {
@@ -71,22 +85,34 @@ export function TopSevenEditor({ initial, players }: { initial: Record<Slot, str
         {SLOTS.map(({ key, label }) => {
           const p = lineup[key] ? bySlug.get(lineup[key]!) : undefined;
           return (
-            <li key={key} className={t.slot} data-center={key === "center" || undefined} data-empty={!p || undefined} data-changed={lineup[key] !== saved[key] || undefined}>
-              <span className={t.where}>{label}</span>
+            <li key={key} className={t.slot} data-center={key === "center" || undefined} data-empty={!p || undefined} data-changed={lineup[key] !== saved[key] || undefined} data-pinned={key in pins || undefined}>
+              <span className={t.where}>
+                {label}
+                {key in pins && " · 🔒 Locked"}
+              </span>
               <div className={t.photo}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 {p?.photo ? <img src={p.photo} alt="" /> : <span className={t.reveal}>{p ? p.name.split(" ").map((w) => w[0]).join("") : "Reveal soon"}</span>}
               </div>
               <b className={t.name}>{p ? p.name : "Empty"}</b>
-              <select className={s.input} aria-label={`${label} place`} value={lineup[key] ?? ""} onChange={(e) => pick(key, e.target.value || null)}>
+              <select className={s.input} aria-label={`${label} place`} value={lineup[key] ?? ""} onChange={(e) => pick(key, e.target.value || null)} disabled={key in pins}>
                 <option value="">— Empty (Reveal soon) —</option>
-                {published.map((pl) => (
+                {published.filter((pl) => !pinnedSlugs.has(pl.slug) || lineup[key] === pl.slug).map((pl) => (
                   <option key={pl.slug} value={pl.slug}>
                     {pl.name}
                     {inTop.has(pl.slug) && lineup[key] !== pl.slug ? " (swap)" : ""}
                   </option>
                 ))}
               </select>
+              <button
+                type="button"
+                className={`${s.btn} ${s.small}`}
+                onClick={() => setLockFor(key)}
+                disabled={!(key in pins) && (changed || !lineup[key])}
+                title={key in pins ? "Unlock this place (lock password)" : changed ? "Publish your changes first, then lock" : "Lock this player in this place (lock password)"}
+              >
+                {key in pins ? "🔒 Unlock" : "🔓 Lock"}
+              </button>
             </li>
           );
         })}
@@ -96,6 +122,20 @@ export function TopSevenEditor({ initial, players }: { initial: Record<Slot, str
         The centre is the featured card. Choosing a player who is already in another place swaps the two. Everyone not in the Top 7 still appears in the player directory below it. Only published players can be chosen
         {players.some((p) => p.draft) ? " (drafts are hidden here)" : ""}.
       </p>
+
+      <LockDialog
+        open={!!lockFor}
+        title={lockFor && lockFor in pins ? "Unlock this place?" : "Lock this place?"}
+        text={
+          lockFor
+            ? lockFor in pins
+              ? "This place can then be changed again."
+              : `${bySlug.get(lineup[lockFor] ?? "")?.name ?? "This player"} will stay in this place. Nobody can change it without the lock password.`
+            : ""
+        }
+        onClose={() => setLockFor(undefined)}
+        onSubmit={toggleLock}
+      />
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         <button type="button" className={`${s.btn} ${s.primary}`} disabled={busy || !changed} onClick={publish}>

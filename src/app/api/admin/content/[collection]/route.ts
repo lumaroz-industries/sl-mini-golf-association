@@ -1,5 +1,4 @@
 import { failure, guard, json } from "@/lib/admin/api";
-import { assertUnlocked } from "@/lib/admin/locks";
 import { reorderOfficials, saveAlbum, saveEntry, saveOfficial, savePlayer, type SaveAlbumInput, type SaveEntryInput } from "@/lib/admin/content";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +14,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ collecti
     if (collection === "updates" || collection === "articles") return json(200, { ok: true, ...(await saveEntry(collection, input as SaveEntryInput)) });
     if (collection === "gallery") return json(200, { ok: true, ...(await saveAlbum(input as SaveAlbumInput)) });
     if (collection === "players") return json(200, { ok: true, ...(await savePlayer(input)) });
-    if (collection === "officials") await assertUnlocked("officials", input?.lockPassword);
     if (collection === "officials") return json(200, { ok: true, ...(input?.order ? await reorderOfficials(input.order) : await saveOfficial(input)) });
     return json(404, { ok: false, message: "Not found." });
   } catch (e) {

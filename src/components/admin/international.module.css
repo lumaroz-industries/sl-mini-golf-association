@@ -185,3 +185,22 @@
   font-weight: 700;
   color: var(--gold);
 }
+
+/* A player locked at their position. */
+.tile[data-pinned] {
+  cursor: default;
+  border-color: rgb(227 194 122 / 0.7);
+  box-shadow: 0 0 0 1px rgb(227 194 122 / 0.35), 0 0 30px -10px rgb(227 194 122 / 0.5);
+}
+
+.tile[data-pinned] .num {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: #1a1206;
+}
+
+.lockPill {
+  color: #1a1206;
+  background: var(--gold-grad, #e3c27a);
+  border-color: transparent;
+}

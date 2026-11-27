@@ -1,14 +1,15 @@
 import { failure, guard, json } from "@/lib/admin/api";
-import { checkLockPassword, readLocks, saveLocks } from "@/lib/admin/locks";
+import { readInternational, readTopSeven } from "@/lib/admin/content";
+import { checkLockPassword, readPins, setPin } from "@/lib/admin/locks";
 
 export const dynamic = "force-dynamic";
 
-/** Which sections are locked. */
+/** The locked positions. */
 export async function GET(req: Request) {
   const denied = await guard(req);
   if (denied) return denied;
   try {
-    return json(200, { ok: true, locked: await readLocks() });
+    return json(200, { ok: true, pins: await readPins() });
   } catch (e) {
     return failure(e);
   }
@@ -27,13 +28,14 @@ export async function POST(req: Request) {
   }
 }
 
-/** Turn locks on or off (body: { locked: [...], password }). */
+/** Lock or unlock one position (body: { section, key, locked, password }). */
 export async function PUT(req: Request) {
   const denied = await guard(req);
   if (denied) return denied;
   try {
-    const { locked, password } = (await req.json()) as { locked?: unknown; password?: unknown };
-    return json(200, { ok: true, ...(await saveLocks(locked, password)) });
+    const input = (await req.json()) as { section?: unknown; key?: unknown; locked?: unknown; password?: unknown };
+    const [international, topSeven] = await Promise.all([readInternational(), readTopSeven()]);
+    return json(200, { ok: true, ...(await setPin(input, { international, topSeven })) });
   } catch (e) {
     return failure(e);
   }

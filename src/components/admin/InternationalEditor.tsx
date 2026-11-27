@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api, waitUntilLive } from "./client";
+import { LockDialog } from "./LockDialog";
 import s from "./admin.module.css";
 import t from "./international.module.css";
 
@@ -26,10 +27,13 @@ const initials = (name: string) =>
 /**
  * Choose the International players section: who is in it and in what order
  * (the same order as on the website). Drag a card, or use the arrows, to
- * reorder.
+ * reorder. A player can be locked at their position with the lock password:
+ * they then stay there while everyone else moves around them.
  */
-export function InternationalEditor({ initial, players }: { initial: string[]; players: IntlPlayer[] }) {
+export function InternationalEditor({ initial, players, pins: initialPins }: { initial: string[]; players: IntlPlayer[]; pins: Record<string, number> }) {
   const [list, setList] = useState(initial);
+  const [pins, setPins] = useState(initialPins);
+  const [lockFor, setLockFor] = useState<string>();
   const [saved, setSaved] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [drag, setDrag] = useState<string>();
@@ -39,13 +43,44 @@ export function InternationalEditor({ initial, players }: { initial: string[]; p
   const others = players.filter((p) => !p.draft && !list.includes(p.slug));
   const intlCards = others.filter((p) => p.card === "international");
 
-  const update = (next: string[]) => (setList(next), setMsg(undefined));
-  const move = (from: number, to: number) => {
-    if (to < 0 || to >= list.length || from === to) return;
-    const next = [...list];
-    next.splice(to, 0, next.splice(from, 1)[0]);
-    update(next);
+  const isPinned = (slug: string) => slug in pins;
+  /** Puts every locked player back at their position; everyone else keeps their order around them. */
+  const settle = (next: string[]) => {
+    const free = next.filter((s) => !isPinned(s));
+    // Locked players are always kept (they can't be removed), at their own position.
+    const locked = Object.entries(pins).filter(([s]) => next.includes(s) || list.includes(s));
+    const at = new Map(locked.map(([s, p]) => [p - 1, s]));
+    const out: string[] = [];
+    const total = free.length + locked.length;
+    for (let i = 0; i < total; i++) out.push(at.get(i) ?? free.shift()!);
+    return out.filter(Boolean);
   };
+  const update = (next: string[]) => (setList(settle(next)), setMsg(undefined));
+  /** Moves a player one place (or onto a dragged-over place), stepping over locked players. */
+  const move = (from: number, to: number) => {
+    if (to < 0 || to >= list.length || from === to || isPinned(list[from]) || isPinned(list[to])) return;
+    const free = list.filter((s) => !isPinned(s));
+    const a = free.indexOf(list[from]);
+    const b = free.indexOf(list[to]);
+    free.splice(b, 0, free.splice(a, 1)[0]);
+    update(free);
+  };
+  /** The next unlocked place in a direction, for the arrow buttons. */
+  const nextFree = (i: number, dir: -1 | 1) => {
+    let j = i + dir;
+    while (j >= 0 && j < list.length && isPinned(list[j])) j += dir;
+    return j;
+  };
+
+  async function toggleLock(password: string) {
+    const slug = lockFor!;
+    const r = await api("PUT", "/api/admin/locks", { section: "international", key: slug, locked: !isPinned(slug), password });
+    if (!r.ok) return r.message ?? "Could not change the lock.";
+    setPins((r.pins as { international: Record<string, number> }).international);
+    setLockFor(undefined);
+    const commit = r.commit as string;
+    setMsg({ tone: "ok", text: commit === "local" ? "Lock saved (local preview)." : "Lock saved." });
+  }
 
   async function publish() {
     setBusy(true);
@@ -73,7 +108,7 @@ export function InternationalEditor({ initial, players }: { initial: string[]; p
           <h2 className={t.title}>
             In the section <span className={t.count}>{list.length}</span>
           </h2>
-          <p className={s.help}>Drag a card or use the arrows to change the order. Two cards sit side by side on phones.</p>
+          <p className={s.help}>Drag a card or use the arrows to change the order. 🔓 locks a player at their position (lock password needed); locked players stay put while the others move around them.</p>
         </header>
         {list.length === 0 ? (
           <div className={s.empty}>No players yet: add them below. Until then the website shows “coming soon” cards.</div>
@@ -86,7 +121,8 @@ export function InternationalEditor({ initial, players }: { initial: string[]; p
                 <li
                   key={slug}
                   className={t.tile}
-                  draggable
+                  draggable={!isPinned(slug)}
+                  data-pinned={isPinned(slug) || undefined}
                   data-dragging={drag === slug || undefined}
                   data-changed={saved[i] !== slug || undefined}
                   onDragStart={(e) => (setDrag(slug), e.dataTransfer.setData("text/plain", slug), (e.dataTransfer.effectAllowed = "move"))}
@@ -104,17 +140,28 @@ export function InternationalEditor({ initial, players }: { initial: string[]; p
                   </div>
                   <b className={t.name}>{p.name}</b>
                   <span className={t.tags}>
+                    {isPinned(slug) && <span className={`${s.pill} ${t.lockPill}`}>🔒 Locked at {pins[slug]}</span>}
                     {p.topSeven && <span className={s.pill}>Top 7</span>}
                     {p.card !== "international" && <span className={`${s.pill} ${s.pillWarn}`} title="This player's card is not the International design (change it in their profile).">{p.card === "national" ? "National card" : "State card"}</span>}
                   </span>
                   <span className={t.actions}>
-                    <button type="button" className={`${s.btn} ${s.small}`} onClick={() => move(i, i - 1)} disabled={i === 0} aria-label={`Move ${p.name} earlier`}>
+                    <button type="button" className={`${s.btn} ${s.small}`} onClick={() => move(i, nextFree(i, -1))} disabled={isPinned(slug) || nextFree(i, -1) < 0} aria-label={`Move ${p.name} earlier`}>
                       ←
                     </button>
-                    <button type="button" className={`${s.btn} ${s.small}`} onClick={() => move(i, i + 1)} disabled={i === list.length - 1} aria-label={`Move ${p.name} later`}>
+                    <button type="button" className={`${s.btn} ${s.small}`} onClick={() => move(i, nextFree(i, 1))} disabled={isPinned(slug) || nextFree(i, 1) >= list.length} aria-label={`Move ${p.name} later`}>
                       →
                     </button>
-                    <button type="button" className={`${s.btn} ${s.small}`} onClick={() => update(list.filter((x) => x !== slug))} aria-label={`Remove ${p.name}`}>
+                    <button
+                      type="button"
+                      className={`${s.btn} ${s.small}`}
+                      onClick={() => setLockFor(slug)}
+                      disabled={!isPinned(slug) && (changed || saved[i] !== slug)}
+                      title={isPinned(slug) ? "Unlock this position (lock password)" : changed ? "Publish your changes first, then lock" : "Lock this player at this position (lock password)"}
+                      aria-label={isPinned(slug) ? `Unlock ${p.name}'s position` : `Lock ${p.name} at position ${i + 1}`}
+                    >
+                      {isPinned(slug) ? "🔒" : "🔓"}
+                    </button>
+                    <button type="button" className={`${s.btn} ${s.small}`} onClick={() => update(list.filter((x) => x !== slug))} disabled={isPinned(slug)} aria-label={`Remove ${p.name}`}>
                       Remove
                     </button>
                   </span>
@@ -155,6 +202,20 @@ export function InternationalEditor({ initial, players }: { initial: string[]; p
           international results from their profile.
         </p>
       </section>
+
+      <LockDialog
+        open={!!lockFor}
+        title={lockFor && isPinned(lockFor) ? "Unlock this position?" : "Lock this position?"}
+        text={
+          lockFor
+            ? isPinned(lockFor)
+              ? `${bySlug.get(lockFor)?.name} can then be moved or removed again.`
+              : `${bySlug.get(lockFor)?.name} will stay at position ${list.indexOf(lockFor) + 1}. Nobody can move or remove them without the lock password.`
+            : ""
+        }
+        onClose={() => setLockFor(undefined)}
+        onSubmit={toggleLock}
+      />
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         <button type="button" className={`${s.btn} ${s.primary}`} disabled={busy || !changed} onClick={publish}>
