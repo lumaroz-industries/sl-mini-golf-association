@@ -28,42 +28,27 @@ const LEVELS = [
   { id: "international", label: "International" },
   { id: "national", label: "National" },
   { id: "state", label: "State" },
-  { id: "district", label: "District" },
 ];
 const SORTS = { name: "Name A–Z", medals: "Most medals", gold: "Most golds", recent: "Most recent result" } as const;
 type Sort = keyof typeof SORTS;
 const KINDS: MedalKind[] = ["gold", "silver", "bronze"];
 
 /**
- * The Maharashtra player directory: search, filters (level, year, district,
- * gender, medallists) and sorting — all kept in the URL so a view can be shared.
+ * The Maharashtra player directory: search, filters (level, gender) and sorting — all kept in the URL so a view can be shared.
  */
 export function PlayerDirectory({ players, heading, intro, kicker, emptyHeading, emptyBody }: { players: DirectoryPlayer[]; heading: string; intro: string; kicker: string; emptyHeading: string; emptyBody: string }) {
-  const years = useMemo(() => [...new Set(players.flatMap((p) => p.results.map((r) => r.year)))].sort((a, c) => c - a), [players]);
-  const districts = useMemo(() => [...new Set(players.map((p) => p.district).filter((d): d is string => !!d))].sort(), [players]);
-
   const [q, setQ] = useUrlState<string>("q", "", () => true);
   const [level, setLevel] = useUrlState<string>("level", "all", (v) => LEVELS.some((l) => l.id === v));
-  const [year, setYear] = useUrlState<string>("year", "all", (v) => years.includes(Number(v)));
-  const [district, setDistrict] = useUrlState<string>("district", "all", (v) => districts.includes(v));
   const [gender, setGender] = useUrlState<string>("gender", "all", (v) => v === "female" || v === "male");
-  const [medalOnly, setMedalOnly] = useUrlState<string>("medallists", "", (v) => v === "1");
   const [sort, setSort] = useUrlState<Sort>("sort", "name", (v) => v in SORTS);
 
   const shown = useMemo(() => {
     const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
     const list = players.filter((p) => {
       if (words.length && !words.every((w) => `${p.name} ${p.district ?? ""}`.toLowerCase().includes(w))) return false;
-      if (district !== "all" && p.district !== district) return false;
       if (gender !== "all" && p.gender !== gender) return false;
-      if (medalOnly && p.total === 0) return false;
       // Level: the player's card level, or any result at that level.
       if (level !== "all" && p.level !== level && !p.results.some((r) => r.level === level)) return false;
-      // Year: a result in that year (at the chosen level, unless the player's own level is the one chosen).
-      if (year !== "all") {
-        const hit = p.results.some((r) => r.year === Number(year) && (level === "all" || p.level === level || r.level === level) && (!medalOnly || !!r.medal));
-        if (!hit) return false;
-      }
       return true;
     });
     const latest = (p: DirectoryPlayer) => Math.max(0, ...p.results.map((r) => r.year));
@@ -74,16 +59,13 @@ export function PlayerDirectory({ players, heading, intro, kicker, emptyHeading,
       recent: (x, y) => latest(y) - latest(x) || x.name.localeCompare(y.name),
     };
     return list.sort(by[sort]);
-  }, [players, q, level, year, district, gender, medalOnly, sort]);
+  }, [players, q, level, gender, sort]);
 
-  const filtered = q || level !== "all" || year !== "all" || district !== "all" || gender !== "all" || medalOnly;
+  const filtered = q || level !== "all" || gender !== "all";
   const reset = () => {
     setQ("");
     setLevel("all");
-    setYear("all");
-    setDistrict("all");
     setGender("all");
-    setMedalOnly("");
   };
 
   return (
@@ -138,38 +120,12 @@ export function PlayerDirectory({ players, heading, intro, kicker, emptyHeading,
         </div>
         <div className={styles.selects}>
           <label className={b.select}>
-            Year
-            <select value={year} onChange={(e) => setYear(e.target.value)} disabled={!years.length}>
-              <option value="all">All years</option>
-              {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className={b.select}>
-            District
-            <select value={district} onChange={(e) => setDistrict(e.target.value)} disabled={!districts.length}>
-              <option value="all">All districts</option>
-              {districts.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className={b.select}>
             Gender
             <select value={gender} onChange={(e) => setGender(e.target.value)}>
               <option value="all">All</option>
               <option value="female">Women</option>
               <option value="male">Men</option>
             </select>
-          </label>
-          <label className={styles.toggle}>
-            <input type="checkbox" checked={!!medalOnly} onChange={(e) => setMedalOnly(e.target.checked ? "1" : "")} />
-            <span>Medallists only</span>
           </label>
           {filtered && (
             <button type="button" className={styles.reset} onClick={reset}>

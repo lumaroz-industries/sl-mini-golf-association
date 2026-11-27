@@ -85,7 +85,7 @@
   "directory": {
     "kicker": "All Maharashtra players",
     "heading": "Player directory",
-    "intro": "Every Maharashtra mini-golf player we have on record. Search by name, or filter by level, year, district and more.",
+    "intro": "Every Maharashtra mini-golf player we have on record. Search by name, or filter by level and category.",
     "emptyHeading": "No players match",
     "emptyBody": "Try a different search or clear the filters."
   }
