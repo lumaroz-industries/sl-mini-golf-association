@@ -1,0 +1,17 @@
+{
+  "slug": "enjal-jatav",
+  "name": "Enjal Jatav",
+  "gender": "female",
+  "card": "national",
+  "photo": {
+    "src": "/players/enjal-jatav/enjal-jatav-card-12pp.webp",
+    "alt": "Enjal Jatav",
+    "width": 960,
+    "height": 1200
+  },
+  "medals": {
+    "gold": 2
+  },
+  "results": [],
+  "draft": false
+}
