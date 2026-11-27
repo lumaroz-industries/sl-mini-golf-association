@@ -680,10 +680,10 @@
 }
 
 /* ================================================================ themes
-   One card, three levels. International: platinum and ice with globe
-   lines. National: navy with the tricolour (saffron, white, green) and
-   flowing ribbons. State: deep maroon with bhagwa saffron and gold, and the
-   Sahyadri ridge. */
+   One wall, three levels. International: platinum and ice with globe
+   lines. National and State: the front is the site's own player card in
+   that design (gold with the tricolour band; saffron and deep red with the
+   MH monogram); the back follows its metal. */
 .wall {
   --edge: #ffffff, #8fb0c4 8%, #1b2830 18%, #b9e6ff 30%, #ffffff 34%, #ffd6ef 40%, #1b2830 52%, #e3c27a 64%, #fff3c4 68%, #1b2830 80%, #7ff0c4 90%, #ffffff;
   --ink-1: #07100c;
@@ -695,21 +695,23 @@
   --ring: conic-gradient(from 210deg, #ffffff, #0b0e12 18%, #9fc3da 32%, #0b0e12 48%, #ffd6ef 62%, #0b0e12 78%, #ffffff);
 }
 
+/* National: champagne gold, as the National player card. */
 .wall[data-theme="national"] {
-  --edge: #ff9933, #ffd5a8 10%, #2a1606 20%, #ffffff 32%, #f4f4f4 38%, #0f2a12 50%, #138808 62%, #9be29b 70%, #0b1a0c 80%, #e3c27a 90%, #ff9933;
-  --ink-1: #0a0d1c;
-  --ink-2: #03040b;
-  --tone: 255 226 190;
-  --tone-hi: #ffe2c0;
-  --glow: 255 153 51;
-  --name-grad: linear-gradient(180deg, #ffffff 0%, #fff4e6 40%, #ffc27a 68%, #ff9933 82%, #fff1dc 100%);
-  --ring: conic-gradient(from 210deg, #ff9933, #2a1606 18%, #ffffff 34%, #1a1a1a 50%, #138808 66%, #0b1a0c 82%, #ff9933);
+  --edge: #fbecc4, #e3c27a 14%, #8c6a2e 32%, #3b2c12 46%, #e3c27a 62%, #fbecc4 72%, #8c6a2e 88%, #3b2c12;
+  --ink-1: #11120f;
+  --ink-2: #050606;
+  --tone: 227 194 122;
+  --tone-hi: #fbecc4;
+  --glow: 227 194 122;
+  --name-grad: linear-gradient(180deg, #ffffff 25%, #c9cdd0 100%);
+  --ring: conic-gradient(from 210deg, #fbecc4, #e3c27a, #6b5020, #e3c27a, #fbecc4);
 }
 
+/* State: saffron to deep red with gold light, as the State player card. */
 .wall[data-theme="state"] {
-  --edge: #ffe3b3, #f4a23c 10%, #3d1106 22%, #e8601f 34%, #ffd08a 42%, #3d1106 54%, #e3c27a 66%, #fff3c4 72%, #5a1a08 84%, #f4a23c 92%, #ffe3b3;
-  --ink-1: #1a0805;
-  --ink-2: #070202;
+  --edge: #ffe3b3, #f4a23c 14%, #a33a12 32%, #3d1106 46%, #f4a23c 62%, #ffe3b3 72%, #a33a12 88%, #3d1106;
+  --ink-1: #1f120b;
+  --ink-2: #070302;
   --tone: 255 210 150;
   --tone-hi: #ffd08a;
   --glow: 232 96 34;
@@ -724,68 +726,80 @@
     linear-gradient(90deg, transparent 20%, rgb(var(--tone) / 0.45), transparent);
 }
 
-/* National: the ribbons in the tricolour. */
-.ribbonA,
-.ribbonB,
-.ribbonC {
-  fill: none;
-  stroke-width: 4;
-  stroke-linecap: round;
-  opacity: 0.16;
+/* National: the rule on the back in the tricolour, as on the card. */
+.wall[data-theme="national"] .rule {
+  background: linear-gradient(90deg, transparent, #ff9933 22%, #f4f4f4 50%, #138808 78%, transparent);
 }
 
-.ribbonA {
-  stroke: #ff9933;
+/* National and State fronts: the player card fills the face; the face
+   itself steps back (no frame, edge or bevel of its own). */
+.wall[data-theme="national"] .front,
+.wall[data-theme="state"] .front {
+  border: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
 }
 
-.ribbonB {
-  stroke: #ffffff;
-  opacity: 0.08;
+.wall[data-theme="national"] .front::before,
+.wall[data-theme="national"] .front::after,
+.wall[data-theme="state"] .front::before,
+.wall[data-theme="state"] .front::after {
+  content: none;
 }
 
-.ribbonC {
-  stroke: #138808;
-  opacity: 0.24;
-}
-
-/* State: the Sahyadri ridge. */
-.ridgeA,
-.ridgeB,
-.ridgeC {
-  fill: none;
-  stroke-width: 0.6;
-  stroke-linejoin: round;
-}
-
-.ridgeA {
-  stroke: rgb(255 208 138 / 0.28);
-}
-
-.ridgeB {
-  stroke: rgb(232 96 34 / 0.3);
-}
-
-.ridgeC {
-  stroke: rgb(255 208 138 / 0.18);
-}
-
-/* The motif sits a little differently for the ribbons and the ridge. */
-.wall[data-theme="national"] .globe,
-.wall[data-theme="state"] .globe {
-  inset: auto 0 0;
-  left: 0;
-  width: 100%;
-  height: 70%;
-  translate: none;
-  stroke: none;
-}
-
-.wall[data-theme="national"] .backGlobe,
-.wall[data-theme="state"] .backGlobe {
+.playerCard {
+  position: absolute;
   inset: 0;
-  top: auto;
-  right: 0;
-  width: 100%;
-  height: 60%;
-  stroke: none;
+  container-type: inline-size;
+}
+
+/* The card sized to the cell (its sizes all follow --w). */
+.playerCard > :first-child {
+  --w: 100cqi;
+  --radius: 6.5cqi;
+}
+
+/* Small cards (two across on phones): the card's fixed spacing scaled down,
+   the credit line hidden so the medals have room. */
+@container (max-width: 230px) {
+  .playerCard [class$="_top"] {
+    inset: 7cqi 7cqi auto;
+  }
+  .playerCard [class$="_badge"],
+  .playerCard [class$="_levelTag"] {
+    padding: 0.8cqi 2.4cqi;
+    font-size: max(7px, 3.6cqi);
+    letter-spacing: 0.14em;
+  }
+  .playerCard [class$="_plate"] {
+    inset: auto 7cqi 6cqi;
+    gap: 2cqi;
+  }
+  .playerCard [class$="_first"] {
+    font-size: 11cqi;
+  }
+  .playerCard [class$="_last"] {
+    margin-top: 1cqi;
+    font-size: max(7px, 3.6cqi);
+    letter-spacing: 0.24em;
+  }
+  .playerCard [class$="_medal"] {
+    gap: 1.4cqi;
+    padding: 0;
+  }
+  .playerCard [class$="_medal"] svg {
+    width: 7cqi;
+    height: auto;
+  }
+  .playerCard [class$="_count"] {
+    font-size: 6.6cqi;
+  }
+  .playerCard [class$="_credit"] {
+    display: none;
+  }
+  .playerCard [class$="_corners"] {
+    inset: 3cqi;
+    --l: 4cqi;
+  }
 }

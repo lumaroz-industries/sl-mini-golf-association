@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import type { ImageAsset } from "@/content/schema";
 import { MedalIcon, type MedalKind } from "./MedalDefs";
+import { PlayerCard } from "./PlayerCard";
 import s from "./WorldWall.module.css";
 
 export interface WallResult {
@@ -64,33 +65,9 @@ const THEME: Record<WallTheme, { seal: string; events: string; place: string }> 
   state: { seal: "STATE ◆ MAHARASHTRA ◆ SAHYADRI ◆", events: "State events", place: "Maharashtra" },
 };
 
-/** National: three flowing ribbons in the tricolour. */
-function Ribbons({ className }: { className: string }) {
-  return (
-    <svg className={className} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M-5 30 C 25 18, 45 42, 105 24" className={s.ribbonA} />
-      <path d="M-5 42 C 25 30, 45 54, 105 36" className={s.ribbonB} />
-      <path d="M-5 54 C 25 42, 45 66, 105 48" className={s.ribbonC} />
-    </svg>
-  );
-}
-
-/** State: the Sahyadri ridge, in layers. */
-function Ridge({ className }: { className: string }) {
-  return (
-    <svg className={className} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0 62 L10 50 L17 56 L27 40 L35 50 L44 36 L52 48 L61 34 L70 46 L78 38 L88 52 L100 42" className={s.ridgeA} />
-      <path d="M0 74 L12 64 L20 70 L31 58 L40 66 L50 54 L58 64 L68 56 L77 66 L86 58 L100 68" className={s.ridgeB} />
-      <path d="M0 86 L14 78 L24 84 L36 74 L48 82 L60 72 L72 80 L84 74 L100 82" className={s.ridgeC} />
-    </svg>
-  );
-}
-
-/** The theme's background motif: globe lines, tricolour ribbons or the Sahyadri ridge. */
+/** The theme's background motif: globe lines on the International cards only. */
 function Motif({ theme, className }: { theme: WallTheme; className: string }) {
-  if (theme === "national") return <Ribbons className={className} />;
-  if (theme === "state") return <Ridge className={className} />;
-  return <Globe className={className} />;
+  return theme === "international" ? <Globe className={className} /> : null;
 }
 
 /** A slowly turning seal around a golf ball, with the level's words. */
@@ -131,6 +108,19 @@ function Seal({ text }: { text: string }) {
 }
 
 function Front({ player, revealLabel, theme }: { player?: WallPlayer; revealLabel: string; theme: WallTheme }) {
+  // National and State: the player card designs used across the site (and in the Card Maker).
+  if (theme !== "international")
+    return (
+      <div className={s.playerCard}>
+        <PlayerCard
+          player={player && { slug: player.slug, name: player.name, photo: player.photo, medals: player.medals, card: theme }}
+          revealLabel={revealLabel}
+          badge={theme === "national" ? "National" : "State"}
+          arrowHidden
+          active={false}
+        />
+      </div>
+    );
   const [first, ...rest] = (player?.name ?? "").split(/\s+/);
   return (
     <>
