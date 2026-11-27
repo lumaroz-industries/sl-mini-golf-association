@@ -1,0 +1,18 @@
+{
+  "slug": "nandlal-sahu",
+  "name": "Nandlal Sahu",
+  "gender": "male",
+  "card": "national",
+  "photo": {
+    "src": "/players/nandlal-sahu/nandlal-sahu-card-f7ot.webp",
+    "alt": "Nandlal Sahu",
+    "width": 960,
+    "height": 1200
+  },
+  "medals": {
+    "silver": 1,
+    "bronze": 1
+  },
+  "results": [],
+  "draft": false
+}
