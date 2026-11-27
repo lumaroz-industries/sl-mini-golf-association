@@ -1,0 +1,24 @@
+{
+  "slug": "lucky-mahendra-sain",
+  "name": "Lucky Mahendra Sain",
+  "gender": "male",
+  "card": "international",
+  "photo": {
+    "src": "/players/lucky-mahendra-sain/lucky-mahendra-sain-card-yjmj.webp",
+    "alt": "Lucky Mahendra Sain",
+    "width": 960,
+    "height": 1200
+  },
+  "intlPhoto": {
+    "src": "/players/lucky-mahendra-sain/formal-portrait-in-navy-suit-5jgw.webp",
+    "alt": "Lucky Mahendra Sain",
+    "width": 1086,
+    "height": 1448
+  },
+  "medals": {
+    "gold": 1,
+    "bronze": 3
+  },
+  "results": [],
+  "draft": false
+}
