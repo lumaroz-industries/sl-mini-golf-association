@@ -6,6 +6,7 @@ import { STUDIO_HANDOFF, type StudioHandoff } from "@/lib/admin/studio";
 import { slugify } from "@/lib/admin/shared";
 import { Choice, Field, ImageField, Section, SlugField, TextArea, TextInput, Toggle, type ImageValue, type Upload } from "./fields";
 import { PublishBar } from "./PublishBar";
+import { CardPhotoField } from "./CardPhotoField";
 import s from "./admin.module.css";
 
 type Outcome = "gold" | "silver" | "bronze" | "position" | "participated";
@@ -166,9 +167,13 @@ export function PlayerEditor({ initial, isNew: startsNew }: { initial: PlayerIni
         />
       </Section>
 
-      <Section title="Photo" hint="A portrait photo (about 4:5) works best. Without one, the card shows the player's initials.">
+      <Section title="Photo" hint="A clear portrait, head and shoulders. The background is replaced automatically to suit the player's card. Without a photo, the card shows the player's initials.">
         {studioPreview && photo && <p className={`${s.help} ${s.ok}`}>New photo from the Card Maker — press Publish (or Save draft) to put it on the card.</p>}
-        <ImageField label="Photo" value={photo} onChange={(v) => (v?.src !== photo?.src && setStudioPreview(undefined), setPhoto(v))} onUploaded={(u) => setUploads((x) => [...x, u])} collection="players" slug={effectiveSlug} withCredit={false} previewSrc={studioPreview} />
+        {studioPreview ? (
+          <ImageField label="Photo" value={photo} onChange={(v) => (v?.src !== photo?.src && setStudioPreview(undefined), setPhoto(v))} onUploaded={(u) => setUploads((x) => [...x, u])} collection="players" slug={effectiveSlug} withCredit={false} previewSrc={studioPreview} />
+        ) : (
+          <CardPhotoField label="Photo" value={photo} onChange={setPhoto} onUploaded={(u) => setUploads((x) => [...x, u])} slug={effectiveSlug} card={card} />
+        )}
         {!isNew && (
           <p className={s.help}>
             Want a studio-style card photo? <Link href={`/admin/card-maker?player=${effectiveSlug}`} style={{ color: "var(--gold)", textDecoration: "underline" }}>Open the Card Maker</Link>.

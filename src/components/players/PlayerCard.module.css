@@ -1,6 +1,6 @@
 /*
  * Collectible player card — a black premium body in one of three metals:
- *   state (Maharashtra)   saffron → deep red with gold, MH monogram, Sahyadri ridge
+ *   state (Maharashtra)   jade and platinum: deep jade-green metal, silver light, brushed jade
  *   national (India)      champagne gold with a tricolour band
  *   international         platinum / diamond with a faceted lattice and prism light
  * Golf details on all three: a ball-dimple texture and putting-green contours.
@@ -54,16 +54,42 @@
   border-radius: var(--radius);
 }
 
-/* State — Maharashtra: saffron (bhagwa) to deep red, with gold light. */
+/* State — jade and platinum: a deep jade-green metal with silver light,
+   on a black-jade body (the site's own emerald, distinct from the gold
+   National and the diamond International cards). */
 .card[data-card="state"] {
-  --gold: #f4a23c;
-  --gold-hi: #ffe3b3;
-  --gold-lo: #a33a12;
-  --gold-deep: #3d1106;
-  --m: 244 162 60;
-  --acc: 232 96 34;
-  --ink-top: #1f120b;
-  --ink-bot: #170805;
+  --gold: #6fdcb4;
+  --gold-hi: #f2fbf7;
+  --gold-lo: #1d7a57;
+  --gold-deep: #06241a;
+  --m: 140 226 192;
+  --acc: 0 168 107;
+  --ink-top: #0b1a14;
+  --ink-bot: #04110b;
+}
+
+/* Jade metal edge: platinum highlights over deep green, brushed. */
+.card[data-card="state"] .foil {
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.06) 0 1px, transparent 1px 3px),
+    linear-gradient(145deg, #ffffff 0%, #bfe9d8 10%, #2fa37a 24%, #06241a 42%, #0f6b4a 54%, #dfeae5 64%, #ffffff 70%, #3bb488 82%, #06241a 100%);
+}
+
+/* A brushed-jade sheen across the body, strongest at the top corners. */
+.jade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(115deg, rgb(140 226 192 / 0.035) 0 1px, transparent 1px 9px),
+    radial-gradient(60% 40% at 0% 0%, rgb(140 226 192 / 0.12), transparent 70%),
+    radial-gradient(60% 40% at 100% 0%, rgb(220 235 230 / 0.08), transparent 70%);
+}
+
+/* Silver light instead of the warm sweep. */
+.card[data-card="state"] .shine::before {
+  background: linear-gradient(100deg, transparent, rgb(140 226 192 / 0.12) 30%, rgb(255 255 255 / 0.28) 50%, rgb(190 220 210 / 0.12) 70%, transparent);
 }
 
 /* International — diamond: platinum and ice with prismatic light. */
@@ -567,21 +593,6 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* State: the Sahyadri ridge at the foot of the photo. */
-.ridge {
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  bottom: 31%;
-  width: 100%;
-  height: 9%;
-  pointer-events: none;
-  fill: rgb(var(--acc) / 0.07);
-  filter: drop-shadow(0 -0.5px 0 rgb(var(--m) / 0.35));
-  opacity: 0.9;
-}
-
 /* National: a tricolour band down the left edge. */
 .tricolour {
   position: absolute;
@@ -771,8 +782,8 @@
 }
 
 .card[data-card="state"] .levelTag {
-  --lvl-rim: linear-gradient(135deg, #ffe3b3, #f4a23c 40%, #a33a12 75%, #f4a23c);
-  --lvl-text: linear-gradient(180deg, #ffe3b3, #f4a23c 55%, #c2541a);
+  --lvl-rim: linear-gradient(135deg, #ffffff, #8ce2c0 40%, #1d7a57 75%, #dfeae5);
+  --lvl-text: linear-gradient(180deg, #ffffff, #bfe9d8 55%, #6fdcb4);
 }
 
 .card[data-card="national"] .levelTag {

@@ -94,11 +94,7 @@ export function PlayerCard({ player, revealLabel, large = false, priority = fals
           <path d="M30 44V8" />
           <path d="M30 9l15 5-15 5" className={styles.holeFlag} />
         </svg>
-        {tier === "state" && (
-          <svg className={styles.ridge} viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M0 20 L0 14 L8 9 L13 12 L21 5 L27 10 L33 7 L40 12 L47 4 L53 9 L58 6 L66 11 L72 3 L79 9 L85 7 L92 12 L100 8 L100 20 Z" />
-          </svg>
-        )}
+        {tier === "state" && <span className={styles.jade} aria-hidden="true" />}
         {tier === "national" && <span className={styles.tricolour} aria-hidden="true" />}
         {tier === "international" && <span className={styles.facets} aria-hidden="true" />}
         <span className={styles.shine} aria-hidden="true" />

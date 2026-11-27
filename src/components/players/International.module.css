@@ -102,25 +102,25 @@
   border-color: rgb(255 153 51 / 0.5);
 }
 
-/* ---- State: bhagwa saffron and gold over deep maroon. */
+/* ---- State: jade and platinum. */
 .section[data-theme="state"] .glow {
   background:
-    radial-gradient(50% 45% at 50% 40%, rgb(232 96 34 / 0.1), transparent 70%),
-    radial-gradient(60% 40% at 50% 100%, rgb(140 30 10 / 0.12), transparent 70%),
-    linear-gradient(90deg, transparent, rgb(244 162 60 / 0.55), transparent) top / 100% 1px no-repeat;
+    radial-gradient(50% 45% at 50% 40%, rgb(111 220 180 / 0.08), transparent 70%),
+    radial-gradient(60% 40% at 50% 100%, rgb(0 168 107 / 0.08), transparent 70%),
+    linear-gradient(90deg, transparent, rgb(191 233 216 / 0.5), transparent) top / 100% 1px no-repeat;
 }
 
 .section[data-theme="state"] .kicker {
-  color: #ffd08a;
+  color: #8ce2c0;
 }
 
 .section[data-theme="state"] .kicker i {
-  background: linear-gradient(135deg, #ffe3b3, #f4a23c 50%, #e8601f);
+  background: linear-gradient(135deg, #ffffff, #8ce2c0 50%, #1d7a57);
   -webkit-background-clip: text;
   background-clip: text;
-  filter: drop-shadow(0 0 6px rgb(232 96 34 / 0.6));
+  filter: drop-shadow(0 0 6px rgb(111 220 180 / 0.6));
 }
 
 .section[data-theme="state"] .count {
-  border-color: rgb(244 162 60 / 0.5);
+  border-color: rgb(111 220 180 / 0.5);
 }

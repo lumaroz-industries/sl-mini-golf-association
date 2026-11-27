@@ -707,22 +707,22 @@
   --ring: conic-gradient(from 210deg, #fbecc4, #e3c27a, #6b5020, #e3c27a, #fbecc4);
 }
 
-/* State: saffron to deep red with gold light, as the State player card. */
+/* State: jade and platinum, as the State player card. */
 .wall[data-theme="state"] {
-  --edge: #ffe3b3, #f4a23c 14%, #a33a12 32%, #3d1106 46%, #f4a23c 62%, #ffe3b3 72%, #a33a12 88%, #3d1106;
-  --ink-1: #1f120b;
-  --ink-2: #070302;
-  --tone: 255 210 150;
-  --tone-hi: #ffd08a;
-  --glow: 232 96 34;
-  --name-grad: linear-gradient(180deg, #ffffff 0%, #fff0d6 38%, #ffc067 64%, #e8601f 82%, #ffe3b3 100%);
-  --ring: conic-gradient(from 210deg, #ffe3b3, #3d1106 18%, #f4a23c 34%, #3d1106 50%, #e3c27a 66%, #5a1a08 82%, #ffe3b3);
+  --edge: #ffffff, #bfe9d8 10%, #2fa37a 24%, #06241a 42%, #0f6b4a 54%, #dfeae5 64%, #ffffff 70%, #3bb488 82%, #06241a;
+  --ink-1: #0b1a14;
+  --ink-2: #030806;
+  --tone: 191 233 216;
+  --tone-hi: #d9f5ea;
+  --glow: 111 220 180;
+  --name-grad: linear-gradient(180deg, #ffffff 25%, #c9d6d1 100%);
+  --ring: conic-gradient(from 210deg, #ffffff, #2fa37a, #06241a, #6fdcb4, #ffffff);
 }
 
 /* The rule under the name: tricolour (international, national), saffron to gold (state). */
 .wall[data-theme="state"] .rule {
   background:
-    linear-gradient(90deg, #ffd08a 0 8%, #e8601f 8% 16%, transparent 16%),
+    linear-gradient(90deg, #ffffff 0 8%, #6fdcb4 8% 16%, transparent 16%),
     linear-gradient(90deg, transparent 20%, rgb(var(--tone) / 0.45), transparent);
 }
 
