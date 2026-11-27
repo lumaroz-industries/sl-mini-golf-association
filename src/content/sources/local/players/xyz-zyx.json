@@ -1,0 +1,14 @@
+{
+  "slug": "xyz-zyx",
+  "name": "xyz zyx",
+  "gender": "female",
+  "card": "national",
+  "photo": {
+    "src": "/players/xyz-zyx/confident-athlete-in-navy-track-jacket-t49b.webp",
+    "alt": "xyz zyx",
+    "width": 1086,
+    "height": 1448
+  },
+  "results": [],
+  "draft": false
+}
