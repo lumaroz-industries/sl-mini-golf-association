@@ -147,52 +147,48 @@ export async function cutOut(file: Blob, onProgress?: (share: number) => void): 
 
 /**
  * Repairs common background-remover mistakes, in place (matte at model size):
- *  - On a plain backdrop (black, white or grey studio), anything near the
- *    person that clearly differs from the backdrop colour is the person —
+ *  - On a plain backdrop (black, white or grey studio), anything joined to
+ *    the person that clearly differs from the backdrop colour is the person —
  *    e.g. a white shirt that the model half-erased.
  *  - Small holes completely surrounded by the person are filled.
  */
 function refineMatte(alpha: Float32Array, px: Uint8ClampedArray, w: number, h: number) {
   const n = w * h;
-  // 1. Plain backdrop: sample a band along the top and sides.
+  // 1. Plain backdrop: sample a band along the top and sides (the person's
+  //    shoulders may reach the edges, so use the typical colour and check that
+  //    most of the band matches it).
   const band = Math.max(2, Math.round(Math.min(w, h) * 0.03));
-  let sum = [0, 0, 0], cnt = 0;
-  const border: number[] = [];
-  for (let y = 0; y < h; y++)
+  const rs: number[] = [], gs: number[] = [], bs: number[] = [];
+  for (let y = 0; y < h * 0.8; y++)
     for (let x = 0; x < w; x++) {
       if (y >= band && x >= band && x < w - band) continue;
-      if (y > h * 0.8) continue; // the bottom is usually the person
       const i = (y * w + x) * 4;
-      sum = [sum[0] + px[i], sum[1] + px[i + 1], sum[2] + px[i + 2]];
-      border.push(i);
-      cnt++;
+      rs.push(px[i]);
+      gs.push(px[i + 1]);
+      bs.push(px[i + 2]);
     }
-  const bg = sum.map((v) => v / cnt);
-  let spread = 0;
-  for (const i of border) spread += Math.abs(px[i] - bg[0]) + Math.abs(px[i + 1] - bg[1]) + Math.abs(px[i + 2] - bg[2]);
-  spread /= cnt;
-  if (spread < 18) {
-    // Near the person: within a few pixels of where the model is fairly sure.
-    const near = new Uint8Array(n);
-    const reach = Math.round(Math.min(w, h) * 0.06);
-    for (let y = 0; y < h; y++) {
-      let last = -1e9;
-      for (let x = 0; x < w; x++) {
-        if (alpha[y * w + x] > 0.5) last = x;
-        if (x - last <= reach) near[y * w + x] = 1;
+  const median = (v: number[]) => v.sort((a, b) => a - b)[v.length >> 1];
+  const bg = [median([...rs]), median([...gs]), median([...bs])];
+  let close = 0;
+  for (let k = 0; k < rs.length; k++) if (Math.abs(rs[k] - bg[0]) + Math.abs(gs[k] - bg[1]) + Math.abs(bs[k] - bg[2]) < 30) close++;
+  if (close / rs.length > 0.7) {
+    // Grow the person out from where the model is sure, through every pixel
+    // that clearly isn't the backdrop colour (e.g. a half-erased white shirt).
+    const fg = new Uint8Array(n);
+    for (let i = 0; i < n; i++) fg[i] = Math.abs(px[i * 4] - bg[0]) + Math.abs(px[i * 4 + 1] - bg[1]) + Math.abs(px[i * 4 + 2] - bg[2]) > 60 ? 1 : 0;
+    const grown = new Uint8Array(n);
+    const queue: number[] = [];
+    for (let i = 0; i < n; i++) if (alpha[i] > 0.5) (grown[i] = 1), queue.push(i);
+    while (queue.length) {
+      const i = queue.pop()!;
+      const x = i % w;
+      for (const j of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, i - w, i + w]) {
+        if (j < 0 || j >= n || grown[j] || !fg[j]) continue;
+        grown[j] = 1;
+        queue.push(j);
       }
-      last = 1e9;
-      for (let x = w - 1; x >= 0; x--) {
-        if (alpha[y * w + x] > 0.5) last = x;
-        if (last - x <= reach) near[y * w + x] = 1;
-      }
     }
-    for (let i = 0; i < n; i++) {
-      if (!near[i]) continue;
-      const d = Math.abs(px[i * 4] - bg[0]) + Math.abs(px[i * 4 + 1] - bg[1]) + Math.abs(px[i * 4 + 2] - bg[2]);
-      if (d > 90) alpha[i] = 1;
-      else if (d > 45) alpha[i] = Math.max(alpha[i], (d - 45) / 45);
-    }
+    for (let i = 0; i < n; i++) if (grown[i] && fg[i]) alpha[i] = 1;
   }
   // 2. Fill small holes: low-alpha areas not connected to the image edge.
   const seen = new Uint8Array(n);
