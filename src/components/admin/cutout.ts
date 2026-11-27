@@ -126,7 +126,8 @@ export async function cutOut(file: Blob, onProgress?: (share: number) => void): 
     input[2 * n + i] = px[i * 4 + 2] / 127.5 - 1;
   }
   const out = await s.run({ [s.inputNames[0]]: new ort.Tensor("float32", input, [1, 3, mh, mw]) });
-  const alpha = out[s.outputNames[0]].data;
+  const alpha = Float32Array.from(out[s.outputNames[0]].data as Float32Array);
+  refineMatte(alpha, px, mw, mh);
 
   // Tighten the matte a little: drops the faint halo of old background at the edges.
   const m = sctx.createImageData(mw, mh);
@@ -142,6 +143,95 @@ export async function cutOut(file: Blob, onProgress?: (share: number) => void): 
   mctx.drawImage(small, 0, 0, W, H);
 
   return { photo, matte, frame: autoFrame(alpha, mw, mh, W / mw) };
+}
+
+/**
+ * Repairs common background-remover mistakes, in place (matte at model size):
+ *  - On a plain backdrop (black, white or grey studio), anything near the
+ *    person that clearly differs from the backdrop colour is the person —
+ *    e.g. a white shirt that the model half-erased.
+ *  - Small holes completely surrounded by the person are filled.
+ */
+function refineMatte(alpha: Float32Array, px: Uint8ClampedArray, w: number, h: number) {
+  const n = w * h;
+  // 1. Plain backdrop: sample a band along the top and sides.
+  const band = Math.max(2, Math.round(Math.min(w, h) * 0.03));
+  let sum = [0, 0, 0], cnt = 0;
+  const border: number[] = [];
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      if (y >= band && x >= band && x < w - band) continue;
+      if (y > h * 0.8) continue; // the bottom is usually the person
+      const i = (y * w + x) * 4;
+      sum = [sum[0] + px[i], sum[1] + px[i + 1], sum[2] + px[i + 2]];
+      border.push(i);
+      cnt++;
+    }
+  const bg = sum.map((v) => v / cnt);
+  let spread = 0;
+  for (const i of border) spread += Math.abs(px[i] - bg[0]) + Math.abs(px[i + 1] - bg[1]) + Math.abs(px[i + 2] - bg[2]);
+  spread /= cnt;
+  if (spread < 18) {
+    // Near the person: within a few pixels of where the model is fairly sure.
+    const near = new Uint8Array(n);
+    const reach = Math.round(Math.min(w, h) * 0.06);
+    for (let y = 0; y < h; y++) {
+      let last = -1e9;
+      for (let x = 0; x < w; x++) {
+        if (alpha[y * w + x] > 0.5) last = x;
+        if (x - last <= reach) near[y * w + x] = 1;
+      }
+      last = 1e9;
+      for (let x = w - 1; x >= 0; x--) {
+        if (alpha[y * w + x] > 0.5) last = x;
+        if (last - x <= reach) near[y * w + x] = 1;
+      }
+    }
+    for (let i = 0; i < n; i++) {
+      if (!near[i]) continue;
+      const d = Math.abs(px[i * 4] - bg[0]) + Math.abs(px[i * 4 + 1] - bg[1]) + Math.abs(px[i * 4 + 2] - bg[2]);
+      if (d > 90) alpha[i] = 1;
+      else if (d > 45) alpha[i] = Math.max(alpha[i], (d - 45) / 45);
+    }
+  }
+  // 2. Fill small holes: low-alpha areas not connected to the image edge.
+  const seen = new Uint8Array(n);
+  const stack: number[] = [];
+  const push = (i: number) => {
+    if (!seen[i] && alpha[i] < 0.5) {
+      seen[i] = 1;
+      stack.push(i);
+    }
+  };
+  for (let x = 0; x < w; x++) push(x), push((h - 1) * w + x);
+  for (let y = 0; y < h; y++) push(y * w), push(y * w + w - 1);
+  while (stack.length) {
+    const i = stack.pop()!;
+    const x = i % w;
+    if (x > 0) push(i - 1);
+    if (x < w - 1) push(i + 1);
+    if (i >= w) push(i - w);
+    if (i < n - w) push(i + w);
+  }
+  const limit = n * 0.015;
+  const done = new Uint8Array(n);
+  for (let s = 0; s < n; s++) {
+    if (seen[s] || done[s] || alpha[s] >= 0.5) continue;
+    const comp: number[] = [];
+    const st = [s];
+    done[s] = 1;
+    while (st.length) {
+      const i = st.pop()!;
+      comp.push(i);
+      const x = i % w;
+      for (const j of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, i - w, i + w]) {
+        if (j < 0 || j >= n || done[j] || seen[j] || alpha[j] >= 0.5) continue;
+        done[j] = 1;
+        st.push(j);
+      }
+    }
+    if (comp.length < limit) for (const i of comp) alpha[i] = 1;
+  }
 }
 
 /**
