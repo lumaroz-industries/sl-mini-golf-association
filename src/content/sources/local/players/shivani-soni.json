@@ -1,0 +1,19 @@
+{
+  "slug": "shivani-soni",
+  "name": "Shivani Soni",
+  "gender": "female",
+  "card": "international",
+  "photo": {
+    "src": "/players/shivani-soni/shivani-soni-card-fxkk.webp",
+    "alt": "Shivani Soni",
+    "width": 960,
+    "height": 1200
+  },
+  "medals": {
+    "gold": 6,
+    "silver": 2,
+    "bronze": 5
+  },
+  "results": [],
+  "draft": false
+}
