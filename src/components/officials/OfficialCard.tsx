@@ -75,7 +75,7 @@ export function OfficialCard({ official, revealLabel, role, levelName, orgShort 
       <span className={s.guilloche} aria-hidden="true" />
       <span className={s.glow} aria-hidden="true" />
 
-      <div className={s.photo}>
+      <div className={s.photo} data-cutout={official?.photo?.src.includes("-cutout") || undefined}>
         {official?.photo ? (
           <Image src={official.photo.src} alt={official.photo.alt} width={official.photo.width} height={official.photo.height} sizes="(max-width: 760px) 100vw, 50vw" />
         ) : official ? (

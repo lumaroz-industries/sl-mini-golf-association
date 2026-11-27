@@ -463,3 +463,45 @@ export function compose(
 
 export const toWebp = (c: HTMLCanvasElement) =>
   new Promise<Blob>((resolve, reject) => c.toBlob((b) => (b ? resolve(b) : reject(new Error("Your browser could not save the image."))), "image/webp", 0.92));
+
+/**
+ * Just the person, on a transparent background, trimmed to them (a little
+ * room above the head and at the sides). For cards where the person stands
+ * on the card itself, like the officials' cards.
+ */
+export function cutoutImage(cut: Cutout): HTMLCanvasElement {
+  const { photo, matte } = cut;
+  const W = photo.width;
+  const H = photo.height;
+  // Find the person's outline on a small copy of the matte.
+  const sw = 200;
+  const sh = Math.max(1, Math.round((sw * H) / W));
+  const small = canvas(sw, sh);
+  const sc = small.getContext("2d")!;
+  sc.drawImage(matte, 0, 0, sw, sh);
+  const px = sc.getImageData(0, 0, sw, sh).data;
+  let x0 = sw, y0 = sh, x1 = 0, y1 = 0;
+  for (let y = 0; y < sh; y++)
+    for (let x = 0; x < sw; x++)
+      if (px[(y * sw + x) * 4] > 60) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+  if (x1 <= x0 || y1 <= y0) [x0, y0, x1, y1] = [0, 0, sw - 1, sh - 1];
+  const k = W / sw;
+  const pad = 0.04 * W;
+  const cx = Math.max(0, x0 * k - pad);
+  const cy = Math.max(0, y0 * k - pad);
+  const cw = Math.min(W, (x1 + 1) * k + pad) - cx;
+  const ch = Math.min(H, (y1 + 1) * k) - cy;
+
+  const out = canvas(Math.round(cw), Math.round(ch));
+  const o = out.getContext("2d")!;
+  o.imageSmoothingQuality = "high";
+  o.drawImage(photo, cx, cy, cw, ch, 0, 0, cw, ch);
+  o.globalCompositeOperation = "destination-in";
+  o.drawImage(matte, cx, cy, cw, ch, 0, 0, cw, ch);
+  return out;
+}

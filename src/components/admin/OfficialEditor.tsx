@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { slugify } from "@/lib/admin/shared";
-import { Choice, Field, ImageField, Section, SlugField, TextInput, type ImageValue, type Upload } from "./fields";
+import { Choice, Field, Section, SlugField, TextInput, type ImageValue, type Upload } from "./fields";
+import { CutoutPhotoField } from "./CutoutPhotoField";
 import { PublishBar } from "./PublishBar";
 import s from "./admin.module.css";
 
@@ -80,8 +81,8 @@ export function OfficialEditor({ initial, isNew: startsNew, levels }: { initial:
         <Choice label="Level" value={level} onChange={setLevel} options={levels.map((l) => ({ value: l.id, label: `${l.title} · ${l.subtitle}` }))} />
       </Section>
 
-      <Section title="Photo" hint="Shown large beside their details, like the people's cards on the Social Media page. A portrait (head and shoulders, about 3:4) works best; a cut-out with a transparent background looks best of all. Without one, the card shows their initials.">
-        <ImageField label="Photo" value={photo} onChange={setPhoto} onUploaded={(u) => setUploads((x) => [...x, u])} collection="officials" slug={effectiveId} withCredit={false} />
+      <Section title="Photo" hint="Shown large beside their details, like the people's cards on the Social Media page. Just upload a portrait: the background is removed automatically. Without one, the card shows their initials.">
+        <CutoutPhotoField label="Photo" value={photo} onChange={setPhoto} onUploaded={(u) => setUploads((x) => [...x, u])} collection="officials" slug={effectiveId} />
       </Section>
 
       <Section title="On the card" hint="All optional. Only what you fill in is shown.">

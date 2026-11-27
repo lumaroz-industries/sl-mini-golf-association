@@ -414,3 +414,25 @@
     transition: none;
   }
 }
+
+/* A cut-out (transparent background): the person stands on the card from
+   the bottom, like the people's cards on the Social Media page. */
+.photo[data-cutout] {
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 12%);
+  mask-image: linear-gradient(to top, transparent 0%, #000 12%);
+}
+
+.photo[data-cutout] img {
+  inset: 6% 0 0;
+  height: 94%;
+  object-fit: contain;
+  object-position: 50% 100%;
+  filter: drop-shadow(0 18px 40px rgb(0 0 0 / 0.6));
+}
+
+@media (max-width: 760px) {
+  .photo[data-cutout] img {
+    inset: 4% 0 0;
+    height: 96%;
+  }
+}
