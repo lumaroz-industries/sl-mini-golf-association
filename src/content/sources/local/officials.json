@@ -47,7 +47,14 @@
       "role": "Secretary General",
       "level": "india",
       "organisation": "Minigolf Federation of India",
-      "bio": "Manages federation operations and also competes as an international player."
+      "photo": {
+        "src": "/officials/suraj-singh-yeotikar/suraj-singh-yeotikar-cutout-tw58.webp",
+        "alt": "Dr. Suraj Singh Yeotikar",
+        "width": 1026,
+        "height": 1415
+      },
+      "bio": "Manages federation operations and also competes as an international player.",
+      "draft": false
     },
     {
       "id": "rajesh-shendekar",
