@@ -15,6 +15,11 @@
     "width": 1086,
     "height": 1448
   },
+  "medals": {
+    "gold": 5,
+    "silver": 1,
+    "bronze": 5
+  },
   "results": [],
   "draft": false
 }
