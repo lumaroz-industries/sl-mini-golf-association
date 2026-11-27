@@ -78,3 +78,49 @@
   color: var(--fg-muted);
   text-align: center;
 }
+
+/* ---- National: navy light with the tricolour. */
+.section[data-theme="national"] .glow {
+  background:
+    radial-gradient(45% 40% at 30% 30%, rgb(255 153 51 / 0.08), transparent 70%),
+    radial-gradient(45% 40% at 70% 70%, rgb(19 136 8 / 0.09), transparent 70%),
+    linear-gradient(90deg, transparent, rgb(255 153 51 / 0.45), rgb(255 255 255 / 0.4), rgb(19 136 8 / 0.5), transparent) top / 100% 1px no-repeat;
+}
+
+.section[data-theme="national"] .kicker {
+  color: #ffc27a;
+}
+
+.section[data-theme="national"] .kicker i {
+  background: linear-gradient(180deg, #ff9933 0 33%, #ffffff 33% 66%, #138808 66%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: none;
+}
+
+.section[data-theme="national"] .count {
+  border-color: rgb(255 153 51 / 0.5);
+}
+
+/* ---- State: bhagwa saffron and gold over deep maroon. */
+.section[data-theme="state"] .glow {
+  background:
+    radial-gradient(50% 45% at 50% 40%, rgb(232 96 34 / 0.1), transparent 70%),
+    radial-gradient(60% 40% at 50% 100%, rgb(140 30 10 / 0.12), transparent 70%),
+    linear-gradient(90deg, transparent, rgb(244 162 60 / 0.55), transparent) top / 100% 1px no-repeat;
+}
+
+.section[data-theme="state"] .kicker {
+  color: #ffd08a;
+}
+
+.section[data-theme="state"] .kicker i {
+  background: linear-gradient(135deg, #ffe3b3, #f4a23c 50%, #e8601f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 6px rgb(232 96 34 / 0.6));
+}
+
+.section[data-theme="state"] .count {
+  border-color: rgb(244 162 60 / 0.5);
+}

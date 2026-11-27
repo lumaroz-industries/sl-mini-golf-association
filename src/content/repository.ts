@@ -10,7 +10,7 @@ import "server-only";
 import { cache } from "react";
 import { deriveHandle } from "@/config/social-platforms";
 import { z } from "zod";
-import { ArticleCategory, ArticlesPageContent, GalleryPageContent, OfficialsPageContent, PlayersPageContent, UpdatesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
+import { ArticleCategory, ArticlesPageContent, GalleryPageContent, OfficialsPageContent, PlayersPageContent, type PlayerSection, UpdatesPageContent, ContactContent, HomeContent, Person, SiteSettings, SocialPageContent, type ImageAsset, type SocialLink } from "./schema";
 import { loadArticles, type RawArticle } from "./articles";
 import { loadUpdates, type RawUpdate } from "./updates";
 import { loadGallery, type GalleryAlbum } from "./gallery";
@@ -259,10 +259,10 @@ export async function getPlayer(slug: string) {
   return (await getPlayers()).find((p) => p.slug === slug);
 }
 
-/** The International section's players, in the admins' order (unknown or draft players are left out). */
-export async function getInternationalPlayers() {
+/** A level section's players (International, National or State), in the admins' order (unknown or draft players are left out). */
+export async function getSectionPlayers(section: PlayerSection) {
   const [content, players] = await Promise.all([getPlayersPageContent(), getPlayers()]);
-  return content.international.players.flatMap((slug) => players.filter((p) => p.slug === slug));
+  return content[section].players.flatMap((slug) => players.filter((p) => p.slug === slug));
 }
 
 /** The Top 7 line-up resolved to player records (unknown or draft players leave an empty place). */

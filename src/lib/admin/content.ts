@@ -2,7 +2,7 @@ import "server-only";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { z } from "zod";
 import sharp from "sharp";
-import { ArticleFrontmatter, GalleryAlbumFile, GalleryManifest, Official, OfficialsPageContent, Player, PlayersPageContent, UpdateFrontmatter } from "@/content/schema";
+import { ArticleFrontmatter, GalleryAlbumFile, GalleryManifest, Official, OfficialsPageContent, Player, PlayersPageContent, playerSections, UpdateFrontmatter, type PlayerSection } from "@/content/schema";
 import playersPage from "@/content/sources/local/players.json";
 import articleCategories from "@/content/sources/local/article-categories.json";
 import galleryCategories from "@/content/sources/local/gallery-categories.json";
@@ -391,6 +391,8 @@ export interface PlayerListItem {
   photo?: string;
   topSeven: boolean;
   international: boolean;
+  /** Which level sections (International, National, State) the player is in. */
+  sections: PlayerSection[];
   card?: "state" | "national" | "international";
 }
 
@@ -466,32 +468,42 @@ export async function saveTopSeven(lineup: Partial<Record<string, unknown>>): Pr
   return { commit };
 }
 
-/* ---------------------------------------------------------- international */
+/* ------------------------------------- level sections (International, National, State) */
 
-type IntlSection = { players?: string[] } & Record<string, unknown>;
+type LevelSection = { players?: string[] } & Record<string, unknown>;
+export const SECTION_LABELS: Record<PlayerSection, string> = { international: "International", national: "National", state: "State" };
 
-/** The International section's players, in order. */
-export async function readInternational(): Promise<string[]> {
+export function isPlayerSection(v: unknown): v is PlayerSection {
+  return typeof v === "string" && (playerSections as readonly string[]).includes(v);
+}
+
+/** A level section's players, in order. */
+export async function readSection(section: PlayerSection): Promise<string[]> {
   const page = await readPlayersPage();
-  return ((page.international as IntlSection | undefined)?.players ?? []).filter((s) => typeof s === "string");
+  return ((page[section] as LevelSection | undefined)?.players ?? []).filter((s) => typeof s === "string");
 }
 
-async function internationalSlugs(): Promise<Set<string>> {
+export const readInternational = () => readSection("international");
+
+async function sectionMembers(): Promise<Record<PlayerSection, Set<string>>> {
+  let page: Record<string, unknown>;
   try {
-    return new Set(await readInternational());
+    page = await readPlayersPage();
   } catch {
-    return new Set(((playersPage as { international?: IntlSection }).international?.players ?? []) as string[]);
+    page = playersPage as Record<string, unknown>;
   }
+  return Object.fromEntries(playerSections.map((s) => [s, new Set(((page[s] as LevelSection | undefined)?.players ?? []) as string[])])) as Record<PlayerSection, Set<string>>;
 }
 
-/** Saves the International section chosen in the admin: existing, published players, each once, in order. */
-export async function saveInternational(list: unknown): Promise<{ commit: string }> {
+/** Saves a level section chosen in the admin: existing, published players, each once, in order. */
+export async function saveSection(sectionName: PlayerSection, list: unknown): Promise<{ commit: string }> {
+  const label = SECTION_LABELS[sectionName];
   if (!Array.isArray(list)) throw new ContentError("The list of players is missing.");
   const players: string[] = [];
   for (const v of list) {
     const slug = String(v);
     if (!SLUG.test(slug)) throw new ContentError("One of the players is invalid.");
-    if (players.includes(slug)) throw new ContentError("A player can only be in the International section once.");
+    if (players.includes(slug)) throw new ContentError(`A player can only be in the ${label} section once.`);
     const p = await readPlayer(slug);
     if (!p) throw new ContentError(`The player "${slug}" no longer exists.`);
     if (p.draft === true) throw new ContentError(`${String(p.name ?? slug)} is still a draft — publish them first, then add them here.`);
@@ -499,18 +511,18 @@ export async function saveInternational(list: unknown): Promise<{ commit: string
   }
   const page = await readPlayersPage();
   const current = PlayersPageContent.safeParse(page);
-  const section = current.success ? current.data.international : ((page.international as IntlSection | undefined) ?? {});
-  const next = { ...page, international: { ...section, players } };
+  const section = current.success ? current.data[sectionName] : ((page[sectionName] as LevelSection | undefined) ?? {});
+  const next = { ...page, [sectionName]: { ...section, players } };
   const parsed = PlayersPageContent.safeParse(next);
   if (!parsed.success) throw new ContentError("The list needs fixing.", issuesOf(parsed.error));
-  const commit = await getStorage().commit("Admin: Update the International players", [{ path: PLAYERS_PAGE, text: JSON.stringify(next, null, 2) + "\n" }]);
+  const commit = await getStorage().commit(`Admin: Update the ${label} players`, [{ path: PLAYERS_PAGE, text: JSON.stringify(next, null, 2) + "\n" }]);
   return { commit };
 }
 
 export async function listPlayers(): Promise<PlayerListItem[]> {
   const storage = getStorage();
   const files = (await storage.list(`${CONTENT}/players`)).filter((f) => f.endsWith(".json"));
-  const [top, intl] = await Promise.all([topSevenSlugs(), internationalSlugs()]);
+  const [top, members] = await Promise.all([topSevenSlugs(), sectionMembers()]);
   const items = await Promise.all(
     files.map(async (f): Promise<PlayerListItem | null> => {
       const text = await storage.readText(f);
@@ -526,7 +538,8 @@ export async function listPlayers(): Promise<PlayerListItem[]> {
         results: Array.isArray(d.results) ? d.results.length : 0,
         photo: (d.photo as { src?: string } | undefined)?.src,
         topSeven: top.has(slug),
-        international: intl.has(slug),
+        international: members.international.has(slug),
+        sections: playerSections.filter((s) => members[s].has(slug)),
         card: d.card === "national" || d.card === "international" || d.card === "state" ? d.card : undefined,
       };
     }),
@@ -544,7 +557,7 @@ export async function savePlayer(input: { mode: "create" | "edit"; data: Record<
   const storage = getStorage();
   const data = clean({ ...input.data });
   const slug = String(data.slug ?? "");
-  if (!SLUG.test(slug) || slug === "new" || slug === "top-7" || slug === "international") throw new ContentError("Choose a web address using lowercase letters, numbers and hyphens, e.g. first-last.");
+  if (!SLUG.test(slug) || slug === "new" || slug === "top-7" || (playerSections as readonly string[]).includes(slug)) throw new ContentError("Choose a web address using lowercase letters, numbers and hyphens, e.g. first-last.");
   const file = `${CONTENT}/players/${slug}.json`;
   const existing = await storage.readText(file);
   if (input.mode === "create" && existing !== null) throw new ContentError(`There is already a player at this web address (${slug}). Choose another.`);
@@ -574,13 +587,14 @@ export async function deletePlayer(slug: string): Promise<string> {
   if ((await topSevenSlugs()).has(slug)) throw new ContentError("This player is in Maharashtra's Top 7. Take them out of the line-up first (Players → Top 7).");
   const storage = getStorage();
   const changes: Change[] = [{ path: `${CONTENT}/players/${slug}.json`, delete: true }, ...(await storage.list(`public/players/${slug}`)).map((x) => ({ path: x, delete: true as const }))];
-  // Take them out of the International section too.
+  // Take them out of the level sections (International, National, State) too.
   const page = await readPlayersPage();
-  const intl = page.international as IntlSection | undefined;
-  if (intl?.players?.includes(slug)) {
-    const next = { ...page, international: { ...intl, players: intl.players.filter((s) => s !== slug) } };
-    changes.push({ path: PLAYERS_PAGE, text: JSON.stringify(next, null, 2) + "\n" });
+  let next: Record<string, unknown> = page;
+  for (const sec of playerSections) {
+    const s = next[sec] as LevelSection | undefined;
+    if (s?.players?.includes(slug)) next = { ...next, [sec]: { ...s, players: s.players.filter((x) => x !== slug) } };
   }
+  if (next !== page) changes.push({ path: PLAYERS_PAGE, text: JSON.stringify(next, null, 2) + "\n" });
   return storage.commit(`Admin: Delete player "${String(p.name ?? slug)}"`, changes);
 }
 

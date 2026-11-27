@@ -96,7 +96,7 @@
   position: absolute;
   inset: 12% 4% -8%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(185 230 255 / 0.32), rgb(0 168 107 / 0.1) 60%, transparent);
+  background: radial-gradient(closest-side, rgb(var(--glow) / 0.32), rgb(0 168 107 / 0.1) 60%, transparent);
   filter: blur(22px);
   opacity: 0.3;
   transition: opacity 0.5s;
@@ -130,8 +130,8 @@
   border-radius: 6.5cqi;
   border: 1.6px solid transparent;
   background:
-    linear-gradient(180deg, #07100c, #020403) padding-box,
-    conic-gradient(from var(--spin), #ffffff, #8fb0c4 8%, #1b2830 18%, #b9e6ff 30%, #ffffff 34%, #ffd6ef 40%, #1b2830 52%, #e3c27a 64%, #fff3c4 68%, #1b2830 80%, #7ff0c4 90%, #ffffff) border-box;
+    linear-gradient(180deg, var(--ink-1), var(--ink-2)) padding-box,
+    conic-gradient(from var(--spin), var(--edge)) border-box;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   isolation: isolate;
@@ -151,7 +151,7 @@
   z-index: 3;
   inset: 2.6cqi;
   border-radius: 4.4cqi;
-  border: 1px solid rgb(207 230 245 / 0.18);
+  border: 1px solid rgb(var(--tone) / 0.18);
   pointer-events: none;
 }
 
@@ -223,7 +223,7 @@
   justify-items: center;
   gap: 4cqi;
   height: 100%;
-  background: radial-gradient(70% 50% at 50% 40%, rgb(185 230 255 / 0.1), transparent 70%);
+  background: radial-gradient(70% 50% at 50% 40%, rgb(var(--glow) / 0.1), transparent 70%);
 }
 
 .mystery img {
@@ -237,7 +237,7 @@
   font-weight: 800;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--dmd-ice);
+  color: var(--tone-hi);
   opacity: 0.75;
 }
 
@@ -249,7 +249,7 @@
   width: 130cqi;
   translate: -50% 0;
   fill: none;
-  stroke: rgb(185 230 255 / 0.18);
+  stroke: rgb(var(--glow) / 0.18);
   stroke-width: 0.25;
   pointer-events: none;
 }
@@ -259,7 +259,7 @@
   position: absolute;
   inset: 0;
   z-index: 2;
-  background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.16) 45%, rgb(255 214 239 / 0.12) 50%, rgb(185 230 255 / 0.14) 55%, transparent 70%) 150% 0 / 300% 100% no-repeat;
+  background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.16) 45%, rgb(255 214 239 / 0.12) 50%, rgb(var(--glow) / 0.14) 55%, transparent 70%) 150% 0 / 300% 100% no-repeat;
   mix-blend-mode: screen;
   pointer-events: none;
   animation: sheen 7s cubic-bezier(0.45, 0, 0.25, 1) calc(var(--i, 0) * 0.9s) infinite;
@@ -289,13 +289,13 @@
 
 .sealRim {
   fill: rgb(3 5 4 / 0.72);
-  stroke: rgb(207 230 245 / 0.55);
+  stroke: rgb(var(--tone) / 0.55);
   stroke-width: 1;
 }
 
 .sealInner {
   fill: none;
-  stroke: rgb(207 230 245 / 0.3);
+  stroke: rgb(var(--tone) / 0.3);
   stroke-width: 0.8;
 }
 
@@ -342,7 +342,7 @@
   text-transform: uppercase;
   white-space: nowrap;
   text-overflow: ellipsis;
-  background: var(--dmd-text);
+  background: var(--name-grad);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -358,7 +358,7 @@
   text-transform: uppercase;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: var(--dmd-ice);
+  color: var(--tone-hi);
 }
 
 /* Tricolour hairline that fades into ice. */
@@ -366,7 +366,7 @@
   height: 1px;
   background:
     linear-gradient(90deg, #ff9933 0 6%, #f4f4f4 6% 12%, #138808 12% 18%, transparent 18%),
-    linear-gradient(90deg, transparent 20%, rgb(207 230 245 / 0.45), transparent);
+    linear-gradient(90deg, transparent 20%, rgb(var(--tone) / 0.45), transparent);
 }
 
 .medals {
@@ -409,7 +409,7 @@
 }
 
 .hit:focus-visible {
-  outline: 2px solid var(--dmd-ice);
+  outline: 2px solid var(--tone-hi);
   outline-offset: -5px;
 }
 
@@ -421,9 +421,9 @@
   padding: 7cqi;
   cursor: pointer;
   background:
-    radial-gradient(90% 50% at 50% 0%, rgb(185 230 255 / 0.12), transparent 70%) padding-box,
-    linear-gradient(180deg, #07100c, #020403) padding-box,
-    conic-gradient(from var(--spin), #ffffff, #8fb0c4 8%, #1b2830 18%, #b9e6ff 30%, #ffffff 34%, #ffd6ef 40%, #1b2830 52%, #e3c27a 64%, #fff3c4 68%, #1b2830 80%, #7ff0c4 90%, #ffffff) border-box;
+    radial-gradient(90% 50% at 50% 0%, rgb(var(--glow) / 0.12), transparent 70%) padding-box,
+    linear-gradient(180deg, var(--ink-1), var(--ink-2)) padding-box,
+    conic-gradient(from var(--spin), var(--edge)) border-box;
 }
 
 /* The player's photo, faint and cool-toned, behind the back. */
@@ -451,7 +451,7 @@
   right: -36cqi;
   width: 100cqi;
   fill: none;
-  stroke: rgb(185 230 255 / 0.12);
+  stroke: rgb(var(--glow) / 0.12);
   stroke-width: 0.3;
 }
 
@@ -470,7 +470,7 @@
   height: 18cqi;
   padding: 2px;
   border-radius: 50%;
-  background: var(--dmd-ring);
+  background: var(--ring);
 }
 
 .avatar img,
@@ -487,7 +487,7 @@
   display: grid;
   place-items: center;
   font-family: var(--font-display);
-  color: var(--dmd-ice);
+  color: var(--tone-hi);
 }
 
 .backWho {
@@ -515,7 +515,7 @@
   text-transform: uppercase;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--dmd-ice);
+  color: var(--tone-hi);
   opacity: 0.8;
 }
 
@@ -524,7 +524,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 2cqi;
   padding: 3.4cqi 0;
-  border-block: 1px solid rgb(207 230 245 / 0.14);
+  border-block: 1px solid rgb(var(--tone) / 0.14);
 }
 
 .backMedal {
@@ -578,7 +578,7 @@
   font-weight: 800;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--dmd-ice);
+  color: var(--tone-hi);
 }
 
 .events ul {
@@ -619,7 +619,7 @@
 
 .pos {
   font-weight: 700;
-  color: var(--dmd-ice);
+  color: var(--tone-hi);
 }
 
 /* Small cards: two events only. */
@@ -663,7 +663,7 @@
 }
 
 .profile:focus-visible {
-  outline: 2px solid var(--dmd-ice);
+  outline: 2px solid var(--tone-hi);
   outline-offset: 2px;
 }
 
@@ -677,4 +677,115 @@
   .sealText {
     animation: none;
   }
+}
+
+/* ================================================================ themes
+   One card, three levels. International: platinum and ice with globe
+   lines. National: navy with the tricolour (saffron, white, green) and
+   flowing ribbons. State: deep maroon with bhagwa saffron and gold, and the
+   Sahyadri ridge. */
+.wall {
+  --edge: #ffffff, #8fb0c4 8%, #1b2830 18%, #b9e6ff 30%, #ffffff 34%, #ffd6ef 40%, #1b2830 52%, #e3c27a 64%, #fff3c4 68%, #1b2830 80%, #7ff0c4 90%, #ffffff;
+  --ink-1: #07100c;
+  --ink-2: #020403;
+  --tone: 207 230 245;
+  --tone-hi: #cfe6f5;
+  --glow: 185 230 255;
+  --name-grad: linear-gradient(180deg, #ffffff 0%, #eef8ff 36%, #9ec6de 56%, #5f8aa3 70%, #e8f6ff 100%);
+  --ring: conic-gradient(from 210deg, #ffffff, #0b0e12 18%, #9fc3da 32%, #0b0e12 48%, #ffd6ef 62%, #0b0e12 78%, #ffffff);
+}
+
+.wall[data-theme="national"] {
+  --edge: #ff9933, #ffd5a8 10%, #2a1606 20%, #ffffff 32%, #f4f4f4 38%, #0f2a12 50%, #138808 62%, #9be29b 70%, #0b1a0c 80%, #e3c27a 90%, #ff9933;
+  --ink-1: #0a0d1c;
+  --ink-2: #03040b;
+  --tone: 255 226 190;
+  --tone-hi: #ffe2c0;
+  --glow: 255 153 51;
+  --name-grad: linear-gradient(180deg, #ffffff 0%, #fff4e6 40%, #ffc27a 68%, #ff9933 82%, #fff1dc 100%);
+  --ring: conic-gradient(from 210deg, #ff9933, #2a1606 18%, #ffffff 34%, #1a1a1a 50%, #138808 66%, #0b1a0c 82%, #ff9933);
+}
+
+.wall[data-theme="state"] {
+  --edge: #ffe3b3, #f4a23c 10%, #3d1106 22%, #e8601f 34%, #ffd08a 42%, #3d1106 54%, #e3c27a 66%, #fff3c4 72%, #5a1a08 84%, #f4a23c 92%, #ffe3b3;
+  --ink-1: #1a0805;
+  --ink-2: #070202;
+  --tone: 255 210 150;
+  --tone-hi: #ffd08a;
+  --glow: 232 96 34;
+  --name-grad: linear-gradient(180deg, #ffffff 0%, #fff0d6 38%, #ffc067 64%, #e8601f 82%, #ffe3b3 100%);
+  --ring: conic-gradient(from 210deg, #ffe3b3, #3d1106 18%, #f4a23c 34%, #3d1106 50%, #e3c27a 66%, #5a1a08 82%, #ffe3b3);
+}
+
+/* The rule under the name: tricolour (international, national), saffron to gold (state). */
+.wall[data-theme="state"] .rule {
+  background:
+    linear-gradient(90deg, #ffd08a 0 8%, #e8601f 8% 16%, transparent 16%),
+    linear-gradient(90deg, transparent 20%, rgb(var(--tone) / 0.45), transparent);
+}
+
+/* National: the ribbons in the tricolour. */
+.ribbonA,
+.ribbonB,
+.ribbonC {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0.16;
+}
+
+.ribbonA {
+  stroke: #ff9933;
+}
+
+.ribbonB {
+  stroke: #ffffff;
+  opacity: 0.08;
+}
+
+.ribbonC {
+  stroke: #138808;
+  opacity: 0.24;
+}
+
+/* State: the Sahyadri ridge. */
+.ridgeA,
+.ridgeB,
+.ridgeC {
+  fill: none;
+  stroke-width: 0.6;
+  stroke-linejoin: round;
+}
+
+.ridgeA {
+  stroke: rgb(255 208 138 / 0.28);
+}
+
+.ridgeB {
+  stroke: rgb(232 96 34 / 0.3);
+}
+
+.ridgeC {
+  stroke: rgb(255 208 138 / 0.18);
+}
+
+/* The motif sits a little differently for the ribbons and the ridge. */
+.wall[data-theme="national"] .globe,
+.wall[data-theme="state"] .globe {
+  inset: auto 0 0;
+  left: 0;
+  width: 100%;
+  height: 70%;
+  translate: none;
+  stroke: none;
+}
+
+.wall[data-theme="national"] .backGlobe,
+.wall[data-theme="state"] .backGlobe {
+  inset: 0;
+  top: auto;
+  right: 0;
+  width: 100%;
+  height: 60%;
+  stroke: none;
 }

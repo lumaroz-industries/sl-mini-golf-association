@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { findNavItem } from "@/config/navigation";
-import { getInternationalPlayers, getPlayers, getPlayersPageContent, getTopSeven } from "@/content/repository";
+import { getPlayers, getPlayersPageContent, getSectionPlayers, getTopSeven } from "@/content/repository";
+import { playerSections, type PlayerSection } from "@/content/schema";
 import { PlayerDirectory } from "@/components/players/PlayerDirectory";
 import { MedalDefs } from "@/components/players/MedalDefs";
 import { initialsOf, medalTotals, totalMedals } from "@/lib/players";
 import { TopSeven } from "@/components/players/TopSeven";
-import { InternationalPlayers } from "@/components/players/InternationalPlayers";
+import { LevelPlayers } from "@/components/players/InternationalPlayers";
 import { buildSlots } from "@/components/players/slots";
 import styles from "./page.module.css";
 
@@ -30,7 +31,7 @@ function Heading({ text }: { text: string }) {
 }
 
 export default async function PlayersPage() {
-  const [content, top, players, intl] = await Promise.all([getPlayersPageContent(), getTopSeven(), getPlayers(), getInternationalPlayers()]);
+  const [content, top, players, ...sectionLists] = await Promise.all([getPlayersPageContent(), getTopSeven(), getPlayers(), ...playerSections.map((s) => getSectionPlayers(s))]);
   const slots = buildSlots(top);
   const topSlugs = new Set(top.map((t) => t.slug));
   const directory = players.map((p) => {
@@ -50,22 +51,26 @@ export default async function PlayersPage() {
     };
   });
 
-  // The International section's cards: medals and latest international results.
-  const international = intl.map((p) => {
-    const medals = medalTotals(p);
-    const results = p.results.filter((r) => r.level === "international").sort((a, b) => b.year - a.year);
-    return {
-      slug: p.slug,
-      name: p.name,
-      photo: p.intlPhoto ?? p.photo,
-      district: p.district,
-      medals,
-      total: totalMedals(medals),
-      results: results.slice(0, 3).map((r) => ({ event: r.event, year: r.year, place: r.place, medal: r.medal, position: r.position })),
-      resultCount: results.length,
-    };
+  // The level sections' cards (International, National, State): medals and the latest results at that level.
+  const sections = playerSections.map((section: PlayerSection, i) => {
+    const cards = sectionLists[i].map((p) => {
+      const medals = medalTotals(p);
+      const results = p.results.filter((r) => r.level === section).sort((a, b) => b.year - a.year);
+      return {
+        slug: p.slug,
+        name: p.name,
+        // The International card can have its own photo.
+        photo: section === "international" ? (p.intlPhoto ?? p.photo) : p.photo,
+        district: p.district,
+        medals,
+        total: totalMedals(medals),
+        results: results.slice(0, 3).map((r) => ({ event: r.event, year: r.year, place: r.place, medal: r.medal, position: r.position })),
+        resultCount: results.length,
+      };
+    });
+    const { players: _order, ...text } = content[section];
+    return { section, cards, text };
   });
-  const { players: _order, ...intlText } = content.international;
 
   return (
     <div className={styles.page}>
@@ -87,7 +92,9 @@ export default async function PlayersPage() {
       </section>
 
       <MedalDefs />
-      <InternationalPlayers players={international} revealLabel={content.revealLabel} {...intlText} />
+      {sections.map(({ section, cards, text }) => (
+        <LevelPlayers key={section} section={section} players={cards} revealLabel={content.revealLabel} {...text} />
+      ))}
       <PlayerDirectory players={directory} {...content.directory} />
     </div>
   );

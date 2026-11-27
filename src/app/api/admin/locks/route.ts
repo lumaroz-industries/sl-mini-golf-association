@@ -1,5 +1,6 @@
 import { failure, guard, json } from "@/lib/admin/api";
-import { readInternational, readTopSeven } from "@/lib/admin/content";
+import { readSection, readTopSeven } from "@/lib/admin/content";
+import { playerSections } from "@/content/schema";
 import { checkLockPassword, readPins, setPin } from "@/lib/admin/locks";
 
 export const dynamic = "force-dynamic";
@@ -34,8 +35,9 @@ export async function PUT(req: Request) {
   if (denied) return denied;
   try {
     const input = (await req.json()) as { section?: unknown; key?: unknown; locked?: unknown; password?: unknown };
-    const [international, topSeven] = await Promise.all([readInternational(), readTopSeven()]);
-    return json(200, { ok: true, ...(await setPin(input, { international, topSeven })) });
+    const [lists, topSeven] = await Promise.all([Promise.all(playerSections.map((s) => readSection(s))), readTopSeven()]);
+    const sections = Object.fromEntries(playerSections.map((s, i) => [s, lists[i]])) as Parameters<typeof setPin>[1]["sections"];
+    return json(200, { ok: true, ...(await setPin(input, { sections, topSeven })) });
   } catch (e) {
     return failure(e);
   }

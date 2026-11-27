@@ -55,8 +55,46 @@ function Globe({ className }: { className: string }) {
   );
 }
 
-/** A slowly turning seal: "International · Maharashtra" around a golf ball. */
-function Seal() {
+export type WallTheme = "international" | "national" | "state";
+
+/** What changes with the theme: the seal's words, the back's labels. */
+const THEME: Record<WallTheme, { seal: string; events: string; place: string }> = {
+  international: { seal: "INTERNATIONAL ◆ MAHARASHTRA ◆", events: "International events", place: "Maharashtra · India" },
+  national: { seal: "NATIONAL ◆ TEAM INDIA ◆ MAHARASHTRA ◆", events: "National events", place: "Maharashtra · India" },
+  state: { seal: "STATE ◆ MAHARASHTRA ◆ SAHYADRI ◆", events: "State events", place: "Maharashtra" },
+};
+
+/** National: three flowing ribbons in the tricolour. */
+function Ribbons({ className }: { className: string }) {
+  return (
+    <svg className={className} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M-5 30 C 25 18, 45 42, 105 24" className={s.ribbonA} />
+      <path d="M-5 42 C 25 30, 45 54, 105 36" className={s.ribbonB} />
+      <path d="M-5 54 C 25 42, 45 66, 105 48" className={s.ribbonC} />
+    </svg>
+  );
+}
+
+/** State: the Sahyadri ridge, in layers. */
+function Ridge({ className }: { className: string }) {
+  return (
+    <svg className={className} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 62 L10 50 L17 56 L27 40 L35 50 L44 36 L52 48 L61 34 L70 46 L78 38 L88 52 L100 42" className={s.ridgeA} />
+      <path d="M0 74 L12 64 L20 70 L31 58 L40 66 L50 54 L58 64 L68 56 L77 66 L86 58 L100 68" className={s.ridgeB} />
+      <path d="M0 86 L14 78 L24 84 L36 74 L48 82 L60 72 L72 80 L84 74 L100 82" className={s.ridgeC} />
+    </svg>
+  );
+}
+
+/** The theme's background motif: globe lines, tricolour ribbons or the Sahyadri ridge. */
+function Motif({ theme, className }: { theme: WallTheme; className: string }) {
+  if (theme === "national") return <Ribbons className={className} />;
+  if (theme === "state") return <Ridge className={className} />;
+  return <Globe className={className} />;
+}
+
+/** A slowly turning seal around a golf ball, with the level's words. */
+function Seal({ text }: { text: string }) {
   const id = useId().replace(/:/g, "");
   return (
     <svg className={s.seal} viewBox="0 0 100 100" aria-hidden="true">
@@ -73,7 +111,7 @@ function Seal() {
       <g className={s.sealText}>
         <text>
           <textPath href={`#r${id}`} textLength="230">
-            INTERNATIONAL ◆ MAHARASHTRA ◆
+            {text}
           </textPath>
         </text>
       </g>
@@ -92,7 +130,7 @@ function Seal() {
   );
 }
 
-function Front({ player, revealLabel }: { player?: WallPlayer; revealLabel: string }) {
+function Front({ player, revealLabel, theme }: { player?: WallPlayer; revealLabel: string; theme: WallTheme }) {
   const [first, ...rest] = (player?.name ?? "").split(/\s+/);
   return (
     <>
@@ -107,11 +145,11 @@ function Front({ player, revealLabel }: { player?: WallPlayer; revealLabel: stri
           </div>
         )}
       </div>
-      <Globe className={s.globe} />
+      <Motif theme={theme} className={s.globe} />
       <span className={s.sheen} aria-hidden="true" />
       <span className={s.glare} aria-hidden="true" />
 
-      <Seal />
+      <Seal text={THEME[theme].seal} />
 
       <div className={s.plate}>
         {player ? (
@@ -143,7 +181,7 @@ function Front({ player, revealLabel }: { player?: WallPlayer; revealLabel: stri
   );
 }
 
-function Back({ player }: { player: WallPlayer }) {
+function Back({ player, theme }: { player: WallPlayer; theme: WallTheme }) {
   const known = MEDALS.some(({ kind }) => player.medals[kind] !== undefined);
   return (
     <>
@@ -152,7 +190,7 @@ function Back({ player }: { player: WallPlayer }) {
           <Image src={player.photo.src} alt="" width={player.photo.width} height={player.photo.height} sizes="(max-width: 640px) 46vw, 260px" />
         </div>
       )}
-      <Globe className={s.backGlobe} />
+      <Motif theme={theme} className={s.backGlobe} />
       <span className={s.glare} aria-hidden="true" />
       <div className={s.backHead}>
         <span className={s.avatar}>
@@ -160,7 +198,7 @@ function Back({ player }: { player: WallPlayer }) {
         </span>
         <span className={s.backWho}>
           <b>{player.name}</b>
-          <span>{player.district ? `${player.district} · Maharashtra` : "Maharashtra · India"}</span>
+          <span>{player.district ? `${player.district} · Maharashtra` : THEME[theme].place}</span>
         </span>
       </div>
 
@@ -184,7 +222,7 @@ function Back({ player }: { player: WallPlayer }) {
       </p>
 
       <div className={s.events}>
-        <span className={s.eventsLabel}>International events</span>
+        <span className={s.eventsLabel}>{THEME[theme].events}</span>
         {player.results.length > 0 ? (
           <ul>
             {player.results.map((r) => (
@@ -215,12 +253,12 @@ function Back({ player }: { player: WallPlayer }) {
 
 
 /**
- * Wall of fame: Maharashtra's international players as a grid of
- * cards (five across on PC, two side by side on phones).
- * Tapping a card turns it over to the medals and international events;
- * tapping it again turns it back.
+ * Wall of fame: a level's players (International, National or State) as a
+ * grid of cards (five across on PC, two side by side on phones), in the
+ * level's own theme. Tapping a card turns it over to the medals and the
+ * events at that level; tapping it again turns it back.
  */
-export function WorldWall({ players, revealLabel }: { players: WallPlayer[]; revealLabel: string }) {
+export function WorldWall({ players, revealLabel, theme = "international" }: { players: WallPlayer[]; revealLabel: string; theme?: WallTheme }) {
   const [open, setOpen] = useState<string>();
 
   useEffect(() => {
@@ -232,13 +270,13 @@ export function WorldWall({ players, revealLabel }: { players: WallPlayer[]; rev
 
   if (players.length === 0) {
     return (
-      <ul className={s.wall} data-empty aria-hidden="true">
+      <ul className={s.wall} data-theme={theme} data-empty aria-hidden="true">
         {[0, 1, 2, 3].map((i) => (
           <li key={i} className={s.cell} style={{ "--i": i } as React.CSSProperties}>
             <div className={s.card}>
               <div className={s.inner}>
                 <div className={`${s.face} ${s.front}`}>
-                  <Front revealLabel={revealLabel} />
+                  <Front revealLabel={revealLabel} theme={theme} />
                 </div>
                 <div className={`${s.face} ${s.back}`} />
               </div>
@@ -250,7 +288,7 @@ export function WorldWall({ players, revealLabel }: { players: WallPlayer[]; rev
   }
 
   return (
-    <ul className={s.wall}>
+    <ul className={s.wall} data-theme={theme}>
       {players.map((p, i) => {
         const flipped = open === p.slug;
         const toggle = () => setOpen(flipped ? undefined : p.slug);
@@ -259,14 +297,14 @@ export function WorldWall({ players, revealLabel }: { players: WallPlayer[]; rev
             <div className={s.card} data-flipped={flipped || undefined}>
               <div className={s.inner}>
                 <div className={`${s.face} ${s.front}`} inert={flipped}>
-                  <Front player={p} revealLabel={revealLabel} />
+                  <Front player={p} revealLabel={revealLabel} theme={theme} />
                   <button type="button" className={s.hit} aria-expanded={false} onClick={toggle}>
                     <span className="visually-hidden">Turn over {p.name}&apos;s card: medals and events</span>
                   </button>
                 </div>
                 {/* Tapping anywhere on the back (except the profile link) turns the card back. */}
                 <div className={`${s.face} ${s.back}`} inert={!flipped} onClick={toggle}>
-                  <Back player={p} />
+                  <Back player={p} theme={theme} />
                   <button type="button" className="visually-hidden" onClick={(e) => (e.stopPropagation(), toggle())}>
                     Turn {p.name}&apos;s card back
                   </button>

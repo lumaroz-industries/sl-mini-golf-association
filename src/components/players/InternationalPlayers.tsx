@@ -1,9 +1,14 @@
+import type { PlayerSection } from "@/content/schema";
 import { WorldWall, type WallPlayer } from "./WorldWall";
 import hero from "@/components/hero/Hero.module.css";
 import s from "./International.module.css";
 
-/** The International players section: a heading, then the wall of cards. */
-export function InternationalPlayers({
+/**
+ * A level section of the Players page (International, National or State): a
+ * heading, then the wall of cards in that level's own theme.
+ */
+export function LevelPlayers({
+  section,
   players,
   kicker,
   heading,
@@ -11,6 +16,7 @@ export function InternationalPlayers({
   emptyBody,
   revealLabel,
 }: {
+  section: PlayerSection;
   players: WallPlayer[];
   kicker: string;
   heading: string;
@@ -21,7 +27,7 @@ export function InternationalPlayers({
   const words = heading.trim().split(/\s+/);
   const last = words.pop();
   return (
-    <section className={s.section} id="international" aria-labelledby="international-title">
+    <section className={s.section} id={section} data-theme={section} aria-labelledby={`${section}-title`}>
       <div className={s.glow} aria-hidden="true" />
       <header className={`container ${s.head}`}>
         <span className={s.kicker}>
@@ -29,13 +35,13 @@ export function InternationalPlayers({
           {kicker}
           {players.length > 0 && <span className={s.count}>{players.length}</span>}
         </span>
-        <h2 id="international-title" className={s.title}>
+        <h2 id={`${section}-title`} className={s.title}>
           {words.join(" ")} <span className={hero.outline}>{last}</span>
         </h2>
         <p className={s.intro}>{intro}</p>
       </header>
       <div className="container">
-        <WorldWall players={players} revealLabel={revealLabel} />
+        <WorldWall theme={section} players={players} revealLabel={revealLabel} />
         {players.length === 0 && <p className={s.emptyBody}>{emptyBody}</p>}
       </div>
     </section>

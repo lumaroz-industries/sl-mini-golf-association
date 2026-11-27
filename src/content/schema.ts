@@ -438,6 +438,22 @@ export const FeaturedSlot = z.object({
 });
 export type FeaturedSlot = z.infer<typeof FeaturedSlot>;
 
+/** One of the level sections on the Players page (International, National, State): its text and its players, in order. */
+const levelSection = (defaults: { kicker: string; heading: string; intro: string; emptyBody: string }) =>
+  z
+    .object({
+      kicker: z.string().min(1),
+      heading: z.string().min(1),
+      intro: z.string().min(1),
+      emptyBody: z.string().min(1),
+      players: z.array(slug).max(120).default([]),
+    })
+    .default({ ...defaults, players: [] });
+
+/** The level sections below the Top 7, in page order. */
+export const playerSections = ["international", "national", "state"] as const;
+export type PlayerSection = (typeof playerSections)[number];
+
 export const PlayersPageContent = z
   .object({
     kicker: z.string().min(1),
@@ -453,21 +469,26 @@ export const PlayersPageContent = z
      * Maharashtra's international players, Top 7 included, in the order chosen
      * in the admin (Players → International).
      */
-    international: z
-      .object({
-        kicker: z.string().min(1),
-        heading: z.string().min(1),
-        intro: z.string().min(1),
-        emptyBody: z.string().min(1),
-        players: z.array(slug).max(80).default([]),
-      })
-      .default({
-        kicker: "International players",
-        heading: "On the world stage",
-        intro: "Maharashtra's players who compete at international level. Tap a card to turn it over.",
-        emptyBody: "Maharashtra's international players will be added here soon.",
-        players: [],
-      }),
+    international: levelSection({
+      kicker: "International players",
+      heading: "On the world stage",
+      intro: "Maharashtra's players who compete at international level. Tap a card to turn it over.",
+      emptyBody: "Maharashtra's international players will be added here soon.",
+    }),
+    /** The National players section (below International): Maharashtra's players at national level. */
+    national: levelSection({
+      kicker: "National players",
+      heading: "Playing for India",
+      intro: "Maharashtra's players who compete at national level. Tap a card to turn it over.",
+      emptyBody: "Maharashtra's national players will be added here soon.",
+    }),
+    /** The State players section (below National): Maharashtra's players at state level. */
+    state: levelSection({
+      kicker: "State players",
+      heading: "Pride of Maharashtra",
+      intro: "Maharashtra's players who compete at state level. Tap a card to turn it over.",
+      emptyBody: "Maharashtra's state players will be added here soon.",
+    }),
     directory: z.object({
       kicker: z.string().min(1),
       heading: z.string().min(1),
@@ -488,8 +509,10 @@ export const PlayersPageContent = z
     if (c.featured.some((p) => p.side === "center" && p.place !== undefined)) ctx.addIssue({ code: "custom", path: ["featured"], message: "The centre card does not take a place." });
     const slugs = c.featured.map((p) => p.slug);
     if (new Set(slugs).size !== slugs.length) ctx.addIssue({ code: "custom", path: ["featured"], message: "Each player appears only once in the Top 7." });
-    const intl = c.international.players;
-    if (new Set(intl).size !== intl.length) ctx.addIssue({ code: "custom", path: ["international", "players"], message: "Each player appears only once in the International section." });
+    for (const sec of playerSections) {
+      const list = c[sec].players;
+      if (new Set(list).size !== list.length) ctx.addIssue({ code: "custom", path: [sec, "players"], message: `Each player appears only once in the ${sec} section.` });
+    }
   });
 export type PlayersPageContent = z.infer<typeof PlayersPageContent>;
 

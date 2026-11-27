@@ -25,12 +25,15 @@ const initials = (name: string) =>
     .toUpperCase();
 
 /**
- * Choose the International players section: who is in it and in what order
+ * Choose a level section (International, National or State players): who is in it and in what order
  * (the same order as on the website). Drag a card, or use the arrows, to
  * reorder. A player can be locked at their position with the lock password:
  * they then stay there while everyone else moves around them.
  */
-export function InternationalEditor({ initial, players, pins: initialPins }: { initial: string[]; players: IntlPlayer[]; pins: Record<string, number> }) {
+const LABEL = { international: "International", national: "National", state: "State" } as const;
+
+export function SectionEditor({ section, initial, players, pins: initialPins }: { section: "international" | "national" | "state"; initial: string[]; players: IntlPlayer[]; pins: Record<string, number> }) {
+  const label = LABEL[section];
   const [list, setList] = useState(initial);
   const [pins, setPins] = useState(initialPins);
   const [lockFor, setLockFor] = useState<string>();
@@ -41,7 +44,8 @@ export function InternationalEditor({ initial, players, pins: initialPins }: { i
   const bySlug = new Map(players.map((p) => [p.slug, p]));
   const changed = list.length !== saved.length || list.some((slug, i) => saved[i] !== slug);
   const others = players.filter((p) => !p.draft && !list.includes(p.slug));
-  const intlCards = others.filter((p) => p.card === "international");
+  // Players whose card is this level's design (cards without a type are State cards).
+  const intlCards = others.filter((p) => (p.card ?? "state") === section);
 
   const isPinned = (slug: string) => slug in pins;
   /** Puts every locked player back at their position; everyone else keeps their order around them. */
@@ -74,9 +78,9 @@ export function InternationalEditor({ initial, players, pins: initialPins }: { i
 
   async function toggleLock(password: string) {
     const slug = lockFor!;
-    const r = await api("PUT", "/api/admin/locks", { section: "international", key: slug, locked: !isPinned(slug), password });
+    const r = await api("PUT", "/api/admin/locks", { section, key: slug, locked: !isPinned(slug), password });
     if (!r.ok) return r.message ?? "Could not change the lock.";
-    setPins((r.pins as { international: Record<string, number> }).international);
+    setPins((r.pins as Record<string, Record<string, number>>)[section]);
     setLockFor(undefined);
     const commit = r.commit as string;
     setMsg({ tone: "ok", text: commit === "local" ? "Lock saved (local preview)." : "Lock saved." });
@@ -85,20 +89,20 @@ export function InternationalEditor({ initial, players, pins: initialPins }: { i
   async function publish() {
     setBusy(true);
     setMsg({ tone: "info", text: "Publishing…" });
-    const r = await api("PUT", "/api/admin/international", { players: list });
+    const r = await api("PUT", `/api/admin/sections/${section}`, { players: list });
     setBusy(false);
     if (!r.ok) return setMsg({ tone: "err", text: r.message ?? "Could not save the list." });
     setSaved(list);
     const commit = r.commit as string;
     const view = (
-      <a href="/players#international-title" target="_blank" rel="noreferrer">
+      <a href={`/players#${section}`} target="_blank" rel="noreferrer">
         View it ↗
       </a>
     );
     if (commit === "local") return setMsg({ tone: "ok", text: <>Published (local preview). {view}</> });
     setMsg({ tone: "info", text: "Published! The website is updating — this usually takes 1–2 minutes…" });
     const live = await waitUntilLive(commit, (sec) => setMsg({ tone: "info", text: `Published! The website is updating… (${sec}s)` }));
-    setMsg({ tone: "ok", text: live ? <>The International players are live. {view}</> : <>Published. The website should update within a few minutes. {view}</> });
+    setMsg({ tone: "ok", text: live ? <>The {label} players are live. {view}</> : <>Published. The website should update within a few minutes. {view}</> });
   }
 
   return (
@@ -142,7 +146,7 @@ export function InternationalEditor({ initial, players, pins: initialPins }: { i
                   <span className={t.tags}>
                     {isPinned(slug) && <span className={`${s.pill} ${t.lockPill}`}>🔒 Locked at {pins[slug]}</span>}
                     {p.topSeven && <span className={s.pill}>Top 7</span>}
-                    {p.card !== "international" && <span className={`${s.pill} ${s.pillWarn}`} title="This player's card is not the International design (change it in their profile).">{p.card === "national" ? "National card" : "State card"}</span>}
+                    {(p.card ?? "state") !== section && <span className={`${s.pill} ${s.pillWarn}`} title={`This player's card is not the ${label} design (change it in their profile).`}>{p.card === "national" ? "National card" : p.card === "international" ? "International card" : "State card"}</span>}
                   </span>
                   <span className={t.actions}>
                     <button type="button" className={`${s.btn} ${s.small}`} onClick={() => move(i, nextFree(i, -1))} disabled={isPinned(slug) || nextFree(i, -1) < 0} aria-label={`Move ${p.name} earlier`}>
@@ -177,7 +181,7 @@ export function InternationalEditor({ initial, players, pins: initialPins }: { i
           <h2 className={t.title}>Add players</h2>
           {intlCards.length > 1 && (
             <button type="button" className={`${s.btn} ${s.small}`} onClick={() => update([...list, ...intlCards.map((p) => p.slug)])}>
-              + Add all {intlCards.length} with an International card
+              + Add all {intlCards.length} with a{section === "international" ? "n" : ""} {label} card
             </button>
           )}
         </header>
@@ -187,7 +191,7 @@ export function InternationalEditor({ initial, players, pins: initialPins }: { i
           <ul className={t.pick}>
             {others.map((p) => (
               <li key={p.slug}>
-                <button type="button" className={t.chip} onClick={() => update([...list, p.slug])} data-intl={p.card === "international" || undefined}>
+                <button type="button" className={t.chip} onClick={() => update([...list, p.slug])} data-intl={(p.card ?? "state") === section || undefined}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {p.photo ? <img src={p.photo} alt="" /> : <span>{initials(p.name)}</span>}
                   {p.name}
@@ -198,8 +202,8 @@ export function InternationalEditor({ initial, players, pins: initialPins }: { i
           </ul>
         )}
         <p className={s.help}>
-          Highlighted players already have the International card. Only published players are listed{players.some((p) => p.draft) ? " (drafts are hidden)" : ""}. The cards on the website show each player&apos;s photo, medals and
-          international results from their profile.
+          Highlighted players already have the {label} card. Only published players are listed{players.some((p) => p.draft) ? " (drafts are hidden)" : ""}. The cards on the website show each player&apos;s photo, medals and
+          {section} results from their profile.
         </p>
       </section>
 
@@ -219,7 +223,7 @@ export function InternationalEditor({ initial, players, pins: initialPins }: { i
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         <button type="button" className={`${s.btn} ${s.primary}`} disabled={busy || !changed} onClick={publish}>
-          {busy ? "Publishing…" : "Publish International players"}
+          {busy ? "Publishing…" : `Publish ${label} players`}
         </button>
         {changed && (
           <button type="button" className={s.btn} disabled={busy} onClick={() => update(saved)}>

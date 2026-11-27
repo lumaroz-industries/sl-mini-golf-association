@@ -61,6 +61,20 @@
       "aayush-bante"
     ]
   },
+  "national": {
+    "kicker": "National players",
+    "heading": "Playing for India",
+    "intro": "Maharashtra's players who compete at national level. Tap a card to turn it over.",
+    "emptyBody": "Maharashtra's national players will be added here soon.",
+    "players": []
+  },
+  "state": {
+    "kicker": "State players",
+    "heading": "Pride of Maharashtra",
+    "intro": "Maharashtra's players who compete at state level. Tap a card to turn it over.",
+    "emptyBody": "Maharashtra's state players will be added here soon.",
+    "players": []
+  },
   "directory": {
     "kicker": "All Maharashtra players",
     "heading": "Player directory",
