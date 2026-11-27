@@ -9,11 +9,35 @@ export interface ApiResult {
   [k: string]: unknown;
 }
 
+/* Section locks: the lock password, once entered, is kept for this tab only
+   and sent with every change (the server decides whether it is needed). */
+const LOCK_KEY = "sl-admin-lock";
+
+export function getLockPassword(): string | undefined {
+  try {
+    return sessionStorage.getItem(LOCK_KEY) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function setLockPassword(pw: string | undefined) {
+  try {
+    if (pw) sessionStorage.setItem(LOCK_KEY, pw);
+    else sessionStorage.removeItem(LOCK_KEY);
+  } catch {}
+}
+
 export async function api(method: string, url: string, body?: unknown): Promise<ApiResult> {
+  const lock = getLockPassword();
+  if (lock && body && typeof body === "object" && !(body instanceof Blob) && !Array.isArray(body)) body = { ...(body as object), lockPassword: lock };
   try {
     const res = await fetch(url, {
       method,
-      headers: body instanceof Blob ? { "Content-Type": body.type || "application/octet-stream" } : body ? { "Content-Type": "application/json" } : undefined,
+      headers: {
+        ...(body instanceof Blob ? { "Content-Type": body.type || "application/octet-stream" } : body ? { "Content-Type": "application/json" } : {}),
+        ...(lock ? { "x-lock-password": lock } : {}),
+      },
       body: body instanceof Blob ? body : body ? JSON.stringify(body) : undefined,
     });
     const data = (await res.json().catch(() => ({}))) as ApiResult;

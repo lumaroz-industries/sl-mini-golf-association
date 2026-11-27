@@ -1409,3 +1409,53 @@ a.tile:hover .tileGo svg {
 a.tile:hover::after {
   opacity: 1;
 }
+
+/* ---- section locks */
+.lockBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 18px;
+  margin-bottom: 22px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  border: 1px solid rgb(227 194 122 / 0.5);
+  background: linear-gradient(180deg, rgb(227 194 122 / 0.1), rgb(227 194 122 / 0.03));
+  font-size: var(--fs-sm);
+  color: var(--fg-muted);
+}
+
+.lockBar b {
+  margin-right: 6px;
+  color: var(--gold-hi);
+}
+
+.lockBar[data-open] {
+  border-color: rgb(31 138 95 / 0.55);
+  background: linear-gradient(180deg, rgb(11 61 42 / 0.4), rgb(11 61 42 / 0.15));
+}
+
+.lockForm {
+  display: flex;
+  gap: 8px;
+  flex: 1 1 280px;
+  max-width: 420px;
+}
+
+.lockForm .input {
+  min-height: 44px;
+}
+
+.lockArea {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lockArea[data-locked] {
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
