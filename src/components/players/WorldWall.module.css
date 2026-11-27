@@ -803,3 +803,8 @@
     --l: 4cqi;
   }
 }
+
+/* National and State sections: no level plaques in the top corners (the section already says it). */
+.playerCard [class$="_top"] {
+  display: none;
+}

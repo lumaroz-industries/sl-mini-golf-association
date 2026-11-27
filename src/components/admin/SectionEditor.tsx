@@ -43,7 +43,8 @@ export function SectionEditor({ section, initial, players, pins: initialPins }: 
   const [msg, setMsg] = useState<{ tone: "ok" | "err" | "info"; text: React.ReactNode }>();
   const bySlug = new Map(players.map((p) => [p.slug, p]));
   const changed = list.length !== saved.length || list.some((slug, i) => saved[i] !== slug);
-  const others = players.filter((p) => !p.draft && !list.includes(p.slug));
+  // Only players whose card is this level (cards without a type are State cards) can be added here.
+  const others = players.filter((p) => !p.draft && !list.includes(p.slug) && (p.card ?? "state") === section);
   // Players whose card is this level's design (cards without a type are State cards).
   const intlCards = others.filter((p) => (p.card ?? "state") === section);
 
@@ -186,7 +187,7 @@ export function SectionEditor({ section, initial, players, pins: initialPins }: 
           )}
         </header>
         {others.length === 0 ? (
-          <p className={s.help}>Every published player is already in the section.</p>
+          <p className={s.help}>Every published player with a{section === "international" ? "n" : ""} {label} card is already in the section.</p>
         ) : (
           <ul className={t.pick}>
             {others.map((p) => (
@@ -202,8 +203,7 @@ export function SectionEditor({ section, initial, players, pins: initialPins }: 
           </ul>
         )}
         <p className={s.help}>
-          Highlighted players already have the {label} card. Only published players are listed{players.some((p) => p.draft) ? " (drafts are hidden)" : ""}. The cards on the website show each player&apos;s photo, medals and
-          {section} results from their profile.
+          Only published players with a{section === "international" ? "n" : ""} {label} card are listed{players.some((p) => p.draft) ? " (drafts are hidden)" : ""}. To add someone else, change their card type in their profile first. The cards on the website show each player&apos;s photo, medals and {section} results from their profile.
         </p>
       </section>
 

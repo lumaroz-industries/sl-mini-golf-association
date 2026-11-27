@@ -3,6 +3,7 @@ import { listPlayers } from "@/lib/admin/content";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { attempt, PageHead, SetupNotice, StatusPill } from "@/components/admin/Page";
 import s from "@/components/admin/admin.module.css";
+import { PlayersFilter } from "@/components/admin/PlayersFilter";
 
 export const metadata = { title: "Players" };
 
@@ -30,9 +31,18 @@ export default async function PlayersList() {
       </div>
       {r.error && <SetupNotice>{r.error}</SetupNotice>}
       {r.data && r.data.length === 0 && <div className={s.empty}>No players yet. Click “New player” to add the first one.</div>}
+      {r.data && r.data.length > 0 && (
+        <PlayersFilter
+          counts={{
+            all: r.data.length,
+            international: r.data.filter((p) => p.card === "international").length,
+            national: r.data.filter((p) => p.card === "national").length,
+            state: r.data.filter((p) => (p.card ?? "state") === "state").length,
+          }}
+        >
       <ul className={s.list}>
         {r.data?.map((p) => (
-          <li key={p.slug} className={s.row}>
+          <li key={p.slug} className={s.row} data-level={p.card ?? "state"}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {p.photo ? <img className={s.rowThumb} src={p.photo} alt="" style={{ width: 48, height: 60 }} /> : <span className={s.rowThumb} style={{ width: 48, height: 60 }} />}
             <div className={s.rowMain}>
@@ -62,6 +72,8 @@ export default async function PlayersList() {
           </li>
         ))}
       </ul>
+        </PlayersFilter>
+      )}
     </>
   );
 }
