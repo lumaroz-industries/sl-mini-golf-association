@@ -212,12 +212,14 @@ export function autoFrame(alpha: Float32Array, w: number, h: number, toPhoto: nu
   return { scale, cx: ((left + right) / 2) * toPhoto, top: top * toPhoto, confident: false };
 }
 
-export type Backdrop = "green" | "black" | "gold" | "original";
+export type Backdrop = "green" | "black" | "gold" | "champagne" | "ember" | "original";
 
 export const BACKDROPS: Array<{ id: Backdrop; label: string }> = [
   { id: "green", label: "Green studio" },
   { id: "black", label: "Black studio" },
   { id: "gold", label: "Gold spotlight" },
+  { id: "champagne", label: "Champagne (National card)" },
+  { id: "ember", label: "Ember (State card)" },
   { id: "original", label: "Keep original" },
 ];
 
@@ -250,6 +252,10 @@ const LOOKS: Record<Exclude<Backdrop, "original">, StudioLook> = {
   green: { dark: [1, 10, 6], light: [30, 118, 64], gamma: 1.45, rim: [90, 255, 150], rimStrength: 1, glow: [30, 120, 65], glowAlpha: 0.1, seed: 11 },
   black: { dark: [4, 4, 5], light: [52, 56, 58], gamma: 1.8, rim: [215, 232, 245], rimStrength: 0.55, glow: [160, 170, 175], glowAlpha: 0.08, seed: 23 },
   gold: { dark: [5, 3, 1], light: [92, 64, 22], gamma: 1.7, rim: [255, 205, 120], rimStrength: 0.75, glow: [255, 200, 110], glowAlpha: 0.16, seed: 37 },
+  // For the National card: smoky bronze and champagne under the card's gold metal, an ivory rim (no flag colours to clash with its tricolour band).
+  champagne: { dark: [7, 6, 4], light: [78, 66, 44], gamma: 1.6, rim: [255, 240, 205], rimStrength: 0.7, glow: [235, 210, 160], glowAlpha: 0.12, seed: 41 },
+  // For the State card: deep oxblood-maroon smoke under its saffron-to-red metal, a warm amber rim.
+  ember: { dark: [7, 2, 1], light: [92, 30, 14], gamma: 1.6, rim: [255, 176, 96], rimStrength: 0.75, glow: [240, 120, 50], glowAlpha: 0.12, seed: 53 },
 };
 
 /** Fractal value noise (several octaves) — the look of photographic smoke. */
