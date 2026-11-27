@@ -1,1 +1,8 @@
-{ "pins": { "international": {}, "top-seven": {} } }
+{
+  "pins": {
+    "international": {
+      "pranjali-surduse": 1
+    },
+    "top-seven": {}
+  }
+}
