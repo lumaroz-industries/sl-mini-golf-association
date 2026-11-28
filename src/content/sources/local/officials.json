@@ -115,6 +115,21 @@
       },
       "district": "Nagpur",
       "draft": false
+    },
+    {
+      "id": "pritam-chaudhari",
+      "name": "Pritam Chaudhari",
+      "role": "Chandrapur Coach",
+      "level": "maharashtra",
+      "organisation": "Chandrapur MiniGolf Association",
+      "photo": {
+        "src": "/officials/pritam-chaudhari/pritam-chaudhari-cutout-xgvx.webp",
+        "alt": "Pritam Chaudhari",
+        "width": 994,
+        "height": 1448
+      },
+      "district": "Chandrapur",
+      "draft": false
     }
   ],
   "revealLabel": "To be announced",
