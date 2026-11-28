@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { navigation } from "@/config/navigation";
 import { getActiveSocialLinks, getPeopleByIds, getPeopleInstagram, getSiteSettings } from "@/content/repository";
+import { AppDownload } from "@/components/ui/AppDownload";
 import { InstagramHandle } from "@/components/ui/InstagramHandle";
 import { Logo } from "@/components/ui/Logo";
 import { SocialLinks } from "@/components/ui/SocialLinks";
@@ -40,6 +41,7 @@ export async function SiteFooter() {
             <Link href="/social-media" className={styles.ctaSecondary}>
               Follow the community
             </Link>
+            <AppDownload />
           </div>
         </div>
       </div>
@@ -74,6 +76,9 @@ export async function SiteFooter() {
             </a>
           )}
           <SocialLinks links={social} />
+          <div className={styles.app}>
+            <AppDownload />
+          </div>
           {!email && social.length === 0 && (
             <p className={styles.pending}>Official contact and social channels will be listed here soon.</p>
           )}

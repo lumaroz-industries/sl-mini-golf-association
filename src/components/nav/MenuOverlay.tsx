@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { isActive, navigation } from "@/config/navigation";
 import type { SocialLink } from "@/content/schema";
+import { AppDownload } from "@/components/ui/AppDownload";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import styles from "./MenuOverlay.module.css";
 
@@ -77,6 +78,7 @@ export function MenuOverlay({ id, open, pathname, onNavigate, tagline, email, so
             </a>
           )}
           {social.length > 0 && <SocialLinks links={social} className={styles.social} />}
+          <AppDownload className={styles.app} />
         </aside>
       </div>
     </div>

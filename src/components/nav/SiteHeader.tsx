@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SocialLink } from "@/content/schema";
+import { AppDownload } from "@/components/ui/AppDownload";
 import { MenuOverlay } from "./MenuOverlay";
 import { isActive, navigation } from "@/config/navigation";
 import styles from "./SiteHeader.module.css";
@@ -86,6 +87,8 @@ export function SiteHeader({ siteName, tagline, email, social }: SiteHeaderProps
                 </Link>
               ))}
           </nav>
+
+          <AppDownload variant="pill" className={styles.app} />
 
           <button
             ref={toggleRef}

@@ -251,3 +251,19 @@
     margin-left: 8px;
   }
 }
+
+/* The Android app download, just before the Menu button. */
+.app {
+  margin-left: auto;
+  margin-right: -6px;
+}
+
+@media (min-width: 1100px) {
+  .app {
+    margin-left: 0;
+    margin-right: -8px;
+  }
+  .header[data-menu-open] .app {
+    visibility: hidden;
+  }
+}
