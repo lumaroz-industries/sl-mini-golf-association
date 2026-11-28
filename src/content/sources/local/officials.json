@@ -85,6 +85,21 @@
       },
       "district": "Chandrapur",
       "draft": false
+    },
+    {
+      "id": "shubham-deshmukh",
+      "name": "Shubham Deshmukh",
+      "role": "Jalgaon  Coach",
+      "level": "maharashtra",
+      "organisation": "Jalgaon  MiniGolf Association",
+      "photo": {
+        "src": "/officials/shubham-deshmukh/shubham-deshmukh-cutout-etox.webp",
+        "alt": "Shubham Deshmukh",
+        "width": 1026,
+        "height": 1432
+      },
+      "district": "Jalgaon",
+      "draft": false
     }
   ],
   "revealLabel": "To be announced",
