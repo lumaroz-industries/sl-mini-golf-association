@@ -70,6 +70,21 @@
       },
       "bio": "Oversees technical standards and rules for the federation.",
       "draft": false
+    },
+    {
+      "id": "pranali-rakhade",
+      "name": "Pranali Rakhade",
+      "role": "Chandrapur Coach",
+      "level": "maharashtra",
+      "organisation": "Chandrapur MiniGolf Association",
+      "photo": {
+        "src": "/officials/pranali-rakhade/pranali-rakhade-cutout-pdxw.webp",
+        "alt": "Pranali Rakhade",
+        "width": 1032,
+        "height": 1448
+      },
+      "district": "Chandrapur",
+      "draft": false
     }
   ],
   "revealLabel": "To be announced",
