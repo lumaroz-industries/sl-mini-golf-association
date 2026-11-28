@@ -21,6 +21,8 @@ Twenty players. One flag. When the Minigolf Open Asian Championships 2026 teed o
 
 For Indian mini golf, this is more than a tournament entry. It is proof of how far the sport has travelled — from local courses and state competitions to an international stage, with the tricolour on every shirt.
 
+![The Indian team, players kneeling with their putters in front and officials and coaches standing behind, at the welcome banner of the 2026 Minigolf Open Asian Championships in Pranpuri, Thailand](/articles/team-india-minigolf-open-asian-championships-2026/team-india.webp "Team India at the welcome banner of the 2026 Minigolf Open Asian Championships, Pranpuri, Thailand.")
+
 ## India on the Asian stage
 
 The Minigolf Open Asian Championships bring together the region's finest players for a test of precision, nerve and consistency. Every lane counts, every stroke is recorded, and one missed putt can change a leaderboard.
