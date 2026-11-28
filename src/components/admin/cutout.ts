@@ -71,6 +71,8 @@ export interface Cutout {
   matte: HTMLCanvasElement;
   /** Suggested framing (see `autoFrame`). */
   frame: Framing;
+  /** Average brightness (0–255) of the original backdrop, to clean light fringes. */
+  backdropLum: number;
 }
 
 /** Where the photo goes in the 960×1200 card frame: scale and the photo point placed at the frame's centre-top reference. */
@@ -142,7 +144,17 @@ export async function cutOut(file: Blob, onProgress?: (share: number) => void): 
   mctx.imageSmoothingQuality = "high";
   mctx.drawImage(small, 0, 0, W, H);
 
-  return { photo, matte, frame: autoFrame(alpha, mw, mh, W / mw) };
+  // How bright the original backdrop was (where the matte is clearly background).
+  let lumSum = 0;
+  let lumN = 0;
+  for (let i = 0; i < n; i++)
+    if (alpha[i] < 0.1) {
+      lumSum += 0.299 * px[i * 4] + 0.587 * px[i * 4 + 1] + 0.114 * px[i * 4 + 2];
+      lumN++;
+    }
+  const backdropLum = lumN ? lumSum / lumN : 0;
+
+  return { photo, matte, frame: autoFrame(alpha, mw, mh, W / mw), backdropLum };
 }
 
 /**
@@ -491,6 +503,7 @@ export function compose(
   const mc = matte.getContext("2d")!;
   mc.imageSmoothingQuality = "high";
   mc.drawImage(cut.matte, dx, dy, dw, dh);
+  choke(matte);
   const fullMatte = canvas(W, H);
   fullMatte.getContext("2d")!.drawImage(matte, 0, 0);
   // If the photo ends above the bottom of the frame, fade the person out there (the backdrop carries on).
@@ -512,6 +525,7 @@ export function compose(
   l.drawImage(cut.photo, dx, dy, dw, dh);
   l.globalCompositeOperation = "destination-in";
   l.drawImage(matte, 0, 0);
+  defringe(layer, cut.backdropLum);
 
   // Grounding: a soft dark shadow behind the person.
   ctx.save();
@@ -545,6 +559,69 @@ export function compose(
   ctx.globalAlpha = 0.45;
   ctx.drawImage(softened(rim, 5), 0, 0); // a faint glow just around the edge
   ctx.restore();
+}
+
+/**
+ * Tightens a matte's edge by about a pixel and hardens it a little, so the
+ * thin light fringe left by a white or bright backdrop doesn't show as a halo
+ * on a dark background. In place.
+ */
+function choke(m: HTMLCanvasElement) {
+  const ctx = m.getContext("2d", { willReadFrequently: true })!;
+  const img = ctx.getImageData(0, 0, m.width, m.height);
+  const d = img.data;
+  for (let i = 3; i < d.length; i += 4) {
+    const a = d[i] / 255;
+    // 0 below 0.35, full above 0.9, smooth between.
+    const t = Math.min(1, Math.max(0, (a - 0.35) / 0.55));
+    d[i] = Math.round(t * t * (3 - 2 * t) * 255);
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+/**
+ * After a light backdrop (white, light grey, a checkered pattern): fades out
+ * the backdrop-coloured pixels left along the person's outline, so no light
+ * halo shows on a dark card. Only near the edge; dark backdrops are left
+ * alone. In place, on a person layer (RGBA).
+ */
+function defringe(layer: HTMLCanvasElement, backdropLum: number) {
+  if (backdropLum < 160) return;
+  const w = layer.width;
+  const h = layer.height;
+  const ctx = layer.getContext("2d", { willReadFrequently: true })!;
+  const img = ctx.getImageData(0, 0, w, h);
+  const d = img.data;
+  // Distance to the outline, roughly: a pixel is "edge" if any pixel within 4 px is transparent.
+  const R = 4;
+  const solid = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) solid[i] = d[i * 4 + 3] > 200 ? 1 : 0;
+  // Horizontal then vertical min-filter (erosion) of the solid mask.
+  const tmp = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      let v = 1;
+      for (let k = -R; k <= R && v; k++) {
+        const xx = x + k;
+        if (xx < 0 || xx >= w || !solid[y * w + xx]) v = 0;
+      }
+      tmp[y * w + x] = v;
+    }
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const i = y * w + x;
+      if (!d[i * 4 + 3]) continue;
+      let inner = 1;
+      for (let k = -R; k <= R && inner; k++) {
+        const yy = y + k;
+        if (yy < 0 || yy >= h || !tmp[yy * w + x]) inner = 0;
+      }
+      if (inner) continue;
+      const lum = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+      const cut = Math.min(1, Math.max(0, (backdropLum - 25 - lum) / 40)); // 1 = keep, 0 = backdrop-coloured
+      if (cut < 1) d[i * 4 + 3] = Math.round(d[i * 4 + 3] * cut);
+    }
+  ctx.putImageData(img, 0, 0);
 }
 
 export const toWebp = (c: HTMLCanvasElement) =>
@@ -587,7 +664,11 @@ export function cutoutImage(cut: Cutout): HTMLCanvasElement {
   const o = out.getContext("2d")!;
   o.imageSmoothingQuality = "high";
   o.drawImage(photo, cx, cy, cw, ch, 0, 0, cw, ch);
+  const m = canvas(Math.round(cw), Math.round(ch));
+  m.getContext("2d")!.drawImage(matte, cx, cy, cw, ch, 0, 0, cw, ch);
+  choke(m);
   o.globalCompositeOperation = "destination-in";
-  o.drawImage(matte, cx, cy, cw, ch, 0, 0, cw, ch);
+  o.drawImage(m, 0, 0);
+  defringe(out, cut.backdropLum);
   return out;
 }
