@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import { SiteHeader } from "@/components/nav/SiteHeader";
 import { SiteFooter } from "@/components/footer/SiteFooter";
 import { getActiveSocialLinks, getPeopleByIds, getPeopleInstagram, getPeopleStyle, getSiteSettings } from "@/content/repository";
@@ -32,6 +33,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, "\\u003c") }} />
       {/* Homepage opening animation; lives here (not in the page) so it covers the screen. */}
       <SiteIntro tagline={site.tagline} people={introPeople} />
+      {/* Vercel Web Analytics: visitors and page views on the public site (the admin is not counted). */}
+      <Analytics />
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
