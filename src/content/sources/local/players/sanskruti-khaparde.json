@@ -1,0 +1,18 @@
+{
+  "slug": "sanskruti-khaparde",
+  "name": "Sanskruti Khaparde",
+  "gender": "female",
+  "card": "national",
+  "photo": {
+    "src": "/players/sanskruti-khaparde/sanskruti-khaparde-card-abqa.webp",
+    "alt": "Sanskruti Khaparde",
+    "width": 960,
+    "height": 1200
+  },
+  "medals": {
+    "gold": 1,
+    "bronze": 1
+  },
+  "results": [],
+  "draft": false
+}
