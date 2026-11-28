@@ -8,8 +8,8 @@ author:
   bio: The team behind the platform.
 publishedAt: "2026-11-28"
 cover:
-  src: /articles/team-india-minigolf-open-asian-championships-2026/cover-banner.webp
-  alt: "Welcome banner of the 2026 Minigolf Open Asian Championships, Pranpuri, Thailand, 11–14 November 2026, with a Thai-flag swoosh, palm trees by the sea and the flags of the competing nations."
+  src: /articles/team-india-minigolf-open-asian-championships-2026/cover.webp
+  alt: "A gold number 20 with the words \"Players. One flag. Team India.\" beside a golf flag in the Indian tricolour on a putting green."
   width: 1600
   height: 1000
 tags: [Asian Championships, Team India, Thailand, international]
