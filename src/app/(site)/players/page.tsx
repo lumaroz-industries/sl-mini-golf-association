@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { findNavItem } from "@/config/navigation";
 import { getPlayers, getPlayersPageContent, getSectionPlayers, getTopSeven } from "@/content/repository";
 import { playerSections, type PlayerSection } from "@/content/schema";
+
+/** Level sections shown on the page. The State section is hidden for now (still managed in the admin). */
+const SHOWN: PlayerSection[] = playerSections.filter((s) => s !== "state");
 import { PlayerDirectory } from "@/components/players/PlayerDirectory";
 import { MedalDefs } from "@/components/players/MedalDefs";
 import { initialsOf, medalTotals, totalMedals } from "@/lib/players";
@@ -31,7 +34,7 @@ function Heading({ text }: { text: string }) {
 }
 
 export default async function PlayersPage() {
-  const [content, top, players, ...sectionLists] = await Promise.all([getPlayersPageContent(), getTopSeven(), getPlayers(), ...playerSections.map((s) => getSectionPlayers(s))]);
+  const [content, top, players, ...sectionLists] = await Promise.all([getPlayersPageContent(), getTopSeven(), getPlayers(), ...SHOWN.map((s) => getSectionPlayers(s))]);
   const slots = buildSlots(top);
   const topSlugs = new Set(top.map((t) => t.slug));
   const directory = players.map((p) => {
@@ -52,7 +55,7 @@ export default async function PlayersPage() {
   });
 
   // The level sections' cards (International, National, State): medals and the latest results at that level.
-  const sections = playerSections.map((section: PlayerSection, i) => {
+  const sections = SHOWN.map((section: PlayerSection, i) => {
     const cards = sectionLists[i].map((p) => {
       const medals = medalTotals(p);
       const results = p.results.filter((r) => r.level === section).sort((a, b) => b.year - a.year);
