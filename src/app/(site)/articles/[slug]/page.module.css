@@ -25,10 +25,15 @@
   gap: 10px;
 }
 
+/* Covers are made at 16:10, so show them whole: the same shape as the
+   image, capped in width on large screens so it doesn't get too tall. */
 .banner {
   position: relative;
   margin: 0;
-  aspect-ratio: 21 / 9;
+  aspect-ratio: 16 / 10;
+  width: 100%;
+  max-width: 1120px;
+  justify-self: center;
   border-radius: var(--radius-lg);
   border: 1px solid transparent;
   background:
@@ -89,11 +94,6 @@
   }
 }
 
-@media (max-width: 700px) {
-  .banner {
-    aspect-ratio: 16 / 10;
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .bannerSheen::before {

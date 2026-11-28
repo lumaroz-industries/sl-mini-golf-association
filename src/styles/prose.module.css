@@ -152,6 +152,8 @@
   height: 100%;
   object-fit: cover;
   aspect-ratio: 4 / 3;
+  /* Keep heads in frame when a portrait is cropped to the tile. */
+  object-position: 50% 12%;
 }
 
 @media (min-width: 900px) {
