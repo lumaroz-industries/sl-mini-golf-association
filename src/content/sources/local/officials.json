@@ -100,6 +100,21 @@
       },
       "district": "Jalgaon",
       "draft": false
+    },
+    {
+      "id": "durgesh-mendhe",
+      "name": "Durgesh Mendhe",
+      "role": "Nagpur Coach",
+      "level": "maharashtra",
+      "organisation": "Nagpur MiniGolf Association",
+      "photo": {
+        "src": "/officials/durgesh-mendhe/durgesh-mendhe-cutout-y5os.webp",
+        "alt": "Durgesh Mendhe",
+        "width": 1087,
+        "height": 1408
+      },
+      "district": "Nagpur",
+      "draft": false
     }
   ],
   "revealLabel": "To be announced",
