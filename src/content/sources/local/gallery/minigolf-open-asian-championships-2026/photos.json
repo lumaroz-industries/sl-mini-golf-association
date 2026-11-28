@@ -1,0 +1,120 @@
+{
+  "01-welcome-banner.jpg": {
+    "id": "01-welcome-banner",
+    "width": 960,
+    "height": 1280,
+    "widths": [
+      480,
+      960
+    ],
+    "blur": "data:image/webp;base64,UklGRjABAABXRUJQVlA4ICQBAABQBgCdASoYACAAPu1grFAppSQisBgIATAdiWoAnTKBr7Y3gXBYTk2NGDWR+CApH95nZU/5NTtJqSmqCAD+7qE9nNmtfv5tLM1s6mMpJ9ZjHBq6C/UMvTH1UftLRv9Kb2ayKM8xqYVEBToeZKj8LYJoIwSwT4cjnnzMTNIyxxb9XpeG+Mo0ZqRnZzczGkizkyDieavnXf9v2Yo+UQ3EkRUMoM82AIFua3qTGFPlNgrrnhZkzuLIjaaUDQhuJ08gskLHwEfV5gMo5hyxvn9wz7Bs++IGny9zG9jAfU78mOghWjE6UnJgE0dvfMT8wdnxdi5oOhlMLfJswOd309p4nIBHyG8mhrA6eo66KalsMjsLtlGwyUhDRTch2BWu6QCm4HrzAAAA",
+    "hash": "c887eaa6fc3ccb2e"
+  },
+  "02-practice-camp.jpg": {
+    "id": "02-practice-camp",
+    "width": 1600,
+    "height": 1200,
+    "widths": [
+      480,
+      960,
+      1600
+    ],
+    "blur": "data:image/webp;base64,UklGRgYBAABXRUJQVlA4IPoAAAAwBQCdASoYABIAPu1ur1KppiQiqAgBMB2JZACdEfqi2EzhWH5SWuuUc3FfijjdhL7sRgD2vbwnDcd3PKDOraLbUMSC5Ois2qb7WBi1H4n3jZrTvRrcwJsHM6We2MhUfjW3403r6GpnZ+GOIFurjrK1D+Gc6hFTxTIsvLkg79WIXb+3Ox3bxi9de9jCZ3jw33mYm+tkZWjzWg3UiqJVpJ6j4ijV+S5OFcLj+Ud4B3RgS1W72ARdt0MtgNXAQ+nDMv94UIg72eX2O1so3Ahd6N9NPu4NxDfSk75lLa0c+xBPzoRlf9E6CPFjFxLU7sSPW2/ilUI089dNIAAA",
+    "hash": "0b901935e59e9cad"
+  },
+  "03-teams-at-the-banner.jpg": {
+    "id": "03-teams-at-the-banner",
+    "width": 1280,
+    "height": 960,
+    "widths": [
+      480,
+      960,
+      1280
+    ],
+    "blur": "data:image/webp;base64,UklGRu4AAABXRUJQVlA4IOIAAADwBACdASoYABIAPu1qq1EppaOnKAqpMB2JYgCzgYzQZAeffoxJBkgcxZoPjMQXQQAA/uaTRR9Q63piOfb22HoldKlIdvssKpouR/pa0Fg8CmwVoqYGMCTF2CkYRN5k6lX23j+npXqibYnb0IN9ZWTYWDr09K7CSDTUQUp8FUTOwNYF0sYGiv5nqDhiBSMFi8RXjONJ63R2PL4wx3EyTlSrtR7Niu0gnU+Z82nKnZlzDT2sQY6QT4N/GjSpSYbpzR3WI8WqIfYjx+aXQPhCpy90NJXYTbE4sJNZbE7fc9t9hoAA",
+    "hash": "426687067ebe26b1"
+  },
+  "04-team-india-night.jpg": {
+    "id": "04-team-india-night",
+    "width": 1280,
+    "height": 960,
+    "widths": [
+      480,
+      960,
+      1280
+    ],
+    "blur": "data:image/webp;base64,UklGRvYAAABXRUJQVlA4IOoAAACwBQCdASoYABIAPu1qrVCppaQiqAqpMB2JQBYg6xnEBaKhzJJ7dAQ/zjEizd3m+S0vRM4xA+AA/qoQTVEiX7qIHLyaL8O9f471gS2UtOumyj/AbZ2nBH5otMmF9rdYk1O05aZj751OXn55oAyD6XLhmZOCfwkWAsCQyseLsAauU0s/B7TgdIyOYxLjHULwRVAq16EooMS/2+98b9qNay7kNRGYFUE3vcZZhgC79Amtw1QFzR0EZXKXxEgDabrAM75BfOPGXtMNv1TSfO5kSX3i0DIROWi2EevyLFmI+dA2sYnFsUaGmrcrAAA=",
+    "hash": "6b29fdd2102a5a63"
+  },
+  "05-team-india-jerseys.jpg": {
+    "id": "05-team-india-jerseys",
+    "width": 1280,
+    "height": 960,
+    "widths": [
+      480,
+      960,
+      1280
+    ],
+    "blur": "data:image/webp;base64,UklGRsIAAABXRUJQVlA4ILYAAADQBACdASoYABIAPu1orlCppaQiqAqpMB2JQBigEAWIAUnKv3+6Ne1e89hQ53p8AADOL8Z/BWX4Lgn7gwEvRSu9uThp8aCJVFPtay4Y2HdTmSzhwiItOziCqjV0dmrhKGS56KGFb8X+9RRHQsblLZBS2/FGuHJS1u/ln0fDMefC7ecN+0ZLGQHhQBn8NwC9wnA0y/0Js5c+XCAOPYST/kddF+cxsc0KDwOzwbYzOcmqgCShwQGAAA==",
+    "hash": "beb3ede541177bda"
+  },
+  "06-flag-at-the-banner.jpg": {
+    "id": "06-flag-at-the-banner",
+    "width": 1600,
+    "height": 1199,
+    "widths": [
+      480,
+      960,
+      1600
+    ],
+    "blur": "data:image/webp;base64,UklGRtQAAABXRUJQVlA4IMgAAAAQBgCdASoYABIAPu1qrVCppaQiqAqpMB2JagCxHoSA/6nXxBbU4uVNK3cU7hK2kLBNW+zZRXHBtMgA/mFlB3+m9eL/6xwaJZ+ANJQKVn+SThUfWCyj9A5mCfstsMPIFom4WepUWYPCPlDkCCiyTEjXJQMsEdHhHIDKURIdCt2bsPQlrGQUJm5c1KB3BSuefqJnqqBa8xOQYoS4Cwf7BSkWyJmYwjX3+FuS7wMLEOI3vQHBjyujpvFyJe6mb4ni4KyF20jgHAAAAA==",
+    "hash": "97495e01397b9d22"
+  },
+  "07-flag-duo.jpg": {
+    "id": "07-flag-duo",
+    "width": 960,
+    "height": 1280,
+    "widths": [
+      480,
+      960
+    ],
+    "blur": "data:image/webp;base64,UklGRkABAABXRUJQVlA4IDQBAABQBgCdASoYACAAPu1ur1IppiQiqAgBMB2JbACdMzQ/VtW5YJn889mOmD8kfRlNlWj0H8A8niqIvrfw/AD++d/RyWMLMR2hCerll9umeV5ORcfp4YYGcq4FrTQQWXQPwznpDnq4RqsSTdmKrezqNsiZyn4wc+9M2myvcEg8O4IUYC1DogO3lvuz6yOaFcw7M3cOJy4GENuJwVTbGcp0RCs99pVsDUowePCa8FEFbZDHLEDC/nmtVmkqpgdKZGXAOUWtc9uILvNVden33MRD9fsFhoDohdt418Yd1NTidAVr7YaR66vnKzlZLLJV4gyknnNLtFbCev3Lhr2tti/Y/Ytt9nIojQoS3AVx7a44xZHZij4v41R3obfXiwA1sGCcr27lHQnv0nJlE2MrxU8HEJo+KEjwAA==",
+    "hash": "a1015858656b7c2c"
+  },
+  "08-team-india-flag.jpg": {
+    "id": "08-team-india-flag",
+    "width": 1600,
+    "height": 1200,
+    "widths": [
+      480,
+      960,
+      1600
+    ],
+    "blur": "data:image/webp;base64,UklGRt4AAABXRUJQVlA4INIAAADwBQCdASoYABIAPu1qrlCppaQiqAqpMB2JYgCdMoMyk0h0y4kehNFKOWcI+PldjWggNd00MxqIAADLRQC9JTVPe5OcCO6aaySKEj29KZfQ1Mp4eo1caCHQCuJ0PTjMrBVLtcXCColBANYPbv4eLMyqecz6RIn0waORnAUbfwZmQO2tmJzijU84vkgsSGilnufYMld59L1fPo+DdU7E/3M9p7ANQ7QZhRUpXJx0gOTPpSx793L0LjRUEgwjgLd2Hs1nXXtJ4NOqjOxLj9WL5FvFAAA=",
+    "hash": "730468a7021c6264"
+  },
+  "09-team-india-blazers.jpg": {
+    "id": "09-team-india-blazers",
+    "width": 1280,
+    "height": 960,
+    "widths": [
+      480,
+      960,
+      1280
+    ],
+    "blur": "data:image/webp;base64,UklGRtoAAABXRUJQVlA4IM4AAACwBQCdASoYABIAPu1or1AppaSiqAqpMB2JagCdM5HzHsV27cGipP1grLuujMOrIgWY4pbSt4AA/scp/LQ+0JamFpD9cCWg5PUGzNIOdsn4AwFH8NMtL56uiPJ+oROvZugy74S2UnCfjiABs416btJ+B/m5YfxNEg53LDlfMov/hE9pmS37waD3aTlLj6y/223MKKLqlsXlsi9mFlpdpwAw5jZ328ZIl6QTZGfuVKYgge4SC0o2zXjJixnUf/mgh7/wRqxcA67RifuYcmgAAA==",
+    "hash": "d48ca9400ae083dd"
+  },
+  "10-team-india-course.jpg": {
+    "id": "10-team-india-course",
+    "width": 1600,
+    "height": 1200,
+    "widths": [
+      480,
+      960,
+      1600
+    ],
+    "blur": "data:image/webp;base64,UklGRsQAAABXRUJQVlA4ILgAAABwBQCdASoYABIAPu1ur1IppiQiqAgBMB2JaACxHzQwJoAB2p/lZtFxmeUigEpSlRCfhWUAAP6MQl4kAdaLYGYjmUi6XA1gJChfZXZQgA11jrsHxutijXR1YEn/oSDnk6wvm31xoNoEXTG6/27y9B7e29k0M+8OMxpbpFiW0g/FuoY1FmNkYoa5qgHZLpGDST5V4WBCewr1bfma9h7jtrHV09as/ap8v3HK38kp4wOWKpkABM50xAAA",
+    "hash": "c586f751a7ac6335"
+  }
+}

@@ -42,6 +42,8 @@ The Indian contingent competed under the supervision of **Dr Surajsingh Yeotikar
 
 Behind every putt at an international championship is a lot of work that never makes the scorecard: training, travel, selection and the steady presence of the people who keep a squad focused far from home.
 
+**See the photos:** the practice camp, the welcome banner, the flag and the squad in the [Minigolf Open Asian Championships 2026 album](/gallery/minigolf-open-asian-championships-2026).
+
 ## Meet Team India
 
 These are the twenty players who represented India at the Minigolf Open Asian Championships 2026. Names linked below have a profile on SL Mini Golf Association.

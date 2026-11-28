@@ -1,0 +1,28 @@
+# Album details — managed in the admin (/admin/gallery). Photos are listed in display order.
+title: Minigolf Open Asian Championships 2026
+date: 2026-11-11
+category: tournaments
+city: Pran Buri, Thailand
+description: "Team India at the Minigolf Open Asian Championships 2026 in Pran Buri, Thailand: the practice camp, the welcome banner, the flag and the squad."
+draft: false
+photos:
+  - file: 01-welcome-banner.jpg
+    alt: A Team India player points to the welcome banner of the 2026 Minigolf Open Asian Championships
+  - file: 02-practice-camp.jpg
+    alt: The Indian squad and staff at the practice camp for the Asian Open Minigolf Championship 2026
+  - file: 03-teams-at-the-banner.jpg
+    alt: Players from the competing nations together at the championship welcome banner at night
+  - file: 04-team-india-night.jpg
+    alt: Team India in white kits with their putters at the welcome banner
+  - file: 05-team-india-jerseys.jpg
+    alt: Indian players in named India jerseys, seen from behind on the course
+  - file: 06-flag-at-the-banner.jpg
+    alt: Indian players and officials holding the Indian flag at the championship banner
+  - file: 07-flag-duo.jpg
+    alt: Two Indian players with the Indian flag at the welcome banner
+  - file: 08-team-india-flag.jpg
+    alt: Team India in blue kits with the Indian flag at the welcome banner
+  - file: 09-team-india-blazers.jpg
+    alt: Team India in blue blazers at the championship welcome banner
+  - file: 10-team-india-course.jpg
+    alt: Team India in blue kits on the course at dusk with players from other nations
